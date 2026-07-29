@@ -32,9 +32,16 @@ const MATRIX_TYPES = ["IPS", "OLED", "Mini-LED", "VA", "TN", "WVA"];
 
 function CatalogContent() {
   const searchParams = useSearchParams();
-  const initialCat = searchParams.get("cat") || "";
-  const initialBrand = searchParams.get("brand") || "";
+  return (
+    <CatalogFilters
+      key={searchParams.toString()}
+      initialCat={searchParams.get("cat") || ""}
+      initialBrand={searchParams.get("brand") || ""}
+    />
+  );
+}
 
+function CatalogFilters({ initialCat, initialBrand }: { initialCat: string; initialBrand: string }) {
   const [productsList, setProductsList] = useState<any[]>(PRODUCTS);
   const [category, setCategory] = useState(initialCat);
   const [brand, setBrand] = useState(initialBrand);
@@ -99,19 +106,6 @@ function CatalogContent() {
     setInStockOnly(false); setSaleOnly(false); setNewOnly(false);
     setSortBy("popular");
   };
-
-  // Next.js keeps this client component mounted when only the query string
-  // changes. Keep the controls in sync with the header links: «Все» (/catalog)
-  // must clear the previous category and every additional filter.
-  useEffect(() => {
-    setCategory(initialCat);
-    setBrand(initialBrand);
-    setPriceMin(""); setPriceMax("");
-    setSelectedProcs([]); setSelectedGPUs([]); setSelectedRAMs([]);
-    setSelectedDisplays([]); setSelectedHz([]); setSelectedMatrix([]);
-    setInStockOnly(false); setSaleOnly(false); setNewOnly(false);
-    setSortBy("popular");
-  }, [initialCat, initialBrand]);
 
   return (
     <div>

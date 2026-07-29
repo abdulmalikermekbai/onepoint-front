@@ -1,19 +1,32 @@
 <?php
 declare(strict_types=1);
 
-/* Укажите пароль MySQL XAMPP, если он задан. */
+/* Настройки подключения к БД */
 const DB_HOST = '127.0.0.1';
 const DB_NAME = 'onepoint_laptops';
-const DB_USER = 'root';
-const DB_PASS = '';
+const DB_USER = 'onepoint_user';
+const DB_PASS = '**jG8E3mcD2ujpwy';
 
 function db(): PDO {
     static $pdo;
     if (!$pdo) {
-        $pdo = new PDO('mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=utf8mb4', DB_USER, DB_PASS, [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-        ]);
+        $host = getenv('DB_HOST') ?: DB_HOST;
+        $name = getenv('DB_NAME') ?: DB_NAME;
+        $user = getenv('DB_USER') ?: DB_USER;
+        $pass = getenv('DB_PASS') !== false ? getenv('DB_PASS') : DB_PASS;
+
+        try {
+            $pdo = new PDO('mysql:host=' . $host . ';dbname=' . $name . ';charset=utf8mb4', $user, $pass, [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            ]);
+        } catch (PDOException $e) {
+            // Fallback for local XAMPP if production user fails locally
+            $pdo = new PDO('mysql:host=127.0.0.1;dbname=onepoint_laptops;charset=utf8mb4', 'root', '', [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            ]);
+        }
     }
     return $pdo;
 }

@@ -27,6 +27,26 @@ function db(): PDO {
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
             ]);
         }
+
+        // Auto-create missing tables / columns on connection to prevent 500 errors
+        try {
+            $pdo->exec("CREATE TABLE IF NOT EXISTS product_images (
+                id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                product_id INT UNSIGNED NOT NULL,
+                image_url VARCHAR(500) NOT NULL,
+                alt_text VARCHAR(255) NULL,
+                is_main TINYINT(1) NOT NULL DEFAULT 0,
+                sort_order INT NOT NULL DEFAULT 0,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                INDEX idx_product_images (product_id, is_main, sort_order)
+            )");
+            $pdo->exec("CREATE TABLE IF NOT EXISTS product_related (
+                id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                product_id INT UNSIGNED NOT NULL,
+                related_id INT UNSIGNED NOT NULL,
+                UNIQUE KEY uq_rel (product_id, related_id)
+            )");
+        } catch (Throwable $t) { /* ignore auto-migration failure */ }
     }
     return $pdo;
 }
@@ -42,9 +62,10 @@ function upload_product_image(array $file): ?string {
     if (!is_dir($directory) && !mkdir($directory, 0755, true) && !is_dir($directory)) throw new RuntimeException('Не удалось создать папку для изображений.');
     $name = bin2hex(random_bytes(16)) . '.' . $extensions[$mime];
     if (!move_uploaded_file($file['tmp_name'], $directory . '/' . $name)) throw new RuntimeException('Не удалось сохранить изображение.');
-    $script = str_replace('\\', '/', $_SERVER['SCRIPT_NAME'] ?? '/backend/admin/upload.php');
-    $base = rtrim(dirname(dirname($script)), '/');
-    return $base . '/uploads/products/' . $name;
+    
+    $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+    $host = $_SERVER['HTTP_HOST'] ?? 'api.onepoint.kz';
+    return $protocol . '://' . $host . '/uploads/products/' . $name;
 }
 function admin_required(): void {
     session_start();

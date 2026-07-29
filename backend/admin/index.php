@@ -86,6 +86,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if ($uploaded) $f['image_url'] = $uploaded;
             }
 
+            // Keep existing image_url if editing and field was left blank
+            if ($editId && empty($f['image_url'])) {
+                $existingImg = $pdo->prepare('SELECT image_url FROM products WHERE id=?');
+                $existingImg->execute([$editId]);
+                $f['image_url'] = $existingImg->fetchColumn() ?: null;
+            }
+
             $cols = ['name','slug','sku','brand_id','category_id','short_description','description',
                      'price','old_price','in_stock','is_new','is_hit','is_sale','is_active',
                      'image_url','processor','gpu','ram','storage','display_size',
@@ -107,6 +114,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } else {
                 $pdo->prepare('INSERT INTO products(' . implode(',', $cols) . ') VALUES(' . rtrim(str_repeat('?,', count($cols)), ',') . ')')->execute($values);
                 $savedId = (int)$pdo->lastInsertId();
+            }
+
+            // Sync main image into product_images table
+            if (!empty($f['image_url'])) {
+                try {
+                    $chk = $pdo->prepare('SELECT COUNT(*) FROM product_images WHERE product_id=? AND image_url=?');
+                    $chk->execute([$savedId, $f['image_url']]);
+                    if (!$chk->fetchColumn()) {
+                        $pdo->prepare('INSERT INTO product_images(product_id, image_url, is_main, sort_order) VALUES(?, ?, 1, 0)')->execute([$savedId, $f['image_url']]);
+                    }
+                } catch (Throwable $eImg) {}
             }
 
             // Save related products

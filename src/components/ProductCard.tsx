@@ -14,6 +14,7 @@ interface ProductCardProps {
 export default function ProductCard({ product, onToast }: ProductCardProps) {
   const [fav, setFav] = useState(false);
   const [buyOpen, setBuyOpen] = useState(false);
+  const [imageLoadError, setImageLoadError] = useState(false);
 
   const waLink = `https://wa.me/77075511979?text=Здравствуйте!%20Хочу%20заказать:%20${encodeURIComponent(product.name)}%20за%20${encodeURIComponent(formatPrice(product.price))}`;
 
@@ -43,7 +44,17 @@ export default function ProductCard({ product, onToast }: ProductCardProps) {
               </svg>
             </button>
           </div>
-          <LaptopSVG color1={product.svgColor1} color2={product.svgColor2} size={220} />
+          {product.image && !imageLoadError ? (
+            <img
+              className="product-photo"
+              src={product.image}
+              alt={product.name}
+              loading="lazy"
+              onError={() => setImageLoadError(true)}
+            />
+          ) : (
+            <LaptopSVG color1={product.svgColor1} color2={product.svgColor2} size={220} />
+          )}
         </div>
 
         {/* Body */}

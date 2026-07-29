@@ -1,18 +1,19 @@
 "use client";
 import { useEffect, useState } from "react";
 import ProductCard from "@/components/ProductCard";
-import { fetchLiveProductsByFlag, Product } from "@/lib/data";
+import { fetchLiveProducts, Product } from "@/lib/data";
 
 export function HitProductsGrid() {
   const [hits, setHits] = useState<Product[]>([]);
 
   useEffect(() => {
-    fetchLiveProductsByFlag("is_hit").then(list => {
-      setHits(list.slice(0, 8));
+    fetchLiveProducts().then(list => {
+      const featured = list.filter(product => product.isHit);
+      setHits((featured.length ? featured : list).slice(0, 8));
     });
   }, []);
 
-  if (hits.length === 0) return null;
+  if (hits.length === 0) return <p className="products-empty">Товары появятся здесь сразу после загрузки каталога.</p>;
 
   return (
     <div className="product-grid reveal">
@@ -27,12 +28,13 @@ export function NewProductsGrid() {
   const [news, setNews] = useState<Product[]>([]);
 
   useEffect(() => {
-    fetchLiveProductsByFlag("is_new").then(list => {
-      setNews(list.slice(0, 4));
+    fetchLiveProducts().then(list => {
+      const featured = list.filter(product => product.isNew);
+      setNews((featured.length ? featured : list).slice(0, 4));
     });
   }, []);
 
-  if (news.length === 0) return null;
+  if (news.length === 0) return <p className="products-empty">Товары появятся здесь сразу после загрузки каталога.</p>;
 
   return (
     <div className="product-grid reveal">

@@ -123,7 +123,9 @@ export function normalizeDbProduct(p: any): Product {
     oldPrice,
     discountPercent,
     saving,
-    image: p.image_url || "/images/products/rog-strix-g16.png",
+    // Empty image is intentional: the card will show its visual fallback only
+    // when the product has no main image in the database.
+    image: p.image_url || "",
     monthlyPayment: Math.round(price / 12),
     inStock: Boolean(p.in_stock),
     stockStatus: p.in_stock ? "in_stock" : "out_of_stock",

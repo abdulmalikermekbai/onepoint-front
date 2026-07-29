@@ -8,6 +8,9 @@ export const metadata: Metadata = {
     "Интернет-магазин ноутбуков в Казахстане. ASUS, Lenovo, HP, Acer, Dell, MSI, Apple. Официальная гарантия, доставка по всему Казахстану, рассрочка 0%.",
   keywords:
     "ноутбуки Казахстан, купить ноутбук Алматы, игровые ноутбуки, MacBook, Lenovo, ASUS, HP",
+  icons: {
+    icon: "/icon.svg",
+  },
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

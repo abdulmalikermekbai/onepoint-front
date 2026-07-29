@@ -3,7 +3,7 @@ import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
-import { PRODUCTS, fetchLiveProductBySlug, formatPrice } from "@/lib/data";
+import { Product, fetchLiveProductBySlug, formatPrice } from "@/lib/data";
 import ProductPageClient, { ProductTabsInteractive, ProductGallery } from "./ProductPageClient";
 
 export const dynamic = "force-dynamic";
@@ -17,12 +17,12 @@ export default async function ProductPage({ params }: Props) {
   const product = await fetchLiveProductBySlug(slug);
   if (!product) notFound();
 
-  const similar = PRODUCTS.filter(p => p.id !== product.id && p.categorySlug === product.categorySlug).slice(0, 4);
+  const similar = (product.related && product.related.length > 0) ? product.related : [];
   const waLink = `https://wa.me/77075511979?text=Здравствуйте!%20Хочу%20заказать:%20${encodeURIComponent(product.name)}%20за%20${encodeURIComponent(formatPrice(product.price))}`;
 
   const specs: [string, string][] = [
     ["Бренд", product.brand],
-    ["Серия", product.series],
+    ["Серия", product.series || "—"],
     ["Артикул", product.sku || "—"],
     ["Процессор", product.processor || "—"],
     ["Видеокарта", product.gpu || "—"],
@@ -113,8 +113,8 @@ export default async function ProductPage({ params }: Props) {
                       </div>
                     )}
                   </div>
-                  {product.discountPercent > 0 && (
-                    <span className="discount-badge" style={{ fontSize: 16, padding: "8px 16px", marginTop: 4 }}>
+                  {Boolean(product.discountPercent) && (
+                    <span className="product-page-badge badge-sale" style={{ fontSize: 16, padding: "8px 16px", marginTop: 4 }}>
                       -{product.discountPercent}%
                     </span>
                   )}
@@ -232,7 +232,7 @@ export default async function ProductPage({ params }: Props) {
 }
 
 function ProductTabsClient({ product, specs, reviews }: {
-  product: ReturnType<typeof getProductBySlug>;
+  product: Product;
   specs: [string, string][];
   reviews?: any[];
 }) {

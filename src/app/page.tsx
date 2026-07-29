@@ -4,10 +4,9 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
 import LaptopSVG from "@/components/LaptopSVG";
-import { PRODUCTS, BRANDS, REVIEWS, formatPrice, getHitProducts } from "@/lib/data";
+import { BRANDS, REVIEWS, formatPrice } from "@/lib/data";
 import HomeClient from "./HomeClient";
-
-const HERO_PRODUCT = PRODUCTS.find(p => p.id === 7)!; // ROG Strix G16
+import { HitProductsGrid, NewProductsGrid } from "./HomePageProducts";
 
 const CATEGORIES = [
   { slug: "gaming", name: "Игровые ноутбуки", count: "128 моделей", icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="24" height="24"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg> },
@@ -33,10 +32,8 @@ const ADVANTAGES = [
   { icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="25" height="25"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>, title: "Более 5 лет опыта", desc: "Тысячи довольных покупателей по всему Казахстану. Оригинальная продукция." },
 ];
 
-const hitProducts = getHitProducts().slice(0, 8);
-
 export default function HomePage() {
-  const waHero = `https://wa.me/77075511979?text=Здравствуйте!%20Интересует%20ноутбук%20${encodeURIComponent(HERO_PRODUCT.name)}`;
+  const waHero = `https://wa.me/77075511979?text=Здравствуйте!%20Интересует%20подбор%20ноутбука`;
 
   return (
     <>
@@ -117,7 +114,7 @@ export default function HomePage() {
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="15" height="15"><path d="M12 2v20M2 12h20"/></svg>
                   32 ГБ DDR5
                 </div>
-                <LaptopSVG color1={HERO_PRODUCT.svgColor1} color2={HERO_PRODUCT.svgColor2} size={440} />
+                <LaptopSVG color1="#5b2a86" color2="#ff5a1f" size={440} />
               </div>
             </div>
 
@@ -181,11 +178,7 @@ export default function HomePage() {
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" width="16" height="16"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
               </Link>
             </div>
-            <div className="product-grid reveal">
-              {hitProducts.map((p) => (
-                <ProductCard key={p.id} product={p} />
-              ))}
-            </div>
+            <HitProductsGrid />
           </div>
         </section>
 
@@ -264,11 +257,7 @@ export default function HomePage() {
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" width="16" height="16"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
               </Link>
             </div>
-            <div className="product-grid reveal">
-              {PRODUCTS.filter(p => p.isNew).slice(0, 4).map(p => (
-                <ProductCard key={p.id} product={p} />
-              ))}
-            </div>
+            <NewProductsGrid />
           </div>
         </section>
 

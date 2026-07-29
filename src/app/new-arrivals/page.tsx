@@ -2,11 +2,13 @@ import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
-import { PRODUCTS } from "@/lib/data";
+import { fetchLiveProductsByFlag } from "@/lib/data";
 
-const newProducts = PRODUCTS.filter(p => p.isNew);
+export const revalidate = 0;
 
-export default function NewArrivalsPage() {
+export default async function NewArrivalsPage() {
+  const newProducts = await fetchLiveProductsByFlag("is_new");
+
   return (
     <>
       <Header />
@@ -38,9 +40,13 @@ export default function NewArrivalsPage() {
             </div>
           </div>
 
-          <div className="product-grid">
-            {newProducts.map(p => <ProductCard key={p.id} product={p} />)}
-          </div>
+          {newProducts.length === 0 ? (
+            <div style={{ padding: "40px 0", color: "var(--text-muted)", fontSize: 14 }}>Загрузка новинок...</div>
+          ) : (
+            <div className="product-grid">
+              {newProducts.map(p => <ProductCard key={p.id} product={p} />)}
+            </div>
+          )}
 
           {/* What's new section */}
           <div style={{ marginTop: 72, background: "linear-gradient(135deg,#0D0D11,#1B1710)", borderRadius: 28, padding: 48, color: "#fff" }}>

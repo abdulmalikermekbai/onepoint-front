@@ -1,13 +1,14 @@
-"use client";
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
-import { PRODUCTS, formatPrice } from "@/lib/data";
+import { fetchLiveProductsByFlag, formatPrice } from "@/lib/data";
 
-const saleProducts = PRODUCTS.filter(p => p.isSale);
+export const revalidate = 0;
 
-export default function PromotionsPage() {
+export default async function PromotionsPage() {
+  const saleProducts = await fetchLiveProductsByFlag("is_sale");
+
   return (
     <>
       <Header />
@@ -46,8 +47,6 @@ export default function PromotionsPage() {
                   minHeight: 200,
                   transition: "transform .3s, box-shadow .3s",
                 }}
-                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = "translateY(-4px)"; (e.currentTarget as HTMLElement).style.boxShadow = "0 20px 40px -10px rgba(0,0,0,.3)"; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = ""; (e.currentTarget as HTMLElement).style.boxShadow = ""; }}
               >
                 <span style={{ fontSize: 36 }}>{promo.emoji}</span>
                 <span style={{ background: "rgba(255,255,255,.18)", borderRadius: 100, padding: "4px 12px", fontSize: 12, fontWeight: 700, alignSelf: "flex-start" }}>{promo.tag}</span>
@@ -66,42 +65,45 @@ export default function PromotionsPage() {
             </div>
           </div>
 
-          <div className="product-grid">
-            {saleProducts.map(p => <ProductCard key={p.id} product={p} />)}
-          </div>
+          {saleProducts.length === 0 ? (
+            <div style={{ padding: "40px 0", color: "var(--text-muted)", fontSize: 14 }}>Загрузка акций...</div>
+          ) : (
+            <div className="product-grid">
+              {saleProducts.map(p => <ProductCard key={p.id} product={p} />)}
+            </div>
+          )}
 
           {/* Savings table */}
-          <div style={{ marginTop: 64, background: "var(--surface)", borderRadius: 24, padding: 40 }}>
-            <h2 style={{ fontSize: 26, fontWeight: 800, marginBottom: 24 }}>Топ экономии</h2>
-            <table style={{ width: "100%", borderCollapse: "collapse" }}>
-              <thead>
-                <tr style={{ borderBottom: "2px solid var(--border)" }}>
-                  {["Модель", "Старая цена", "Новая цена", "Скидка", "Экономия", ""].map(h => (
-                    <th key={h} style={{ padding: "12px 16px", textAlign: "left", fontSize: 13, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: ".04em" }}>{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {saleProducts.sort((a, b) => b.saving - a.saving).map(p => (
-                  <tr key={p.id} style={{ borderBottom: "1px solid var(--border)" }}>
-                    <td style={{ padding: "14px 16px", fontWeight: 600, fontSize: 14 }}>
-                      <Link href={`/product/${p.slug}`} style={{ color: "var(--text)", transition: "color .2s" }}
-                        onMouseEnter={e => (e.currentTarget.style.color = "var(--accent)")}
-                        onMouseLeave={e => (e.currentTarget.style.color = "var(--text)")}
-                      >{p.brand} {p.name.split(" ").slice(1, 5).join(" ")}</Link>
-                    </td>
-                    <td style={{ padding: "14px 16px", textDecoration: "line-through", color: "var(--text-muted)", fontSize: 14 }}>{formatPrice(p.oldPrice!)}</td>
-                    <td style={{ padding: "14px 16px", fontWeight: 800, fontSize: 15 }}>{formatPrice(p.price)}</td>
-                    <td style={{ padding: "14px 16px" }}><span className="discount-badge">-{p.discountPercent}%</span></td>
-                    <td style={{ padding: "14px 16px", color: "var(--success)", fontWeight: 700 }}>{formatPrice(p.saving)}</td>
-                    <td style={{ padding: "14px 16px" }}>
-                      <a href={`https://wa.me/77075511979?text=Хочу%20купить:%20${encodeURIComponent(p.name)}`} target="_blank" rel="noopener noreferrer" className="btn btn-green btn-xs">WhatsApp</a>
-                    </td>
+          {saleProducts.length > 0 && (
+            <div style={{ marginTop: 64, background: "var(--surface)", borderRadius: 24, padding: 40 }}>
+              <h2 style={{ fontSize: 26, fontWeight: 800, marginBottom: 24 }}>Топ экономии</h2>
+              <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                <thead>
+                  <tr style={{ borderBottom: "2px solid var(--border)" }}>
+                    {["Модель", "Старая цена", "Новая цена", "Скидка", "Экономия", ""].map(h => (
+                      <th key={h} style={{ padding: "12px 16px", textAlign: "left", fontSize: 13, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: ".04em" }}>{h}</th>
+                    ))}
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {[...saleProducts].sort((a, b) => (b.saving || 0) - (a.saving || 0)).map(p => (
+                    <tr key={p.id} style={{ borderBottom: "1px solid var(--border)" }}>
+                      <td style={{ padding: "14px 16px", fontWeight: 600, fontSize: 14 }}>
+                        <Link href={`/product/${p.slug}`} style={{ color: "var(--text)", transition: "color .2s" }}>{p.brand} {p.name.split(" ").slice(1, 5).join(" ")}</Link>
+                      </td>
+                      <td style={{ padding: "14px 16px", textDecoration: "line-through", color: "var(--text-muted)", fontSize: 14 }}>{p.oldPrice ? formatPrice(p.oldPrice) : "—"}</td>
+                      <td style={{ padding: "14px 16px", fontWeight: 800, fontSize: 15 }}>{formatPrice(p.price)}</td>
+                      <td style={{ padding: "14px 16px" }}><span className="discount-badge">-{p.discountPercent || 0}%</span></td>
+                      <td style={{ padding: "14px 16px", color: "var(--success)", fontWeight: 700 }}>{p.saving ? formatPrice(p.saving) : "—"}</td>
+                      <td style={{ padding: "14px 16px" }}>
+                        <a href={`https://wa.me/77075511979?text=Хочу%20купить:%20${encodeURIComponent(p.name)}`} target="_blank" rel="noopener noreferrer" className="btn btn-green btn-xs">WhatsApp</a>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       </section>
 

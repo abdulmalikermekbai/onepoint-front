@@ -2,11 +2,18 @@ import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
-import { PRODUCTS, getHitProducts } from "@/lib/data";
+import { fetchLiveProducts, fetchLiveProductsByFlag } from "@/lib/data";
 
-const hitProducts = getHitProducts();
+export const revalidate = 0;
 
-export default function BestsellersPage() {
+export default async function BestsellersPage() {
+  const [hitProducts, allProducts] = await Promise.all([
+    fetchLiveProductsByFlag("is_hit"),
+    fetchLiveProducts(),
+  ]);
+
+  const otherProducts = allProducts.filter(p => !p.isHit).slice(0, 4);
+
   return (
     <>
       <Header />
@@ -25,22 +32,24 @@ export default function BestsellersPage() {
       <section>
         <div className="wrap">
           {/* Top-3 podium */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1.2fr 1fr", gap: 20, marginBottom: 60, alignItems: "flex-end" }}>
-            {hitProducts.slice(0, 3).map((p, i) => (
-              <div key={p.id} style={{
-                background: i === 0 ? "linear-gradient(135deg,#FFD700,#FFA500)" : i === 1 ? "linear-gradient(135deg,#E8E8E8,#C0C0C0)" : "linear-gradient(135deg,#CD7F32,#A0522D)",
-                borderRadius: 20,
-                padding: `${32 + (1 - i) * 16}px 24px 28px`,
-                textAlign: "center",
-                color: i === 0 ? "#5a3000" : "#333",
-              }}>
-                <div style={{ fontSize: 40, fontWeight: 900, opacity: .4, lineHeight: 1 }}>#{i + 1}</div>
-                <div style={{ fontWeight: 700, fontSize: 15, margin: "8px 0 4px", lineHeight: 1.3 }}>{p.brand} {p.series}</div>
-                <div style={{ fontSize: 13, opacity: .7, marginBottom: 12 }}>{p.rating} ⭐ · {p.reviewCount} отзывов</div>
-                <Link href={`/product/${p.slug}`} className="btn btn-dark btn-xs" style={{ display: "inline-flex" }}>Подробнее</Link>
-              </div>
-            ))}
-          </div>
+          {hitProducts.length > 0 && (
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1.2fr 1fr", gap: 20, marginBottom: 60, alignItems: "flex-end" }}>
+              {hitProducts.slice(0, 3).map((p, i) => (
+                <div key={p.id} style={{
+                  background: i === 0 ? "linear-gradient(135deg,#FFD700,#FFA500)" : i === 1 ? "linear-gradient(135deg,#E8E8E8,#C0C0C0)" : "linear-gradient(135deg,#CD7F32,#A0522D)",
+                  borderRadius: 20,
+                  padding: `${32 + (1 - i) * 16}px 24px 28px`,
+                  textAlign: "center",
+                  color: i === 0 ? "#5a3000" : "#333",
+                }}>
+                  <div style={{ fontSize: 40, fontWeight: 900, opacity: .4, lineHeight: 1 }}>#{i + 1}</div>
+                  <div style={{ fontWeight: 700, fontSize: 15, margin: "8px 0 4px", lineHeight: 1.3 }}>{p.brand} {p.series || p.name}</div>
+                  <div style={{ fontSize: 13, opacity: .7, marginBottom: 12 }}>{p.rating} ⭐ · {p.reviewCount} отзывов</div>
+                  <Link href={`/product/${p.slug}`} className="btn btn-dark btn-xs" style={{ display: "inline-flex" }}>Подробнее</Link>
+                </div>
+              ))}
+            </div>
+          )}
 
           <div className="section-head">
             <div>
@@ -49,22 +58,28 @@ export default function BestsellersPage() {
             </div>
           </div>
 
-          <div className="product-grid">
-            {hitProducts.map(p => <ProductCard key={p.id} product={p} />)}
-          </div>
+          {hitProducts.length === 0 ? (
+            <div style={{ padding: "40px 0", textTransform: "uppercase", color: "var(--text-muted)", fontSize: 14 }}>Товары загружаются...</div>
+          ) : (
+            <div className="product-grid">
+              {hitProducts.map(p => <ProductCard key={p.id} product={p} />)}
+            </div>
+          )}
 
           {/* Also popular */}
-          <div style={{ marginTop: 64 }}>
-            <div className="section-head">
-              <div>
-                <div className="eyebrow">Также популярно</div>
-                <h2 className="section-title">Выбор наших покупателей</h2>
+          {otherProducts.length > 0 && (
+            <div style={{ marginTop: 64 }}>
+              <div className="section-head">
+                <div>
+                  <div className="eyebrow">Также популярно</div>
+                  <h2 className="section-title">Выбор наших покупателей</h2>
+                </div>
+              </div>
+              <div className="product-grid">
+                {otherProducts.map(p => <ProductCard key={p.id} product={p} />)}
               </div>
             </div>
-            <div className="product-grid">
-              {PRODUCTS.filter(p => !p.isHit).slice(0, 4).map(p => <ProductCard key={p.id} product={p} />)}
-            </div>
-          </div>
+          )}
         </div>
       </section>
 

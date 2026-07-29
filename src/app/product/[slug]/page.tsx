@@ -5,7 +5,7 @@ import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
 import LaptopSVG from "@/components/LaptopSVG";
 import { PRODUCTS, getProductBySlug, formatPrice } from "@/lib/data";
-import ProductPageClient from "./ProductPageClient";
+import ProductPageClient, { ProductTabsInteractive } from "./ProductPageClient";
 import ProductGallery from "@/components/ProductGallery";
 
 export async function generateStaticParams() {
@@ -68,7 +68,8 @@ export default async function ProductPage({ params }: Props) {
 
       <section style={{ paddingTop: 32, paddingBottom: 80 }}>
         <div className="wrap">
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 48, alignItems: "flex-start" }}>
+          <div className="product-detail-grid">
+
 
             {/* ====== GALLERY ====== */}
             <div>
@@ -166,7 +167,7 @@ export default async function ProductPage({ params }: Props) {
           {product.advantages && product.advantages.length > 0 && (
             <div style={{ marginTop: 48 }}>
               <h2 style={{ fontSize: 26, fontWeight: 800, marginBottom: 24 }}>Почему стоит купить этот ноутбук</h2>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 16 }}>
+              <div className="adv-detail-grid">
                 {product.advantages.map((adv, i) => (
                   <div key={i} style={{ background: "var(--surface)", borderRadius: 16, padding: "20px", display: "flex", gap: 12, alignItems: "flex-start" }}>
                     <span style={{ width: 28, height: 28, borderRadius: "50%", background: "var(--accent)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 13, flexShrink: 0 }}>{i + 1}</span>
@@ -195,7 +196,7 @@ export default async function ProductPage({ params }: Props) {
           {/* ====== FREQUENTLY BOUGHT ====== */}
           <div style={{ marginTop: 48, background: "var(--surface)", borderRadius: 24, padding: 32 }}>
             <h3 style={{ fontSize: 22, fontWeight: 800, marginBottom: 20 }}>Часто покупают вместе</h3>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12 }}>
+            <div className="bought-together-grid">
               {[
                 { name: "Мышь беспроводная Logitech MX Master 3", price: 45990 },
                 { name: "Сумка-рюкзак для ноутбука 15.6\"", price: 18990 },
@@ -203,7 +204,12 @@ export default async function ProductPage({ params }: Props) {
                 { name: "USB-C хаб 7-in-1", price: 15990 },
               ].map(acc => (
                 <div key={acc.name} style={{ background: "#fff", borderRadius: 14, padding: 16, border: "1.5px solid var(--border)", display: "flex", flexDirection: "column", gap: 10 }}>
-                  <div style={{ fontSize: 40, textAlign: "center" }}>🖱️</div>
+                  <div style={{ width: 44, height: 44, borderRadius: 12, background: "var(--accent-tint)", color: "var(--accent)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 4px" }}>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="24" height="24">
+                      <rect x="5" y="2" width="14" height="20" rx="7" />
+                      <line x1="12" y1="6" x2="12" y2="10" />
+                    </svg>
+                  </div>
                   <div style={{ fontSize: 13.5, fontWeight: 600, lineHeight: 1.3 }}>{acc.name}</div>
                   <div style={{ fontSize: 15, fontWeight: 800, color: "var(--accent)" }}>{formatPrice(acc.price)}</div>
                   <a
@@ -227,33 +233,11 @@ export default async function ProductPage({ params }: Props) {
   );
 }
 
-// Tabs as a server-friendly component (client interactivity minimal)
 function ProductTabsClient({ product, specs }: {
   product: ReturnType<typeof getProductBySlug>;
   specs: [string, string][];
 }) {
   if (!product) return null;
-  return (
-    <div>
-      <div style={{ borderBottom: "2px solid var(--border)", marginBottom: 32, display: "flex", gap: 4, overflowX: "auto" }}>
-        {["Характеристики", "Описание", "Комплектация", "Отзывы"].map((tab, i) => (
-          <span key={tab} style={{ padding: "14px 20px", fontWeight: 600, fontSize: 15, color: i === 0 ? "var(--accent)" : "var(--text-muted)", borderBottom: i === 0 ? "2px solid var(--accent)" : "2px solid transparent", marginBottom: -2, whiteSpace: "nowrap", cursor: "pointer" }}>
-            {tab}
-          </span>
-        ))}
-      </div>
-
-      {/* Specs table */}
-      <table className="spec-table">
-        <tbody>
-          {specs.map(([label, val]) => (
-            <tr key={label}>
-              <td>{label}</td>
-              <td>{val}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
+  return <ProductTabsInteractive product={product} specs={specs} />;
 }
+

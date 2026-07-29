@@ -44,3 +44,119 @@ export default function ProductPageClient({ product, waLink }: Props) {
   );
 }
 
+export function ProductTabsInteractive({ product, specs }: {
+
+  product: any;
+  specs: [string, string][];
+}) {
+  const [activeTab, setActiveTab] = useState<"specs" | "desc" | "equipment" | "reviews">("specs");
+
+  return (
+    <div>
+      <div style={{ borderBottom: "2px solid var(--border)", marginBottom: 32, display: "flex", gap: 8, overflowX: "auto" }}>
+        {[
+          { key: "specs", label: "Характеристики" },
+          { key: "desc", label: "Описание" },
+          { key: "equipment", label: "Комплектация" },
+          { key: "reviews", label: `Отзывы (${product.reviewCount || 0})` },
+        ].map((t) => (
+          <button
+            key={t.key}
+            onClick={() => setActiveTab(t.key as any)}
+            style={{
+              padding: "14px 20px",
+              fontWeight: 700,
+              fontSize: 15,
+              color: activeTab === t.key ? "var(--accent)" : "var(--text-muted)",
+              borderBottom: activeTab === t.key ? "2px solid var(--accent)" : "2px solid transparent",
+              marginBottom: -2,
+              whiteSpace: "nowrap",
+              cursor: "pointer",
+              background: "none",
+              borderLeft: "none",
+              borderRight: "none",
+              borderTop: "none"
+            }}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {activeTab === "specs" && (
+        <table className="spec-table">
+          <tbody>
+            {specs.map(([label, val]) => (
+              <tr key={label}>
+                <td>{label}</td>
+                <td>{val}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+
+      {activeTab === "desc" && (
+        <div style={{ background: "var(--surface)", borderRadius: 20, padding: 32, lineHeight: 1.7, fontSize: 15.5 }}>
+          <h3 style={{ fontSize: 20, fontWeight: 800, marginBottom: 14 }}>О модели {product.name}</h3>
+          <p style={{ color: "var(--text)", marginBottom: 16 }}>{product.description || product.shortDescription || "Подробное описание готовит наш технический отдел."}</p>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginTop: 20 }}>
+            <span style={{ background: "#fff", border: "1px solid var(--border)", padding: "8px 16px", borderRadius: 100, fontSize: 13, fontWeight: 600 }}>100% Оригинал</span>
+            <span style={{ background: "#fff", border: "1px solid var(--border)", padding: "8px 16px", borderRadius: 100, fontSize: 13, fontWeight: 600 }}>Заводская пломба</span>
+            <span style={{ background: "#fff", border: "1px solid var(--border)", padding: "8px 16px", borderRadius: 100, fontSize: 13, fontWeight: 600 }}>Официальная сублицензия</span>
+          </div>
+        </div>
+      )}
+
+      {activeTab === "equipment" && (
+        <div style={{ background: "var(--surface)", borderRadius: 20, padding: 32 }}>
+          <h3 style={{ fontSize: 20, fontWeight: 800, marginBottom: 18 }}>Что входит в комплект</h3>
+          <ul style={{ display: "flex", flexDirection: "column", gap: 14, listStyle: "none", padding: 0 }}>
+            {[
+              "Ноутбук " + product.name,
+              "Оригинальное зарядное устройство и кабель питания",
+              "Гарантийный талон и техническая документация",
+              "Фирменная заводская упаковка с защитными демпферами"
+            ].map((item, index) => (
+              <li key={index} style={{ display: "flex", alignItems: "center", gap: 12, fontSize: 15, fontWeight: 600 }}>
+                <span style={{ width: 24, height: 24, borderRadius: "50%", background: "var(--success-tint)", color: "var(--success)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 800 }}>✓</span>
+                {item}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {activeTab === "reviews" && (
+        <div style={{ background: "var(--surface)", borderRadius: 20, padding: 32 }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20, flexWrap: "wrap", gap: 16 }}>
+            <div>
+              <h3 style={{ fontSize: 20, fontWeight: 800, margin: 0 }}>Отзывы покупателей 2ГИС</h3>
+              <div style={{ fontSize: 14, color: "var(--text-muted)", marginTop: 4 }}>Средняя оценка {product.rating} из 5 на основе {product.reviewCount} отзывов</div>
+            </div>
+            <a href="https://go.2gis.com/aduOr" target="_blank" rel="noopener noreferrer" className="btn btn-ghost btn-sm">
+              Оставить отзыв в 2ГИС
+            </a>
+          </div>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            {[
+              { name: "Арман К.", rating: 5, date: "Вчера", text: "Отличный ноутбук! Заказывал с доставкой по Алматы, привезли день в день. Все пломбы на месте, проверили экран и нагрев." },
+              { name: "Елена М.", rating: 5, date: "3 дня назад", text: "Покупали для работы с графикой. Экран шикарный, производительность на высоте. Спасибо менеджеру OnePoint за консультацию." }
+            ].map((rev, i) => (
+              <div key={i} style={{ background: "#fff", borderRadius: 16, padding: 20, border: "1px solid var(--border)" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
+                  <span style={{ fontWeight: 700, fontSize: 15 }}>{rev.name}</span>
+                  <span style={{ color: "var(--text-soft)", fontSize: 13 }}>{rev.date}</span>
+                </div>
+                <div style={{ color: "#FFB100", fontSize: 14, marginBottom: 8 }}>{"★".repeat(rev.rating)}</div>
+                <p style={{ fontSize: 14.5, color: "var(--text-muted)", lineHeight: 1.5 }}>{rev.text}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+

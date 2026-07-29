@@ -30,17 +30,17 @@ export default function ContactsPage() {
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="14" height="14"><path d="M9 18l6-6-6-6"/></svg>
             <span>Контакты</span>
           </div>
-          <h1>📞 Контакты</h1>
+          <h1>Контакты</h1>
           <p>Свяжитесь с нами любым удобным способом. Работаем ежедневно с 10:00 до 19:00.</p>
         </div>
       </div>
 
       <section className="info-section" style={{ paddingBottom: 80 }}>
         <div className="wrap">
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 32, marginBottom: 48 }}>
+          <div className="contacts-grid" style={{ marginBottom: 48 }}>
             {/* Contact cards */}
             <div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 16, marginBottom: 32 }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
                 <a href="tel:+77075511979" className="contact-card">
                   <div className="contact-icon">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="26" height="26">
@@ -94,11 +94,15 @@ export default function ContactsPage() {
             </div>
 
             {/* Contact form */}
-            <div style={{ background: "var(--surface)", borderRadius: 24, padding: 40 }}>
+            <div style={{ background: "var(--surface)", borderRadius: 24, padding: "32px 24px" }}>
               {sent ? (
                 <div style={{ textAlign: "center", padding: "40px 0" }}>
-                  <div style={{ fontSize: 64, marginBottom: 16 }}>✅</div>
-                  <h3 style={{ fontSize: 24, fontWeight: 800, marginBottom: 8 }}>Сообщение отправлено!</h3>
+                  <div style={{ width: 56, height: 56, borderRadius: "50%", background: "var(--success-tint)", color: "var(--success)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" width="28" height="28">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                  </div>
+                  <h3 style={{ fontSize: 22, fontWeight: 800, marginBottom: 8 }}>Сообщение отправлено!</h3>
                   <p style={{ color: "var(--text-muted)", fontSize: 15 }}>Мы свяжемся с вами в ближайшее время.</p>
                 </div>
               ) : (
@@ -125,9 +129,9 @@ export default function ContactsPage() {
             </div>
           </div>
 
-          {/* 2GIS Map Block with Fallback */}
+          {/* 2GIS Map Block */}
           <div style={{ background: "#fff", borderRadius: 24, border: "1px solid var(--border)", boxShadow: "0 12px 32px rgba(0,0,0,0.06)", overflow: "hidden" }}>
-            <div style={{ padding: "28px 32px", display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: 16, borderBottom: "1px solid var(--border)", background: "var(--surface)" }}>
+            <div style={{ padding: "24px", display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: 16, borderBottom: "1px solid var(--border)", background: "var(--surface)" }}>
               <div>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
                   <span style={{ background: "#65a30d", color: "#fff", padding: "4px 10px", borderRadius: 8, fontSize: 12, fontWeight: 800 }}>2GIS</span>
@@ -147,20 +151,23 @@ export default function ContactsPage() {
                     <path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z" />
                     <circle cx="12" cy="10" r="3" />
                   </svg>
-                  Открыть в приложении 2ГИС
+                  Открыть в 2ГИС
                 </a>
               </div>
             </div>
 
-            <div style={{ width: "100%", minHeight: 380, position: "relative", background: "radial-gradient(circle at 50% 50%, #f0fdf4 0%, #e8f5e9 100%)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 32, textAlign: "center" }}>
-              <div style={{ width: 64, height: 64, borderRadius: "50%", background: "#65a30d", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28, marginBottom: 16, boxShadow: "0 8px 24px rgba(101,163,13,0.3)" }}>
-                📍
+            <div style={{ width: "100%", minHeight: 320, position: "relative", background: "radial-gradient(circle at 50% 50%, #f0fdf4 0%, #e8f5e9 100%)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 24, textAlign: "center" }}>
+              <div style={{ width: 56, height: 56, borderRadius: "50%", background: "#65a30d", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 16, boxShadow: "0 8px 24px rgba(101,163,13,0.3)" }}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" width="28" height="28">
+                  <path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z" />
+                  <circle cx="12" cy="10" r="3" />
+                </svg>
               </div>
-              <h4 style={{ fontSize: 22, fontWeight: 800, marginBottom: 8, color: "#1b4332" }}>
+              <h4 style={{ fontSize: 20, fontWeight: 800, marginBottom: 8, color: "#1b4332" }}>
                 Магазин OnePoint на карте 2ГИС
               </h4>
-              <p style={{ color: "var(--text-muted)", maxWidth: 500, fontSize: 14.5, lineHeight: 1.5, marginBottom: 20 }}>
-                г. Алматы, пр. Абылай хана, ТЦ Алтын-Тараз, 2 этаж, бутик 20. Нажмите кнопку ниже, чтобы построить точный маршрут на 2ГИС.
+              <p style={{ color: "var(--text-muted)", maxWidth: 500, fontSize: 14, lineHeight: 1.5, marginBottom: 20 }}>
+                г. Алматы, пр. Абылай хана, ТЦ Алтын-Тараз, 2 этаж, бутик 20. Постройте точный маршрут в приложении или браузере.
               </p>
               <a
                 href="https://go.2gis.com/aduOr"
@@ -169,7 +176,7 @@ export default function ContactsPage() {
                 className="btn btn-primary"
                 style={{ padding: "14px 28px", fontSize: 15, fontWeight: 700, borderRadius: 100 }}
               >
-                Построить маршрут (https://go.2gis.com/aduOr)
+                Построить маршрут в 2ГИС
               </a>
             </div>
           </div>
@@ -180,3 +187,4 @@ export default function ContactsPage() {
     </>
   );
 }
+

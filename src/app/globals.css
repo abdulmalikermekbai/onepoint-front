@@ -510,6 +510,7 @@ html, body {
   background: #f8f9fa;
   border: 1.5px solid var(--border);
 }
+.product-gallery__placeholder { height: 380px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; color: var(--text-muted); font-size: 13px; font-weight: 600; }
 .product-gallery__thumbs {
   display: flex;
   gap: 10px;

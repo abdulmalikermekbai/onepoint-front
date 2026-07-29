@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import BuyModal from "@/components/BuyModal";
+import LaptopSVG from "@/components/LaptopSVG";
 
 interface GalleryImage {
   image_url: string;
@@ -62,9 +63,11 @@ export function ProductGallery({ images, mainImage, productName }: {
   mainImage: string;
   productName: string;
 }) {
-  const allImages: GalleryImage[] = images.length > 0
-    ? images
-    : [{ image_url: mainImage, alt_text: productName, is_main: true }];
+  const allImages = images.filter((image) => Boolean(image.image_url));
+  if (allImages.length === 0 && mainImage) {
+    allImages.push({ image_url: mainImage, alt_text: productName, is_main: true });
+  }
+  const hasImages = allImages.length > 0;
 
   const [active, setActive] = useState(0);
   const [lightbox, setLightbox] = useState(false);
@@ -75,21 +78,24 @@ export function ProductGallery({ images, mainImage, productName }: {
         {/* Main image */}
         <div
           className="product-gallery__main"
-          onClick={() => setLightbox(true)}
-          style={{ cursor: "zoom-in" }}
+          onClick={() => hasImages && setLightbox(true)}
+          style={{ cursor: hasImages ? "zoom-in" : "default" }}
         >
-          <img
-            src={allImages[active]?.image_url || mainImage}
-            alt={allImages[active]?.alt_text || productName}
-            style={{
-              width: "100%",
-              height: 380,
-              objectFit: "contain",
-              borderRadius: 18,
-              background: "#f8f9fa",
-              display: "block",
-            }}
-          />
+          {hasImages ? (
+            <img
+              src={allImages[active]?.image_url}
+              alt={allImages[active]?.alt_text || productName}
+              style={{
+                width: "100%", height: 380, objectFit: "contain", borderRadius: 18,
+                background: "#f8f9fa", display: "block",
+              }}
+            />
+          ) : (
+            <div className="product-gallery__placeholder" aria-label={`Изображение ${productName} пока не добавлено`}>
+              <LaptopSVG color1="#5b2a86" color2="#ff5a1f" size={320} />
+              <span>Фотография товара скоро появится</span>
+            </div>
+          )}
           {allImages.length > 1 && (
             <span style={{
               position: "absolute", bottom: 14, right: 14,

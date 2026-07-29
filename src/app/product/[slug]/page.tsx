@@ -75,7 +75,7 @@ export default async function ProductPage({ params }: Props) {
                   alt_text: product.name,
                   is_main: false
                 }))}
-                mainImage={product.images?.[0] || ""}
+                mainImage={product.image}
                 productName={product.name}
               />
             </div>

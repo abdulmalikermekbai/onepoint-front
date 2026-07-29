@@ -97,7 +97,21 @@ function CatalogContent() {
     setSelectedProcs([]); setSelectedGPUs([]); setSelectedRAMs([]);
     setSelectedDisplays([]); setSelectedHz([]); setSelectedMatrix([]);
     setInStockOnly(false); setSaleOnly(false); setNewOnly(false);
+    setSortBy("popular");
   };
+
+  // Next.js keeps this client component mounted when only the query string
+  // changes. Keep the controls in sync with the header links: «Все» (/catalog)
+  // must clear the previous category and every additional filter.
+  useEffect(() => {
+    setCategory(initialCat);
+    setBrand(initialBrand);
+    setPriceMin(""); setPriceMax("");
+    setSelectedProcs([]); setSelectedGPUs([]); setSelectedRAMs([]);
+    setSelectedDisplays([]); setSelectedHz([]); setSelectedMatrix([]);
+    setInStockOnly(false); setSaleOnly(false); setNewOnly(false);
+    setSortBy("popular");
+  }, [initialCat, initialBrand]);
 
   return (
     <div>

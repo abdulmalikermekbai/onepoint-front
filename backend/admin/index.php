@@ -31,6 +31,7 @@ function translitSlug(string $text): string {
 if (isset($_GET['logout'])) { session_destroy(); header('Location: login.php'); exit; }
 
 /* ── POST handlers ── */
+$_postError = null;
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     /* password */
@@ -43,79 +44,97 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     /* delete */
     if (($_POST['action'] ?? '') === 'delete') {
-        $table = $_POST['table'];
-        if (in_array($table, ['products','reviews','promotions','brands','categories','product_related'], true))
-            $pdo->prepare("DELETE FROM `$table` WHERE id=?")->execute([(int)$_POST['id']]);
+        try {
+            $table = $_POST['table'];
+            if (in_array($table, ['products','reviews','promotions','brands','categories','product_related'], true))
+                $pdo->prepare("DELETE FROM `$table` WHERE id=?")->execute([(int)$_POST['id']]);
+        } catch (Throwable $e) {
+            header('Location: ?page=' . $page . '&error=' . urlencode($e->getMessage())); exit;
+        }
     }
 
     /* product */
     if (($_POST['action'] ?? '') === 'product') {
-        $f = $_POST;
-        $name = trim($f['name'] ?? '');
-
-        // Auto slug
-        $slug = trim($f['slug'] ?? '');
-        if ($slug === '' && $name !== '') {
-            $slug = translitSlug($name);
-        }
-        $f['slug'] = $slug;
-
-        // Auto SKU
-        $sku = trim($f['sku'] ?? '');
-        if ($sku === '') {
-            $sku = 'OP-' . strtoupper(substr(md5(uniqid((string)mt_rand(), true)), 0, 8));
-        }
-        $f['sku'] = $sku;
-
-        // Image upload
         try {
-            if ($uploaded = upload_product_image($_FILES['image_file'] ?? [])) {
-                $f['image_url'] = $uploaded;
+            $f = $_POST;
+            $name = trim($f['name'] ?? '');
+            $editId = !empty($f['id']) && is_numeric($f['id']) ? (int)$f['id'] : null;
+
+            // Auto slug with uniqueness check
+            $slug = trim($f['slug'] ?? '');
+            if ($slug === '' && $name !== '') {
+                $slug = translitSlug($name);
             }
-        } catch (RuntimeException $e) {
-            header('Location: ?page=products&edit=' . urlencode($f['id'] ?? 'new') . '&error=' . urlencode($e->getMessage()));
-            exit;
-        }
-
-        $cols = ['name','slug','sku','brand_id','category_id','short_description','description',
-                 'price','old_price','in_stock','is_new','is_hit','is_sale','is_active',
-                 'image_url','processor','gpu','ram','storage','display_size',
-                 'resolution','refresh_rate','matrix_type','warranty'];
-        $values = [];
-        foreach ($cols as $c) {
-            if ($c === 'in_stock' || str_starts_with($c, 'is_')) {
-                $values[] = isset($f[$c]) ? 1 : 0;
-            } else {
-                $values[] = ($f[$c] !== null && $f[$c] !== '') ? $f[$c] : null;
+            // Ensure slug is unique (skip current product on edit)
+            $checkSlug = $pdo->prepare('SELECT id FROM products WHERE slug=?' . ($editId ? ' AND id!=?' : ''));
+            $checkSlug->execute($editId ? [$slug, $editId] : [$slug]);
+            if ($checkSlug->fetchColumn()) {
+                $slug = $slug . '-' . substr(md5(uniqid()), 0, 6);
             }
-        }
+            $f['slug'] = $slug;
 
-        if (!empty($f['id']) && is_numeric($f['id'])) {
-            $set = implode(',', array_map(fn($c) => "$c=?", $cols));
-            $values[] = (int)$f['id'];
-            $pdo->prepare("UPDATE products SET $set WHERE id=?")->execute($values);
-            $savedId = (int)$f['id'];
-        } else {
-            $pdo->prepare('INSERT INTO products(' . implode(',', $cols) . ') VALUES(' . rtrim(str_repeat('?,', count($cols)), ',') . ')')->execute($values);
-            $savedId = (int)$pdo->lastInsertId();
-        }
+            // Auto SKU
+            $sku = trim($f['sku'] ?? '');
+            if ($sku === '') {
+                $sku = 'OP-' . strtoupper(substr(md5(uniqid((string)mt_rand(), true)), 0, 8));
+            }
+            $f['sku'] = $sku;
 
-        // Save related products
-        if (isset($_POST['related_ids'])) {
-            // Check if table exists
-            $tbl = $pdo->query("SHOW TABLES LIKE 'product_related'")->fetchColumn();
-            if ($tbl) {
-                $pdo->prepare("DELETE FROM product_related WHERE product_id=?")->execute([$savedId]);
-                foreach ($_POST['related_ids'] as $rid) {
-                    $rid = (int)$rid;
-                    if ($rid && $rid !== $savedId) {
-                        $pdo->prepare("INSERT IGNORE INTO product_related(product_id, related_id) VALUES(?,?)")->execute([$savedId, $rid]);
-                    }
+            // Image upload
+            if (!empty($_FILES['image_file']['name'])) {
+                $uploaded = upload_product_image($_FILES['image_file']);
+                if ($uploaded) $f['image_url'] = $uploaded;
+            }
+
+            $cols = ['name','slug','sku','brand_id','category_id','short_description','description',
+                     'price','old_price','in_stock','is_new','is_hit','is_sale','is_active',
+                     'image_url','processor','gpu','ram','storage','display_size',
+                     'resolution','refresh_rate','matrix_type','warranty'];
+            $values = [];
+            foreach ($cols as $c) {
+                if ($c === 'in_stock' || str_starts_with($c, 'is_')) {
+                    $values[] = isset($f[$c]) ? 1 : 0;
+                } else {
+                    $values[] = (isset($f[$c]) && $f[$c] !== '') ? $f[$c] : null;
                 }
             }
-        }
 
-        $page = 'products';
+            if ($editId) {
+                $set = implode(',', array_map(fn($c) => "$c=?", $cols));
+                $values[] = $editId;
+                $pdo->prepare("UPDATE products SET $set WHERE id=?")->execute($values);
+                $savedId = $editId;
+            } else {
+                $pdo->prepare('INSERT INTO products(' . implode(',', $cols) . ') VALUES(' . rtrim(str_repeat('?,', count($cols)), ',') . ')')->execute($values);
+                $savedId = (int)$pdo->lastInsertId();
+            }
+
+            // Save related products
+            try {
+                $pdo->exec("CREATE TABLE IF NOT EXISTS product_related (
+                    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                    product_id INT UNSIGNED NOT NULL,
+                    related_id INT UNSIGNED NOT NULL,
+                    UNIQUE KEY uq_rel (product_id, related_id)
+                )");
+                $pdo->prepare("DELETE FROM product_related WHERE product_id=?")->execute([$savedId]);
+                if (!empty($_POST['related_ids'])) {
+                    foreach ($_POST['related_ids'] as $rid) {
+                        $rid = (int)$rid;
+                        if ($rid && $rid !== $savedId) {
+                            $pdo->prepare("INSERT IGNORE INTO product_related(product_id, related_id) VALUES(?,?)")->execute([$savedId, $rid]);
+                        }
+                    }
+                }
+            } catch (Throwable $re) { /* ignore related products errors */ }
+
+            $page = 'products';
+            header('Location: ?page=products&saved=1'); exit;
+
+        } catch (Throwable $e) {
+            $editParam = !empty($_POST['id']) && is_numeric($_POST['id']) ? $_POST['id'] : 'new';
+            header('Location: ?page=products&edit=' . urlencode($editParam) . '&error=' . urlencode('Ошибка БД: ' . $e->getMessage())); exit;
+        }
     }
 
     /* review */

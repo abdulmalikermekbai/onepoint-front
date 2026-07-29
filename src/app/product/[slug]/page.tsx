@@ -3,10 +3,8 @@ import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
-import LaptopSVG from "@/components/LaptopSVG";
 import { PRODUCTS, getProductBySlug, formatPrice } from "@/lib/data";
-import ProductPageClient, { ProductTabsInteractive } from "./ProductPageClient";
-import ProductGallery from "@/components/ProductGallery";
+import ProductPageClient, { ProductTabsInteractive, ProductGallery } from "./ProductPageClient";
 
 export async function generateStaticParams() {
   return PRODUCTS.map(p => ({ slug: p.slug }));
@@ -72,13 +70,15 @@ export default async function ProductPage({ params }: Props) {
 
 
             {/* ====== GALLERY ====== */}
-            <div>
+            <div style={{ position: "relative" }}>
               <ProductGallery
-                images={product.images || []}
+                images={(product.images || []).map((img: any) => ({
+                  image_url: typeof img === "string" ? img : (img.url || img.image_url),
+                  alt_text: product.name,
+                  is_main: false
+                }))}
+                mainImage={product.images?.[0] || ""}
                 productName={product.name}
-                svgColor1={product.svgColor1}
-                svgColor2={product.svgColor2}
-                bgGradient={product.bgGradient}
               />
             </div>
 
@@ -160,7 +160,7 @@ export default async function ProductPage({ params }: Props) {
 
           {/* ====== TABS ====== */}
           <div style={{ marginTop: 64 }}>
-            <ProductTabsClient product={product} specs={specs} />
+            <ProductTabsClient product={product} specs={specs} reviews={product.reviews || []} />
           </div>
 
           {/* ====== ADVANTAGES ====== */}
@@ -233,11 +233,11 @@ export default async function ProductPage({ params }: Props) {
   );
 }
 
-function ProductTabsClient({ product, specs }: {
+function ProductTabsClient({ product, specs, reviews }: {
   product: ReturnType<typeof getProductBySlug>;
   specs: [string, string][];
+  reviews?: any[];
 }) {
   if (!product) return null;
-  return <ProductTabsInteractive product={product} specs={specs} />;
+  return <ProductTabsInteractive product={product} specs={specs} reviews={reviews} />;
 }
-

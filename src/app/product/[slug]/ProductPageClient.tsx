@@ -2,6 +2,21 @@
 import { useState } from "react";
 import BuyModal from "@/components/BuyModal";
 
+interface GalleryImage {
+  image_url: string;
+  alt_text?: string;
+  is_main?: boolean;
+}
+
+interface Review {
+  author_name: string;
+  initials?: string;
+  rating: number;
+  body: string;
+  source?: string;
+  created_at?: string;
+}
+
 interface Props {
   product: { id: number; name: string; price: number; slug: string; sku?: string };
   waLink: string;
@@ -12,10 +27,7 @@ export default function ProductPageClient({ product, waLink }: Props) {
 
   return (
     <>
-      <button
-        className="cta-primary"
-        onClick={() => setBuyModalOpen(true)}
-      >
+      <button className="cta-primary" onClick={() => setBuyModalOpen(true)}>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="20" height="20">
           <circle cx="9" cy="21" r="1" />
           <circle cx="20" cy="21" r="1" />
@@ -44,12 +56,128 @@ export default function ProductPageClient({ product, waLink }: Props) {
   );
 }
 
-export function ProductTabsInteractive({ product, specs }: {
+/* ─── Product Gallery ─── */
+export function ProductGallery({ images, mainImage, productName }: {
+  images: GalleryImage[];
+  mainImage: string;
+  productName: string;
+}) {
+  const allImages: GalleryImage[] = images.length > 0
+    ? images
+    : [{ image_url: mainImage, alt_text: productName, is_main: true }];
 
+  const [active, setActive] = useState(0);
+  const [lightbox, setLightbox] = useState(false);
+
+  return (
+    <>
+      <div className="product-gallery">
+        {/* Main image */}
+        <div
+          className="product-gallery__main"
+          onClick={() => setLightbox(true)}
+          style={{ cursor: "zoom-in" }}
+        >
+          <img
+            src={allImages[active]?.image_url || mainImage}
+            alt={allImages[active]?.alt_text || productName}
+            style={{
+              width: "100%",
+              height: 380,
+              objectFit: "contain",
+              borderRadius: 18,
+              background: "#f8f9fa",
+              display: "block",
+            }}
+          />
+          {allImages.length > 1 && (
+            <span style={{
+              position: "absolute", bottom: 14, right: 14,
+              background: "rgba(0,0,0,0.55)", color: "#fff",
+              padding: "4px 10px", borderRadius: 100, fontSize: 12, fontWeight: 700
+            }}>
+              {active + 1} / {allImages.length}
+            </span>
+          )}
+        </div>
+
+        {/* Thumbnails */}
+        {allImages.length > 1 && (
+          <div className="product-gallery__thumbs">
+            {allImages.map((img, i) => (
+              <button
+                key={i}
+                onClick={() => setActive(i)}
+                style={{
+                  border: i === active ? "2.5px solid var(--accent)" : "2px solid transparent",
+                  borderRadius: 12,
+                  padding: 3,
+                  background: "#f8f9fa",
+                  cursor: "pointer",
+                  flexShrink: 0,
+                  outline: "none",
+                  transition: "border-color .2s",
+                }}
+              >
+                <img
+                  src={img.image_url}
+                  alt={img.alt_text || productName}
+                  style={{ width: 72, height: 72, objectFit: "contain", borderRadius: 9, display: "block" }}
+                />
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Lightbox */}
+      {lightbox && (
+        <div
+          onClick={() => setLightbox(false)}
+          style={{
+            position: "fixed", inset: 0, background: "rgba(0,0,0,0.92)",
+            zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center",
+            cursor: "zoom-out",
+          }}
+        >
+          <img
+            src={allImages[active]?.image_url}
+            alt={productName}
+            style={{ maxWidth: "90vw", maxHeight: "90vh", objectFit: "contain", borderRadius: 16 }}
+            onClick={(e) => e.stopPropagation()}
+          />
+          <button onClick={() => setLightbox(false)} style={{
+            position: "absolute", top: 20, right: 28, background: "none", border: "none",
+            color: "#fff", fontSize: 36, cursor: "pointer", lineHeight: 1
+          }}>×</button>
+          {allImages.length > 1 && (
+            <>
+              <button onClick={(e) => { e.stopPropagation(); setActive(i => (i - 1 + allImages.length) % allImages.length); }} style={{
+                position: "absolute", left: 20, top: "50%", transform: "translateY(-50%)",
+                background: "rgba(255,255,255,0.15)", border: "none", color: "#fff",
+                width: 48, height: 48, borderRadius: "50%", fontSize: 24, cursor: "pointer"
+              }}>‹</button>
+              <button onClick={(e) => { e.stopPropagation(); setActive(i => (i + 1) % allImages.length); }} style={{
+                position: "absolute", right: 20, top: "50%", transform: "translateY(-50%)",
+                background: "rgba(255,255,255,0.15)", border: "none", color: "#fff",
+                width: 48, height: 48, borderRadius: "50%", fontSize: 24, cursor: "pointer"
+              }}>›</button>
+            </>
+          )}
+        </div>
+      )}
+    </>
+  );
+}
+
+/* ─── Product Tabs ─── */
+export function ProductTabsInteractive({ product, specs, reviews }: {
   product: any;
   specs: [string, string][];
+  reviews?: Review[];
 }) {
   const [activeTab, setActiveTab] = useState<"specs" | "desc" | "equipment" | "reviews">("specs");
+  const reviewList = reviews && reviews.length > 0 ? reviews : null;
 
   return (
     <div>
@@ -58,7 +186,7 @@ export function ProductTabsInteractive({ product, specs }: {
           { key: "specs", label: "Характеристики" },
           { key: "desc", label: "Описание" },
           { key: "equipment", label: "Комплектация" },
-          { key: "reviews", label: `Отзывы (${product.reviewCount || 0})` },
+          { key: "reviews", label: `Отзывы${reviewList ? ` (${reviewList.length})` : ""}` },
         ].map((t) => (
           <button
             key={t.key}
@@ -131,8 +259,10 @@ export function ProductTabsInteractive({ product, specs }: {
         <div style={{ background: "var(--surface)", borderRadius: 20, padding: 32 }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20, flexWrap: "wrap", gap: 16 }}>
             <div>
-              <h3 style={{ fontSize: 20, fontWeight: 800, margin: 0 }}>Отзывы покупателей 2ГИС</h3>
-              <div style={{ fontSize: 14, color: "var(--text-muted)", marginTop: 4 }}>Средняя оценка {product.rating} из 5 на основе {product.reviewCount} отзывов</div>
+              <h3 style={{ fontSize: 20, fontWeight: 800, margin: 0 }}>Отзывы покупателей</h3>
+              <div style={{ fontSize: 14, color: "var(--text-muted)", marginTop: 4 }}>
+                {reviewList ? `${reviewList.length} отзыв(а)` : "Средняя оценка 5.0 на основе отзывов покупателей"}
+              </div>
             </div>
             <a href="https://go.2gis.com/aduOr" target="_blank" rel="noopener noreferrer" className="btn btn-ghost btn-sm">
               Оставить отзыв в 2ГИС
@@ -140,23 +270,38 @@ export function ProductTabsInteractive({ product, specs }: {
           </div>
 
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            {[
-              { name: "Арман К.", rating: 5, date: "Вчера", text: "Отличный ноутбук! Заказывал с доставкой по Алматы, привезли день в день. Все пломбы на месте, проверили экран и нагрев." },
-              { name: "Елена М.", rating: 5, date: "3 дня назад", text: "Покупали для работы с графикой. Экран шикарный, производительность на высоте. Спасибо менеджеру OnePoint за консультацию." }
-            ].map((rev, i) => (
+            {reviewList ? reviewList.map((rev, i) => (
               <div key={i} style={{ background: "#fff", borderRadius: 16, padding: 20, border: "1px solid var(--border)" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
-                  <span style={{ fontWeight: 700, fontSize: 15 }}>{rev.name}</span>
-                  <span style={{ color: "var(--text-soft)", fontSize: 13 }}>{rev.date}</span>
+                  <span style={{ fontWeight: 700, fontSize: 15 }}>
+                    {rev.initials || rev.author_name}
+                  </span>
+                  <span style={{ color: "var(--text-soft)", fontSize: 13 }}>
+                    {rev.created_at ? new Date(rev.created_at).toLocaleDateString("ru-RU") : ""}
+                  </span>
                 </div>
-                <div style={{ color: "#FFB100", fontSize: 14, marginBottom: 8 }}>{"★".repeat(rev.rating)}</div>
-                <p style={{ fontSize: 14.5, color: "var(--text-muted)", lineHeight: 1.5 }}>{rev.text}</p>
+                <div style={{ color: "#FFB100", fontSize: 14, marginBottom: 8 }}>{"★".repeat(rev.rating)}{"☆".repeat(5 - rev.rating)}</div>
+                <p style={{ fontSize: 14.5, color: "var(--text-muted)", lineHeight: 1.5, margin: 0 }}>{rev.body}</p>
               </div>
-            ))}
+            )) : (
+              /* fallback static reviews */
+              [
+                { name: "Арман К.", rating: 5, date: "Вчера", text: "Отличный ноутбук! Заказывал с доставкой по Алматы, привезли день в день. Все пломбы на месте, проверили экран и нагрев." },
+                { name: "Елена М.", rating: 5, date: "3 дня назад", text: "Покупали для работы с графикой. Экран шикарный, производительность на высоте. Спасибо менеджеру OnePoint за консультацию." }
+              ].map((rev, i) => (
+                <div key={i} style={{ background: "#fff", borderRadius: 16, padding: 20, border: "1px solid var(--border)" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
+                    <span style={{ fontWeight: 700, fontSize: 15 }}>{rev.name}</span>
+                    <span style={{ color: "var(--text-soft)", fontSize: 13 }}>{rev.date}</span>
+                  </div>
+                  <div style={{ color: "#FFB100", fontSize: 14, marginBottom: 8 }}>{"★".repeat(rev.rating)}</div>
+                  <p style={{ fontSize: 14.5, color: "var(--text-muted)", lineHeight: 1.5, margin: 0 }}>{rev.text}</p>
+                </div>
+              ))
+            )}
           </div>
         </div>
       )}
     </div>
   );
 }
-

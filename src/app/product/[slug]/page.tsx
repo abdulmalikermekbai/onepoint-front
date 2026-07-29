@@ -3,12 +3,10 @@ import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
-import { PRODUCTS, getProductBySlug, formatPrice } from "@/lib/data";
+import { PRODUCTS, fetchLiveProductBySlug, formatPrice } from "@/lib/data";
 import ProductPageClient, { ProductTabsInteractive, ProductGallery } from "./ProductPageClient";
 
-export async function generateStaticParams() {
-  return PRODUCTS.map(p => ({ slug: p.slug }));
-}
+export const dynamic = "force-dynamic";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -16,7 +14,7 @@ interface Props {
 
 export default async function ProductPage({ params }: Props) {
   const { slug } = await params;
-  const product = getProductBySlug(slug);
+  const product = await fetchLiveProductBySlug(slug);
   if (!product) notFound();
 
   const similar = PRODUCTS.filter(p => p.id !== product.id && p.categorySlug === product.categorySlug).slice(0, 4);

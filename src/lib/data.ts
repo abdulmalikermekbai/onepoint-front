@@ -982,6 +982,84 @@ export const REVIEWS = [
 
 export type Product = typeof PRODUCTS[number];
 
+export function normalizeDbProduct(p: any) {
+  if (!p) return null;
+  return {
+    id: p.id,
+    name: p.name || "",
+    slug: p.slug || `product-${p.id}`,
+    brand: p.brand || "Ноутбуки",
+    series: p.series || "",
+    sku: p.sku || `OP-${p.id}`,
+    categorySlug: p.category_slug || "gaming",
+    categoryName: p.category || "Ноутбуки",
+    price: Number(p.price) || 0,
+    oldPrice: Number(p.old_price) || 0,
+    discountPercent: (p.old_price && p.price) ? Math.round((1 - p.price / p.old_price) * 100) : 0,
+    saving: (p.old_price && p.price) ? (p.old_price - p.price) : 0,
+    monthlyPayment: Math.round((Number(p.price) || 0) / 12),
+    inStock: Boolean(p.in_stock),
+    stockStatus: p.in_stock ? "in_stock" : "out_of_stock",
+    isNew: Boolean(p.is_new),
+    isHit: Boolean(p.is_hit),
+    isSale: Boolean(p.is_sale),
+    rating: Number(p.rating) || 5.0,
+    reviewCount: Number(p.review_count) || 0,
+    color: p.color || "Grey",
+    weight: p.weight || "2.1 кг",
+    processor: p.processor || "Intel Core",
+    processorBrand: p.processor ? p.processor.split(" ")[0] : "Intel",
+    gpu: p.gpu || "GeForce RTX",
+    gpuBrand: p.gpu ? p.gpu.split(" ")[0] : "NVIDIA",
+    ram: p.ram || "16 ГБ",
+    storage: p.storage || "512 ГБ SSD",
+    display: p.display_size || '15.6"',
+    resolution: p.resolution || "1920×1080",
+    refreshRate: p.refresh_rate || "144 Гц",
+    matrixType: p.matrix_type || "IPS",
+    warranty: p.warranty || "1 год",
+    os: p.os || "Windows 11",
+    battery: p.battery || "60 Вт·ч",
+    wifi: p.wifi || "Wi-Fi 6",
+    bluetooth: p.bluetooth || "5.1",
+    camera: p.camera || "720p",
+    dimensions: p.dimensions || "",
+    ports: p.ports || "",
+    shortDescription: p.short_description || "",
+    description: p.description || "",
+    advantages: p.advantages ? p.advantages.split("\n") : [],
+    bgGradient: "linear-gradient(150deg,#F1E9FB,#EAE1F9)",
+    svgColor1: "#5b2a86",
+    svgColor2: "#ff5a1f",
+    images: p.gallery ? p.gallery.map((g: any) => g.image_url) : (p.image_url ? [p.image_url] : []),
+    reviews: p.reviews || [],
+    related: p.related ? p.related.map((r: any) => normalizeDbProduct(r)) : [],
+  };
+}
+
+export async function fetchLiveProducts(): Promise<any[]> {
+  try {
+    const res = await fetch("https://api.onepoint.kz/api/products.php", { cache: "no-store" });
+    if (!res.ok) return PRODUCTS;
+    const data = await res.json();
+    if (Array.isArray(data.products) && data.products.length > 0) {
+      return data.products.map(normalizeDbProduct);
+    }
+  } catch (e) {}
+  return PRODUCTS;
+}
+
+export async function fetchLiveProductBySlug(slug: string): Promise<any> {
+  try {
+    const res = await fetch(`https://api.onepoint.kz/api/products.php?slug=${encodeURIComponent(slug)}`, { cache: "no-store" });
+    if (res.ok) {
+      const data = await res.json();
+      if (data.product) return normalizeDbProduct(data.product);
+    }
+  } catch (e) {}
+  return PRODUCTS.find(p => p.slug === slug) || null;
+}
+
 export function getProductBySlug(slug: string) {
   return PRODUCTS.find(p => p.slug === slug);
 }

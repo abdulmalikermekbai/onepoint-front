@@ -1,10 +1,10 @@
 "use client";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
-import { PRODUCTS, BRANDS, formatPrice } from "@/lib/data";
+import { PRODUCTS, BRANDS, formatPrice, fetchLiveProducts } from "@/lib/data";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 
@@ -35,6 +35,7 @@ function CatalogContent() {
   const initialCat = searchParams.get("cat") || "";
   const initialBrand = searchParams.get("brand") || "";
 
+  const [productsList, setProductsList] = useState<any[]>(PRODUCTS);
   const [category, setCategory] = useState(initialCat);
   const [brand, setBrand] = useState(initialBrand);
   const [priceMin, setPriceMin] = useState("");
@@ -51,12 +52,18 @@ function CatalogContent() {
   const [sortBy, setSortBy] = useState("popular");
   const [filterOpen, setFilterOpen] = useState(false);
 
+  useEffect(() => {
+    fetchLiveProducts().then(list => {
+      if (list && list.length > 0) setProductsList(list);
+    });
+  }, []);
+
   const toggle = (arr: string[], val: string, set: (v: string[]) => void) => {
     set(arr.includes(val) ? arr.filter(v => v !== val) : [...arr, val]);
   };
 
   const filtered = useMemo(() => {
-    let result = [...PRODUCTS];
+    let result = [...productsList];
     if (category) {
       if (category === "rtx") result = result.filter(p => p.gpu?.includes("RTX"));
       else if (category === "oled") result = result.filter(p => p.matrixType === "OLED");
@@ -83,7 +90,7 @@ function CatalogContent() {
       default: result.sort((a, b) => (b.isHit ? 1 : 0) - (a.isHit ? 1 : 0));
     }
     return result;
-  }, [category, brand, priceMin, priceMax, selectedProcs, selectedGPUs, selectedRAMs, selectedDisplays, selectedHz, selectedMatrix, inStockOnly, saleOnly, newOnly, sortBy]);
+  }, [productsList, category, brand, priceMin, priceMax, selectedProcs, selectedGPUs, selectedRAMs, selectedDisplays, selectedHz, selectedMatrix, inStockOnly, saleOnly, newOnly, sortBy]);
 
   const resetFilters = () => {
     setCategory(""); setBrand(""); setPriceMin(""); setPriceMax("");

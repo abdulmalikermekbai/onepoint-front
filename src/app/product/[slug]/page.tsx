@@ -160,7 +160,7 @@ export default async function ProductPage({ params }: Props) {
 
           {/* ====== TABS ====== */}
           <div style={{ marginTop: 64 }}>
-            <ProductTabsClient product={product} specs={specs} reviews={product.reviews || []} />
+            <ProductTabsClient product={product} specs={specs} reviews={(product as any).reviews || []} />
           </div>
 
           {/* ====== ADVANTAGES ====== */}

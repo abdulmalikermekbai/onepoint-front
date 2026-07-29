@@ -62,13 +62,13 @@ function productImageUrl(value: unknown): string {
 }
 
 /**
- * В браузере ходим через Next.js rewrite на текущем домене — это исключает CORS.
- * Во время SSR можно безопасно обратиться к PHP API напрямую.
+ * PHP API выдаёт CORS-заголовки, поэтому используем его напрямую и в браузере.
+ * Это не зависит от TLS-прокси Vercel, который не принимает сертификат API.
  */
 function productsApiUrl(query = ""): string {
-  const base = typeof window === "undefined"
-    ? `${process.env.BACKEND_API_URL || "https://api.onepoint.kz"}/api/products.php`
-    : "/backend-api/products.php";
+  const base = `${typeof window === "undefined"
+    ? (process.env.BACKEND_API_URL || "https://api.onepoint.kz")
+    : "https://api.onepoint.kz"}/api/products.php`;
 
   return query ? `${base}?${query}` : base;
 }

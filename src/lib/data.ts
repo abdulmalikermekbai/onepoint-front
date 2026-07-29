@@ -55,6 +55,18 @@ export interface Product {
 
 export const PRODUCTS: Product[] = [];
 
+/**
+ * В браузере ходим через Next.js rewrite на текущем домене — это исключает CORS.
+ * Во время SSR можно безопасно обратиться к PHP API напрямую.
+ */
+function productsApiUrl(query = ""): string {
+  const base = typeof window === "undefined"
+    ? `${process.env.BACKEND_API_URL || "https://api.onepoint.kz"}/api/products.php`
+    : "/backend-api/products.php";
+
+  return query ? `${base}?${query}` : base;
+}
+
 export const CATEGORIES = [
   { slug: "gaming", name: "Игровые ноутбуки", icon: "gamepad", count: 128, desc: "RTX 5060/5070/5080, высокочастотные дисплеи" },
   { slug: "office", name: "Для работы", icon: "briefcase", count: 96, desc: "Офисные и деловые ноутбуки" },
@@ -154,7 +166,7 @@ export function normalizeDbProduct(p: any): Product {
 
 export async function fetchLiveProducts(): Promise<Product[]> {
   try {
-    const res = await fetch("https://api.onepoint.kz/api/products.php", { cache: "no-store" });
+    const res = await fetch(productsApiUrl(), { cache: "no-store" });
     if (!res.ok) return [];
     const data = await res.json();
     if (Array.isArray(data.products)) {
@@ -168,7 +180,8 @@ export async function fetchLiveProducts(): Promise<Product[]> {
 
 export async function fetchLiveProductsByFlag(flag: "is_hit" | "is_new" | "is_sale"): Promise<Product[]> {
   try {
-    const res = await fetch(`https://api.onepoint.kz/api/products.php?${flag}=1`, { cache: "no-store" });
+    const apiFlag = flag.replace(/^is_/, "");
+    const res = await fetch(productsApiUrl(`${apiFlag}=1`), { cache: "no-store" });
     if (!res.ok) return [];
     const data = await res.json();
     if (Array.isArray(data.products)) {
@@ -182,7 +195,7 @@ export async function fetchLiveProductsByFlag(flag: "is_hit" | "is_new" | "is_sa
 
 export async function fetchLiveProductBySlug(slug: string): Promise<Product | null> {
   try {
-    const res = await fetch(`https://api.onepoint.kz/api/products.php?slug=${encodeURIComponent(slug)}`, { cache: "no-store" });
+    const res = await fetch(productsApiUrl(`slug=${encodeURIComponent(slug)}`), { cache: "no-store" });
     if (res.ok) {
       const data = await res.json();
       if (data.product) return normalizeDbProduct(data.product);

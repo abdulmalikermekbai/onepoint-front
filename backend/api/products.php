@@ -7,7 +7,15 @@ header('Access-Control-Allow-Methods: GET, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { http_response_code(204); exit; }
 
-$pdo = db();
+try {
+    $pdo = db();
+} catch (Throwable $e) {
+    http_response_code(500);
+    echo json_encode(['error' => 'Database connection failed: ' . $e->getMessage()]);
+    exit;
+}
+
+try {
 
 /* ── Single product by slug ── */
 if (!empty($_GET['slug'])) {
@@ -140,10 +148,18 @@ $sql .= " ORDER BY $sort";
 $limit = min((int)($_GET['limit'] ?? 40), 100);
 $offset = (int)($_GET['offset'] ?? 0);
 $sql .= ' LIMIT ? OFFSET ?';
-$args[] = $limit;
-$args[] = $offset;
 
 $st = $pdo->prepare($sql);
-$st->execute($args);
+$i = 1;
+foreach ($args as $arg) {
+    $st->bindValue($i++, $arg);
+}
+$st->bindValue($i++, $limit, PDO::PARAM_INT);
+$st->bindValue($i++, $offset, PDO::PARAM_INT);
+$st->execute();
 
 echo json_encode(['products' => $st->fetchAll()], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+} catch (Throwable $e) {
+    http_response_code(500);
+    echo json_encode(['error' => $e->getMessage()]);
+}

@@ -1,0 +1,4 @@
+<?php
+declare(strict_types=1); require __DIR__ . '/../config.php'; header('Content-Type: application/json; charset=utf-8'); header('Access-Control-Allow-Origin: *');
+$sql='SELECT p.*,b.name AS brand,c.name AS category,c.slug AS category_slug FROM products p LEFT JOIN brands b ON b.id=p.brand_id LEFT JOIN categories c ON c.id=p.category_id WHERE p.is_active=1'; $args=[];
+foreach(['brand'=>'b.name','category'=>'c.slug'] as $q=>$col) if(!empty($_GET[$q])){$sql.=" AND $col=?";$args[]=$_GET[$q];} if(isset($_GET['min'])){$sql.=' AND p.price>=?';$args[]=(float)$_GET['min'];}if(isset($_GET['max'])){$sql.=' AND p.price<=?';$args[]=(float)$_GET['max'];}foreach(['hit'=>'is_hit','sale'=>'is_sale','new'=>'is_new','stock'=>'in_stock'] as $q=>$col)if(!empty($_GET[$q]))$sql.=" AND p.$col=1";$sql.=' ORDER BY p.is_hit DESC,p.id DESC';$s=db()->prepare($sql);$s->execute($args);echo json_encode(['products'=>$s->fetchAll()],JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES);

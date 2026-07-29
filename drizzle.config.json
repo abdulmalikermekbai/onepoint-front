@@ -1,0 +1,7 @@
+{
+  "dialect": "mysql",
+  "schema": "./src/db/schema.ts",
+  "dbCredentials": {
+    "url": "mysql://onepoint_user:password@localhost:3306/onepoint_laptops"
+  }
+}

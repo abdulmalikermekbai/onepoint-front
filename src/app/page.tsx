@@ -119,16 +119,16 @@ export default function HomePage() {
             </div>
 
             {/* Quick Stats */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 16, marginTop: 24 }}>
+            <div className="stats-grid">
               {[
                 { num: "500+", label: "Моделей в каталоге" },
                 { num: "5000+", label: "Довольных клиентов" },
                 { num: "5 лет", label: "На рынке Казахстана" },
                 { num: "0%", label: "Рассрочка без переплат" },
               ].map((s) => (
-                <div key={s.label} style={{ background: "var(--surface)", borderRadius: 16, padding: "20px 24px", textAlign: "center" }}>
-                  <div style={{ fontSize: 28, fontWeight: 800, color: "var(--accent)", letterSpacing: "-.02em" }}>{s.num}</div>
-                  <div style={{ fontSize: 13, color: "var(--text-muted)", marginTop: 4, fontWeight: 500 }}>{s.label}</div>
+                <div key={s.label}>
+                  <div className="stat-num">{s.num}</div>
+                  <div className="stat-label">{s.label}</div>
                 </div>
               ))}
             </div>
@@ -207,7 +207,7 @@ export default function HomePage() {
             <div className="section-head reveal">
               <div>
                 <div className="eyebrow">Акции</div>
-                <h2 className="section-title">🔥 Лучшие предложения недели</h2>
+                <h2 className="section-title">Лучшие предложения недели</h2>
                 <p className="section-sub">Подберите ноутбук со скидкой до 200 000 ₸</p>
               </div>
               <Link href="/promotions" className="link-arrow">
@@ -218,7 +218,7 @@ export default function HomePage() {
             <div className="promo-grid reveal">
               <div className="promo-card orange">
                 <div className="promo-orb" />
-                <span className="promo-tag">🎁 ПОДАРОК К ПОКУПКЕ</span>
+                <span className="promo-tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="14" height="14" style={{verticalAlign:"middle",marginRight:4}}><rect x="3" y="8" width="18" height="14" rx="2"/><path d="M12 8v14M3 12h18M7.5 8C7.5 6 9 4 12 4s4.5 2 4.5 4"/></svg>ПОДАРОК К ПОКУПКЕ</span>
                 <div className="promo-title">Полезный аксессуар к выбранным ноутбукам</div>
                 <p className="promo-desc">Подскажем актуальный подарок и поможем подобрать комплект для вашей модели.</p>
                 <a
@@ -232,7 +232,7 @@ export default function HomePage() {
               </div>
               <div className="promo-card dark" style={{ backgroundImage: "linear-gradient(135deg,#1B1B21,#0D0D11)", position: "relative" }}>
                 <div style={{ position: "absolute", width: 220, height: 220, borderRadius: "50%", background: "rgba(255,90,31,.16)", bottom: -100, right: 20 }} />
-                <span className="promo-tag">⚡ СПЕЦЦЕНЫ НЕДЕЛИ</span>
+                <span className="promo-tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="14" height="14" style={{verticalAlign:"middle",marginRight:4}}><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>СПЕЦЦЕНЫ НЕДЕЛИ</span>
                 <div className="promo-title">Популярные ноутбуки по выгодной цене</div>
                 <p className="promo-desc">Выбирайте модели со скидкой из наличия — количество ограничено.</p>
                 <Link href="/catalog?sale=1" className="btn btn-primary btn-sm">
@@ -270,52 +270,25 @@ export default function HomePage() {
                 <h2 className="section-title">Ноутбук для любых задач</h2>
               </div>
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 14 }} className="reveal">
+            <div className="use-case-grid reveal">
               {[
-                { emoji: "📚", label: "Для учёбы", slug: "student" },
-                { emoji: "💼", label: "Для офиса", slug: "office" },
-                { emoji: "👨‍💻", label: "Для программистов", slug: "dev" },
-                { emoji: "🎮", label: "Для игр", slug: "gaming" },
-                { emoji: "🎬", label: "Видеомонтаж", slug: "video" },
-                { emoji: "🏗️", label: "Для 3D/AutoCAD", slug: "designer" },
-                { emoji: "🎨", label: "Для дизайна", slug: "designer" },
-                { emoji: "✈️", label: "Для путешествий", slug: "ultrabook" },
-                { emoji: "💡", label: "Для бизнеса", slug: "business" },
-                { emoji: "⚡", label: "Ультрабуки", slug: "ultrabook" },
+                { icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="28" height="28"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>, label: "Для учёбы", slug: "student" },
+                { icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="28" height="28"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>, label: "Для офиса", slug: "office" },
+                { icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="28" height="28"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>, label: "Для программистов", slug: "dev" },
+                { icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="28" height="28"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/><path d="M6 8l4 4-4 4"/></svg>, label: "Для игр", slug: "gaming" },
+                { icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="28" height="28"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>, label: "Видеомонтаж", slug: "video" },
+                { icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="28" height="28"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 2v2M15 2v2M9 20v2M15 20v2M2 9h2M2 15h2M20 9h2M20 15h2"/></svg>, label: "Для 3D/AutoCAD", slug: "designer" },
+                { icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="28" height="28"><circle cx="13.5" cy="6.5" r="2.5"/><circle cx="6" cy="12" r="2"/><circle cx="18" cy="16" r="2"/><path d="M11 6.5L8 12M15.5 8l2.5 6"/></svg>, label: "Для дизайна", slug: "designer" },
+                { icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="28" height="28"><rect x="4" y="5" width="16" height="11" rx="2"/><path d="M2 20h20M12 16v4"/></svg>, label: "Для путешествий", slug: "ultrabook" },
+                { icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="28" height="28"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>, label: "Для бизнеса", slug: "business" },
+                { icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="28" height="28"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>, label: "Ультрабуки", slug: "ultrabook" },
               ].map((item) => (
                 <Link
                   key={item.label}
                   href={`/catalog?cat=${item.slug}`}
-                  style={{
-                    background: "var(--surface)",
-                    borderRadius: 16,
-                    padding: "20px 16px",
-                    textAlign: "center",
-                    fontWeight: 600,
-                    fontSize: 13.5,
-                    transition: "background .2s, transform .2s, box-shadow .2s",
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    gap: 10,
-                    border: "1.5px solid transparent",
-                  }}
-                  onMouseEnter={e => {
-                    const el = e.currentTarget as HTMLElement;
-                    el.style.background = "#fff";
-                    el.style.borderColor = "var(--border)";
-                    el.style.transform = "translateY(-4px)";
-                    el.style.boxShadow = "var(--shadow-card)";
-                  }}
-                  onMouseLeave={e => {
-                    const el = e.currentTarget as HTMLElement;
-                    el.style.background = "var(--surface)";
-                    el.style.borderColor = "transparent";
-                    el.style.transform = "";
-                    el.style.boxShadow = "";
-                  }}
+                  className="use-case-card"
                 >
-                  <span style={{ fontSize: 32 }}>{item.emoji}</span>
+                  <span className="use-case-icon">{item.icon}</span>
                   <span>{item.label}</span>
                 </Link>
               ))}
@@ -402,14 +375,14 @@ export default function HomePage() {
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" width="16" height="16"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
               </Link>
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 20 }} className="reveal">
+            <div className="delivery-grid reveal">
               {[
-                { icon: "🚀", title: "Алматы", desc: "Курьерская доставка в день заказа или на следующий день. Сборка и проверка при вас." },
-                { icon: "🚚", title: "По Казахстану", desc: "Отправляем во все города надёжными транспортными компаниями. Страхование груза." },
-                { icon: "🏪", title: "Самовывоз", desc: "г. Алматы, пр. Абылай хана, ТЦ Алтын-Тараз, 2 этаж, бутик 20. Ежедневно 10:00–19:00" },
+                { icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="28" height="28"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>, title: "Алматы", desc: "Курьерская доставка в день заказа или на следующий день. Сборка и проверка при вас." },
+                { icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="28" height="28"><path d="M1 3h15v13H1zM16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>, title: "По Казахстану", desc: "Отправляем во все города надёжными транспортными компаниями. Страхование груза." },
+                { icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="28" height="28"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>, title: "Самовывоз", desc: "г. Алматы, пр. Абылай хана, ТЦ Алтын-Тараз, 2 этаж, бутик 20. Ежедневно 10:00–19:00" },
               ].map((d) => (
-                <div key={d.title} className="info-card" style={{ display: "flex", gap: 20, alignItems: "flex-start" }}>
-                  <span style={{ fontSize: 40 }}>{d.icon}</span>
+                <div key={d.title} className="info-card delivery-card">
+                  <div className="delivery-icon-wrap">{d.icon}</div>
                   <div>
                     <h3 style={{ marginBottom: 8, fontSize: 18 }}>{d.title}</h3>
                     <p>{d.desc}</p>
@@ -451,7 +424,7 @@ export default function HomePage() {
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" width="16" height="16"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
               </Link>
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 20 }} className="reveal">
+            <div className="contacts-home-grid reveal">
               <a href="tel:+77075511979" className="contact-card">
                 <div className="contact-icon">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="26" height="26">

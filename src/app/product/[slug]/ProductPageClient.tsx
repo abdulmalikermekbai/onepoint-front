@@ -71,6 +71,8 @@ export function ProductGallery({ images, mainImage, productName }: {
 
   const [active, setActive] = useState(0);
   const [lightbox, setLightbox] = useState(false);
+  const [imageError, setImageError] = useState(false);
+  const showImage = hasImages && !imageError;
 
   return (
     <>
@@ -78,10 +80,10 @@ export function ProductGallery({ images, mainImage, productName }: {
         {/* Main image */}
         <div
           className="product-gallery__main"
-          onClick={() => hasImages && setLightbox(true)}
-          style={{ cursor: hasImages ? "zoom-in" : "default" }}
+          onClick={() => showImage && setLightbox(true)}
+          style={{ cursor: showImage ? "zoom-in" : "default" }}
         >
-          {hasImages ? (
+          {showImage ? (
             <img
               src={allImages[active]?.image_url}
               alt={allImages[active]?.alt_text || productName}
@@ -89,6 +91,7 @@ export function ProductGallery({ images, mainImage, productName }: {
                 width: "100%", height: 380, objectFit: "contain", borderRadius: 18,
                 background: "#f8f9fa", display: "block",
               }}
+              onError={() => setImageError(true)}
             />
           ) : (
             <div className="product-gallery__placeholder" aria-label={`Изображение ${productName} пока не добавлено`}>
@@ -96,7 +99,7 @@ export function ProductGallery({ images, mainImage, productName }: {
               <span>Фотография товара скоро появится</span>
             </div>
           )}
-          {allImages.length > 1 && (
+          {showImage && allImages.length > 1 && (
             <span style={{
               position: "absolute", bottom: 14, right: 14,
               background: "rgba(0,0,0,0.55)", color: "#fff",
@@ -108,12 +111,12 @@ export function ProductGallery({ images, mainImage, productName }: {
         </div>
 
         {/* Thumbnails */}
-        {allImages.length > 1 && (
+        {showImage && allImages.length > 1 && (
           <div className="product-gallery__thumbs">
             {allImages.map((img, i) => (
               <button
                 key={i}
-                onClick={() => setActive(i)}
+                onClick={() => { setActive(i); setImageError(false); }}
                 style={{
                   border: i === active ? "2.5px solid var(--accent)" : "2px solid transparent",
                   borderRadius: 12,

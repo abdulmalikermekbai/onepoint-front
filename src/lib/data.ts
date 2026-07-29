@@ -55,6 +55,12 @@ export interface Product {
 
 export const PRODUCTS: Product[] = [];
 
+function productImageUrl(value: unknown): string {
+  const url = typeof value === "string" ? value.trim() : "";
+  if (!url) return "";
+  return url.startsWith("/") ? `https://api.onepoint.kz${url}` : url;
+}
+
 /**
  * В браузере ходим через Next.js rewrite на текущем домене — это исключает CORS.
  * Во время SSR можно безопасно обратиться к PHP API напрямую.
@@ -125,7 +131,7 @@ export function normalizeDbProduct(p: any): Product {
     saving,
     // Empty image is intentional: the card will show its visual fallback only
     // when the product has no main image in the database.
-    image: p.image_url || "",
+    image: productImageUrl(p.image_url),
     monthlyPayment: Math.round(price / 12),
     inStock: Boolean(p.in_stock),
     stockStatus: p.in_stock ? "in_stock" : "out_of_stock",
@@ -160,7 +166,7 @@ export function normalizeDbProduct(p: any): Product {
     bgGradient: "linear-gradient(150deg,#F1E9FB,#EAE1F9)",
     svgColor1: "#5b2a86",
     svgColor2: "#ff5a1f",
-    images: p.gallery ? p.gallery.map((g: any) => g.image_url) : (p.image_url ? [p.image_url] : []),
+    images: p.gallery ? p.gallery.map((g: any) => productImageUrl(g.image_url)) : (p.image_url ? [productImageUrl(p.image_url)] : []),
     reviews: p.reviews || [],
     related: p.related ? p.related.map((r: any) => normalizeDbProduct(r)) : [],
   };

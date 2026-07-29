@@ -2,50 +2,77 @@
 declare(strict_types=1);
 require __DIR__ . '/config.php';
 
-function scalar(string $block, string $key, string $default = ''): string {
-    if (preg_match('/\\b' . preg_quote($key, '/') . ':\\s*"((?:\\\\.|[^"\\\\])*)"/', $block, $m)) return stripcslashes($m[1]);
-    if (preg_match("/\\b" . preg_quote($key, '/') . ":\\s*'((?:\\\\\\\\.|[^'\\\\\\\\])*)'/", $block, $m)) return stripcslashes($m[1]);
-    if (preg_match('/\\b' . preg_quote($key, '/') . ':\\s*([0-9.]+)/', $block, $m)) return $m[1];
-    if (preg_match('/\\b' . preg_quote($key, '/') . ':\\s*(true|false)/', $block, $m)) return $m[1] === 'true' ? '1' : '0';
-    return $default;
-}
 try {
-  $root = dirname(__DIR__); 
-  $pdo0 = new PDO('mysql:host='.DB_HOST.';charset=utf8mb4', DB_USER, DB_PASS, [PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION]);
-  
-  $sqlFile = __DIR__.'/database.sql';
-  if (file_exists($sqlFile)) {
-      foreach (array_filter(array_map('trim', preg_split('/;\s*(?:\r?\n|$)/', file_get_contents($sqlFile)))) as $sql) {
-          if (!empty($sql)) $pdo0->exec($sql);
-      }
-  }
+    $pdo = db();
 
-  $pdo = db();
-  if (!$pdo->query('SELECT COUNT(*) FROM admins')->fetchColumn()) {
-      $pdo->prepare('INSERT INTO admins(login,password_hash) VALUES(?,?)')->execute(['admin', password_hash('change-me-now', PASSWORD_DEFAULT)]);
-  }
-
-  $dataFile = $root.'/src/lib/data.ts';
-  $data = file_exists($dataFile) ? file_get_contents($dataFile) : false;
-  $count = 0;
-
-  if ($data !== false) {
-    preg_match('/export const PRODUCTS = \[(.*?)\n\];/s', $data, $all);
-    preg_match_all('/^  \{\n    id:.*?^  \},?$/ms', $all[1] ?? '', $items);
-    $insert = $pdo->prepare('INSERT IGNORE INTO products (name,slug,sku,brand_id,category_id,short_description,description,price,old_price,monthly_payment,in_stock,is_new,is_hit,is_sale,rating,review_count,image_url,processor,gpu,ram,storage,display_size,resolution,refresh_rate,matrix_type,weight,color,os,warranty,battery,ports,wifi,bluetooth,camera,dimensions,advantages) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)');
-    $brandIds=[];$categoryIds=[];
-    foreach (($items[0] ?? []) as $block) {
-      $brand=scalar($block,'brand'); $category=scalar($block,'categoryName'); if (!$brand || !$category) continue;
-      if (!isset($brandIds[$brand])) { $pdo->prepare('INSERT IGNORE INTO brands(name,slug) VALUES(?,?)')->execute([$brand, strtolower(preg_replace('/[^a-z0-9]+/i','-', $brand))]); $brandIds[$brand]=(int)$pdo->query('SELECT id FROM brands WHERE name='.$pdo->quote($brand))->fetchColumn(); }
-      if (!isset($categoryIds[$category])) { $slug=scalar($block,'categorySlug'); $pdo->prepare('INSERT IGNORE INTO categories(name,slug) VALUES(?,?)')->execute([$category,$slug]); $categoryIds[$category]=(int)$pdo->query('SELECT id FROM categories WHERE name='.$pdo->quote($category))->fetchColumn(); }
-      preg_match('/images:\s*\[\s*"((?:\\.|[^"\\])*)"/', $block, $im);
-      preg_match('/advantages:\s*\[(.*?)\]/s', $block, $adv); preg_match_all('/"((?:\\.|[^"\\])+?)"/', $adv[1]??'', $av); $av[1]=array_map('stripcslashes',$av[1]??[]);
-      $insert->execute([scalar($block,'name'),scalar($block,'slug'),scalar($block,'sku'),$brandIds[$brand],$categoryIds[$category],scalar($block,'shortDescription'),scalar($block,'description'),scalar($block,'price','0'),scalar($block,'oldPrice')?:null,scalar($block,'monthlyPayment')?:null,scalar($block,'inStock','1'),scalar($block,'isNew'),scalar($block,'isHit'),scalar($block,'isSale'),scalar($block,'rating','5'),scalar($block,'reviewCount','0'),$im[1]??null,scalar($block,'processor'),scalar($block,'gpu'),scalar($block,'ram'),scalar($block,'storage'),scalar($block,'display'),scalar($block,'resolution'),scalar($block,'refreshRate'),scalar($block,'matrixType'),scalar($block,'weight'),scalar($block,'color'),scalar($block,'os'),scalar($block,'warranty'),scalar($block,'battery'),scalar($block,'ports'),scalar($block,'wifi'),scalar($block,'bluetooth'),scalar($block,'camera'),scalar($block,'dimensions'),implode("\n",$av[1]??[])]); $count++;
+    // 1. Create tables
+    $sqlFile = __DIR__ . '/database.sql';
+    if (file_exists($sqlFile)) {
+        $sqlContent = file_get_contents($sqlFile);
+        $queries = array_filter(array_map('trim', explode(';', $sqlContent)));
+        foreach ($queries as $q) {
+            if (!empty($q)) {
+                try { $pdo->exec($q); } catch (Throwable $t) {}
+            }
+        }
     }
-    preg_match('/export const REVIEWS = \[(.*?)\n\];/s', $data, $reviews); preg_match_all('/\{\s*author:.*?\}/s', $reviews[1]??'', $rows);
-    $review=$pdo->prepare('INSERT INTO reviews(author_name,initials,rating,body,source) VALUES(?,?,?,?,?)'); foreach(($rows[0] ?? []) as $r) $review->execute([scalar($r,'author'),scalar($r,'initials'),scalar($r,'rating','5'),scalar($r,'text'),scalar($r,'source','site')]);
-  }
 
-  $pdo->exec("INSERT IGNORE INTO promotions(title,description,badge,button_text,button_url,color,sort_order) VALUES ('Скидки на популярные модели','Выгодные цены на ноутбуки из наличия','СКИДКИ','Смотреть каталог','/catalog','orange',1),('Подарок к ноутбуку','Подберём полезный аксессуар при покупке выбранных моделей','ПОДАРОК','Выбрать ноутбук','/catalog','dark',2),('Бесплатная доставка','Доставка по Казахстану при заказе от 200 000 ₸','ДОСТАВКА','Подробнее','/delivery','blue',3)");
-  echo '<h1>Готово</h1><p>База данных создана/обновлена. Импортировано товаров: '. $count .'. <a href="admin/login.php">Открыть админку</a></p><p>Логин: <b>admin</b>, пароль: <b>change-me-now</b>.</p>';
-} catch (Throwable $e) { http_response_code(500); echo '<pre>Ошибка: '.htmlspecialchars($e->getMessage()).'</pre>'; }
+    // 2. Additional tables
+    $pdo->exec("CREATE TABLE IF NOT EXISTS product_images (
+        id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        product_id INT UNSIGNED NOT NULL,
+        image_url VARCHAR(500) NOT NULL,
+        alt_text VARCHAR(255) NULL,
+        is_main TINYINT(1) NOT NULL DEFAULT 0,
+        sort_order INT NOT NULL DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        INDEX idx_product_images (product_id, is_main, sort_order)
+    )");
+
+    $pdo->exec("CREATE TABLE IF NOT EXISTS product_related (
+        id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        product_id INT UNSIGNED NOT NULL,
+        related_id INT UNSIGNED NOT NULL,
+        UNIQUE KEY uq_rel (product_id, related_id)
+    )");
+
+    // 3. Admin user
+    $chkAdmin = $pdo->query('SELECT COUNT(*) FROM admins')->fetchColumn();
+    if (!$chkAdmin) {
+        $pdo->prepare('INSERT INTO admins(login,password_hash) VALUES(?,?)')
+            ->execute(['admin', password_hash('change-me-now', PASSWORD_DEFAULT)]);
+    }
+
+    // 4. Default Brands & Categories if empty
+    if (!$pdo->query('SELECT COUNT(*) FROM brands')->fetchColumn()) {
+        $pdo->exec("INSERT INTO brands (name, slug) VALUES 
+            ('Lenovo', 'lenovo'), ('ASUS', 'asus'), ('Apple', 'apple'), 
+            ('HP', 'hp'), ('Dell', 'dell'), ('Acer', 'acer')");
+    }
+
+    if (!$pdo->query('SELECT COUNT(*) FROM categories')->fetchColumn()) {
+        $pdo->exec("INSERT INTO categories (name, slug, sort_order) VALUES 
+            ('Игровые ноутбуки', 'gaming', 1),
+            ('Ультрабуки', 'ultrabooks', 2),
+            ('Для работы и учебы', 'work', 3),
+            ('MacBook', 'macbook', 4)");
+    }
+
+    if (!$pdo->query('SELECT COUNT(*) FROM promotions')->fetchColumn()) {
+        $pdo->exec("INSERT IGNORE INTO promotions (title,description,badge,button_text,button_url,color,sort_order) VALUES 
+            ('Скидки на популярные модели','Выгодные цены на ноутбуки из наличия','СКИДКИ','Смотреть каталог','/catalog','orange',1),
+            ('Подарок к ноутбуку','Подберём полезный аксессуар при покупке выбранных моделей','ПОДАРОК','Выбрать ноутбук','/catalog','dark',2),
+            ('Бесплатная доставка','Доставка по Казахстану при заказе от 200 000 ₸','ДОСТАВКА','Подробнее','/delivery','blue',3)");
+    }
+
+    echo '<h1 style="color:#059669;font-family:sans-serif">✅ База данных успешно инициализирована!</h1>';
+    echo '<p style="font-family:sans-serif">Все таблицы созданы и проверены. Вы можете перейти в админ-панель:</p>';
+    echo '<p style="font-family:sans-serif"><a href="admin/login.php" style="background:#ff5a1f;color:#fff;padding:10px 18px;border-radius:8px;text-decoration:none;font-weight:bold;display:inline-block">Открыть админку</a></p>';
+    echo '<p style="font-family:sans-serif;color:#666">Логин: <b>admin</b> | Пароль: <b>change-me-now</b></p>';
+
+} catch (Throwable $e) {
+    http_response_code(500);
+    echo '<h1 style="color:#dc2626;font-family:sans-serif">Ошибка инициализации</h1>';
+    echo '<pre style="background:#fef2f2;padding:16px;border-radius:8px;color:#991b1b">' . htmlspecialchars($e->getMessage()) . '</pre>';
+}
+

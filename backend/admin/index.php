@@ -99,7 +99,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                      'resolution','refresh_rate','matrix_type','warranty'];
             $values = [];
             foreach ($cols as $c) {
-                if ($c === 'in_stock' || str_starts_with($c, 'is_')) {
+                if ($c === 'in_stock' || strpos($c, 'is_') === 0) {
                     $values[] = isset($f[$c]) ? 1 : 0;
                 } else {
                     $values[] = (isset($f[$c]) && $f[$c] !== '') ? $f[$c] : null;
@@ -261,7 +261,8 @@ body{font:15px system-ui;margin:0;background:var(--l);color:#191a20}
 table{width:100%;border-collapse:collapse;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 10px #0000000a}
 th,td{padding:12px 14px;text-align:left;border-bottom:1px solid #eee;vertical-align:middle}
 th{font-size:11px;color:#6d6e76;text-transform:uppercase;background:#fafafa}
-input[type=text],input[type=number],input[type=password],input[type=file],textarea,select{width:100%;padding:10px;border:1px solid #d9dae0;border-radius:7px;margin:4px 0 12px;font:inherit;background:#fff}
+input[type=text],input[type=number],input[type=password],input[type=file],input:not([type]),textarea,select{width:100%;padding:10px;border:1px solid #d9dae0;border-radius:7px;margin:4px 0 12px;font:inherit;background:#fff;box-shadow:none;outline:none}
+input[type=text]:focus,input[type=number]:focus,input[type=password]:focus,input:not([type]):focus,textarea:focus,select:focus{border-color:var(--a);box-shadow:0 0 0 3px rgba(255,90,31,0.15)}
 input[type=file]{padding:7px}
 textarea{min-height:90px;resize:vertical}
 .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}

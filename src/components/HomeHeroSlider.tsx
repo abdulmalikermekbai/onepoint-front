@@ -95,17 +95,33 @@ export default function HomeHeroSlider() {
         const isCurrent = idx === current;
         return (
           <div key={s.id} style={{ display: isCurrent ? "flex" : "none", justifyContent: "center", alignItems: "center", position: "relative" }}>
-            <img
-              src={s.image_url}
-              alt={s.title || "Слайд"}
-              style={{
-                width: "100%",
-                maxHeight: 520,
-                objectFit: "contain",
-                borderRadius: 28,
-                filter: "drop-shadow(0 20px 40px rgba(0,0,0,.3))"
-              }}
-            />
+            {s.link_url ? (
+              <Link href={s.link_url} style={{ display: "block", width: "100%", height: "100%" }}>
+                <img
+                  src={s.image_url}
+                  alt={s.title || "Слайд"}
+                  style={{
+                    width: "100%",
+                    maxHeight: 520,
+                    objectFit: "contain",
+                    borderRadius: 28,
+                    filter: "drop-shadow(0 20px 40px rgba(0,0,0,.3))"
+                  }}
+                />
+              </Link>
+            ) : (
+              <img
+                src={s.image_url}
+                alt={s.title || "Слайд"}
+                style={{
+                  width: "100%",
+                  maxHeight: 520,
+                  objectFit: "contain",
+                  borderRadius: 28,
+                  filter: "drop-shadow(0 20px 40px rgba(0,0,0,.3))"
+                }}
+              />
+            )}
           </div>
         );
       })}

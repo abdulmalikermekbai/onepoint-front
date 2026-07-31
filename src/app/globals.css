@@ -151,6 +151,7 @@ section { padding: 88px 0; }
 
 /* ============ HERO ============ */
 .hero-section { padding: 52px 0 40px; }
+@media(max-width: 680px) { .hero-section { padding: 12px 0 24px; } }
 .hero-banner {
   position: relative; overflow: hidden; border-radius: 28px;
   background: radial-gradient(ellipse 900px 600px at 78% 20%, #2A1710 0%, transparent 60%),
@@ -522,9 +523,8 @@ html, body {
 .product-gallery__thumbs {
   display: flex;
   gap: 10px;
-  overflow-x: auto;
+  flex-wrap: wrap;
   padding-bottom: 4px;
-  scrollbar-width: thin;
 }
 .product-gallery__thumbs::-webkit-scrollbar { height: 4px; }
 .product-gallery__thumbs::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }

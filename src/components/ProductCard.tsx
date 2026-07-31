@@ -48,59 +48,64 @@ export default function ProductCard({ product, onToast }: ProductCardProps) {
             </button>
           </div>
           {gallery.length > 0 && !imageLoadError ? (
-            <div 
-              style={{ position: "relative", width: "100%", paddingBottom: gallery.length > 1 ? 16 : 0 }}
-              onTouchStart={(e) => {
-                const clientX = e.targetTouches[0].clientX;
-                (e.currentTarget as any)._startX = clientX;
-              }}
-              onTouchEnd={(e) => {
-                const startX = (e.currentTarget as any)._startX;
-                if (startX === undefined) return;
-                const endX = e.changedTouches[0].clientX;
-                const diff = startX - endX;
-                if (Math.abs(diff) > 50) {
-                  if (diff > 0) {
-                    setActiveImg((prev) => (prev + 1) % gallery.length);
-                  } else {
-                    setActiveImg((prev) => (prev - 1 + gallery.length) % gallery.length);
+            <Link href={`/product/${product.slug}`} style={{ display: "block", width: "100%" }} tabIndex={-1}>
+              <div 
+                style={{ position: "relative", width: "100%", paddingBottom: gallery.length > 1 ? 16 : 0 }}
+                onTouchStart={(e) => {
+                  const clientX = e.targetTouches[0].clientX;
+                  (e.currentTarget as any)._startX = clientX;
+                }}
+                onTouchEnd={(e) => {
+                  const startX = (e.currentTarget as any)._startX;
+                  if (startX === undefined) return;
+                  const endX = e.changedTouches[0].clientX;
+                  const diff = startX - endX;
+                  if (Math.abs(diff) > 50) {
+                    e.preventDefault();
+                    if (diff > 0) {
+                      setActiveImg((prev) => (prev + 1) % gallery.length);
+                    } else {
+                      setActiveImg((prev) => (prev - 1 + gallery.length) % gallery.length);
+                    }
                   }
-                }
-              }}
-            >
-              <img
-                className="product-photo"
-                src={gallery[activeImg]}
-                alt={product.name}
-                loading="lazy"
-                style={{ mixBlendMode: "normal" }}
-                onError={() => setImageLoadError(true)}
-              />
-              {gallery.length > 1 && (
-                <div style={{ display: "flex", justifyContent: "center", gap: 6, position: "absolute", bottom: -4, left: 0, right: 0 }}>
-                  {gallery.slice(0, 5).map((_, i) => (
-                    <button
-                      key={i}
-                      onMouseEnter={() => setActiveImg(i)}
-                      onClick={(e) => { e.preventDefault(); setActiveImg(i); }}
-                      style={{
-                        width: activeImg === i ? 16 : 6,
-                        height: 6,
-                        borderRadius: 6,
-                        background: activeImg === i ? "var(--accent)" : "rgba(0,0,0,0.2)",
-                        border: "none",
-                        cursor: "pointer",
-                        padding: 0,
-                        transition: "all 0.2s ease"
-                      }}
-                      aria-label={`Slide ${i + 1}`}
-                    />
-                  ))}
-                </div>
-              )}
-            </div>
+                }}
+              >
+                <img
+                  className="product-photo"
+                  src={gallery[activeImg]}
+                  alt={product.name}
+                  loading="lazy"
+                  style={{ mixBlendMode: "normal" }}
+                  onError={() => setImageLoadError(true)}
+                />
+                {gallery.length > 1 && (
+                  <div style={{ display: "flex", justifyContent: "center", gap: 6, position: "absolute", bottom: -4, left: 0, right: 0 }}>
+                    {gallery.slice(0, 5).map((_, i) => (
+                      <button
+                        key={i}
+                        onMouseEnter={() => setActiveImg(i)}
+                        onClick={(e) => { e.preventDefault(); setActiveImg(i); }}
+                        style={{
+                          width: activeImg === i ? 16 : 6,
+                          height: 6,
+                          borderRadius: 6,
+                          background: activeImg === i ? "var(--accent)" : "rgba(0,0,0,0.2)",
+                          border: "none",
+                          cursor: "pointer",
+                          padding: 0,
+                          transition: "all 0.2s ease"
+                        }}
+                        aria-label={`Slide ${i + 1}`}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+            </Link>
           ) : (
-            <LaptopSVG color1={product.svgColor1} color2={product.svgColor2} size={220} />
+            <Link href={`/product/${product.slug}`} style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "100%", height: "100%" }}>
+              <LaptopSVG color1={product.svgColor1} color2={product.svgColor2} size={220} />
+            </Link>
           )}
         </div>
 

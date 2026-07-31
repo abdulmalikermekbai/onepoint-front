@@ -298,7 +298,7 @@ export default async function ProductPage({ params }: Props) {
                 ].map(acc => (
                   <div key={acc.name} style={{ background: "#fff", borderRadius: 14, padding: 16, border: "1.5px solid var(--border)", display: "flex", flexDirection: "column", gap: 10, textAlign: "center" }}>
                     <div style={{ height: 120, display: "flex", alignItems: "center", justifyContent: "center", background: "#f8f9fa", borderRadius: 8, padding: 8 }}>
-                      <img src={acc.image} alt={acc.name} style={{ maxHeight: "100%", maxWidth: "100%", objectFit: "contain" }} onError={(e) => { e.currentTarget.src = ""; }} />
+                      <img src={acc.image} alt={acc.name} style={{ maxHeight: "100%", maxWidth: "100%", objectFit: "contain" }} />
                     </div>
                     <div style={{ fontSize: 13.5, fontWeight: 600, lineHeight: 1.3, height: 36, overflow: "hidden", textOverflow: "ellipsis" }}>{acc.name}</div>
                     <div style={{ fontSize: 15, fontWeight: 800, color: "var(--accent)" }}>{formatPrice(acc.price)}</div>

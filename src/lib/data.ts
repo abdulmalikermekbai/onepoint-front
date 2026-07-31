@@ -119,7 +119,7 @@ export function normalizeDbProduct(p: any): Product {
   const saving = (oldPrice && oldPrice > price) ? (oldPrice - price) : undefined;
 
   return {
-    id: p.id,
+    id: Number(p.id),
     name: p.name || "",
     slug: p.slug || `product-${p.id}`,
     brand: p.brand || "Ноутбуки",
@@ -169,7 +169,12 @@ export function normalizeDbProduct(p: any): Product {
     bgGradient: "linear-gradient(150deg,#F1E9FB,#EAE1F9)",
     svgColor1: "#5b2a86",
     svgColor2: "#ff5a1f",
-    images: p.gallery ? p.gallery.map((g: any) => productImageUrl(g.image_url)) : (p.image_url ? [productImageUrl(p.image_url)] : []),
+    // gallery = array of objects (single product endpoint), gallery_images = array of strings (list endpoint)
+    images: p.gallery
+      ? p.gallery.map((g: any) => productImageUrl(g.image_url))
+      : p.gallery_images && Array.isArray(p.gallery_images) && p.gallery_images.length > 0
+        ? p.gallery_images.map((url: string) => productImageUrl(url))
+        : (p.image_url ? [productImageUrl(p.image_url)] : []),
     reviews: p.reviews || [],
     related: p.related ? p.related.map((r: any) => normalizeDbProduct(r)) : [],
     sortOrder: Number(p.sort_order) || 0,

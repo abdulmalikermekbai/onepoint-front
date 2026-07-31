@@ -25,7 +25,7 @@ export default function ProductCard({ product, onToast }: ProductCardProps) {
     <>
       <div className="product-card">
         {/* Media */}
-        <div className="product-media" style={{ background: product.bgGradient }}>
+        <div className="product-media">
           <div className="media-top-row">
             <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
               {Boolean(product.discountPercent) && (

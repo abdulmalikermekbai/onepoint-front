@@ -38,15 +38,6 @@ export default function ProductPageClient({ product, waLink }: Props) {
 
   return (
     <>
-      <button className="cta-primary" onClick={() => setBuyModalOpen(true)}>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="20" height="20">
-          <circle cx="9" cy="21" r="1" />
-          <circle cx="20" cy="21" r="1" />
-          <path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6" />
-        </svg>
-        Купить сейчас
-      </button>
-
       <a 
         href={waLink} 
         target="_blank" 
@@ -93,6 +84,17 @@ export function ProductGallery({ images, mainImage, productName }: {
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
   const minSwipeDistance = 50;
+
+  // Keyboard navigation
+  useEffect(() => {
+    if (!hasImages || allImages.length <= 1) return;
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowRight') setActive(prev => (prev + 1) % allImages.length);
+      if (e.key === 'ArrowLeft') setActive(prev => (prev - 1 + allImages.length) % allImages.length);
+    };
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, [hasImages, allImages.length]);
 
   const onTouchStart = (e: React.TouchEvent) => {
     setTouchEnd(null);

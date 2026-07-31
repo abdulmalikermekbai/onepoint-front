@@ -6,6 +6,8 @@ import ProductCard from "@/components/ProductCard";
 import LaptopSVG from "@/components/LaptopSVG";
 import { BRANDS, REVIEWS, formatPrice } from "@/lib/data";
 import HomeClient from "./HomeClient";
+import HomeHeroSlider from "@/components/HomeHeroSlider";
+import { ClientStatsGrid } from "@/components/ClientStats";
 import { HitProductsGrid, NewProductsGrid } from "./HomePageProducts";
 
 const CATEGORIES = [
@@ -25,7 +27,7 @@ const CATEGORIES = [
 
 const ADVANTAGES = [
   { icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="25" height="25"><path d="M1 3h15v13H1zM16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>, title: "Бесплатная доставка", desc: "По всему Казахстану за 1–3 дня. Надежная упаковка и полное страхование груза." },
-  { icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="25" height="25"><path d="M12 2 4 6v6c0 5 3.4 8.7 8 10 4.6-1.3 8-5 8-10V6l-8-4Z"/><path d="m9 12 2 2 4-4"/></svg>, title: "Гарантия 12–24 месяцев", desc: "Официальная гарантия и сервисная поддержка по всему Казахстану." },
+  { icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="25" height="25"><path d="M12 2 4 6v6c0 5 3.4 8.7 8 10 4.6-1.3 8-5 8-10V6l-8-4Z"/><path d="m9 12 2 2 4-4"/></svg>, title: "Гарантия 12–24 месяцев", desc: "Гарантия 1 год и сервисная поддержка по всему Казахстану." },
   { icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="25" height="25"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>, title: "Проверка перед отправкой", desc: "Каждый ноутбук проходит полную диагностику экранов, тесты и предпродажную проверку." },
   { icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="25" height="25"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.7a2 2 0 0 1-.5 2.1L8 9.7a16 16 0 0 0 6 6l1.2-1.2a2 2 0 0 1 2.1-.5c.9.3 1.8.5 2.7.6a2 2 0 0 1 1.7 2Z"/></svg>, title: "Помощь в подборе", desc: "Опытные специалисты подберут идеальный ноутбук под ваши задачи и бюджет." },
   { icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="25" height="25"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>, title: "Консультация 24/7", desc: "Всегда на связи в мессенджерах. Ответим на любые технические вопросы." },
@@ -44,94 +46,10 @@ export default function HomePage() {
         {/* ============ HERO ============ */}
         <section className="hero-section">
           <div className="wrap">
-            <div className="hero-banner">
-              <div className="hero-glow" />
-              <div className="hero-glow-2" />
-
-              <div className="hero-text reveal">
-                <div className="hero-badge">
-                  <span className="ping" />
-                  НОВИНКА 2025 · ЛУЧШИЕ ЦЕНЫ В КАЗАХСТАНЕ
-                </div>
-                <h1 className="hero-title">
-                  Ноутбуки для работы,<br />
-                  учёбы и игр —<br />
-                  по <em>лучшим ценам</em>.
-                </h1>
-                <p className="hero-desc">
-                  Оригинальные ноутбуки ASUS, Lenovo, HP, Acer, Dell, MSI, Apple. Официальная гарантия, доставка по всему Казахстану и выгодные цены каждый день.
-                </p>
-                <div className="hero-specs">
-                  <div className="hero-spec-chip">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="15" height="15"><path d="M12 2 4 6v6c0 5 3.4 8.7 8 10 4.6-1.3 8-5 8-10V6l-8-4Z"/></svg>
-                    Официальная гарантия
-                  </div>
-                  <div className="hero-spec-chip">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="15" height="15"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
-                    Рассрочка 0%
-                  </div>
-                  <div className="hero-spec-chip">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="15" height="15"><path d="M1 3h15v13H1z"/><path d="M16 8h4l3 3v5h-7V8z"/></svg>
-                    Доставка по Казахстану
-                  </div>
-                </div>
-                <div className="hero-cta-row">
-                  <Link href="/catalog" className="btn btn-primary">
-                    Перейти в каталог
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" width="16" height="16"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-                  </Link>
-                  <a
-                    href="https://wa.me/77075511979?text=Здравствуйте!%20Помогите%20подобрать%20ноутбук."
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn btn-green"
-                  >
-                    <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
-                      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
-                      <path d="M12 0C5.373 0 0 5.373 0 12c0 2.125.556 4.122 1.528 5.855L.057 23.082a1 1 0 0 0 1.224 1.3l5.396-1.416A11.942 11.942 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.896 0-3.665-.522-5.176-1.432l-.361-.217-3.742.981.999-3.648-.235-.374A9.96 9.96 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/>
-                    </svg>
-                    Написать в WhatsApp
-                  </a>
-                </div>
-                <div className="hero-perks">
-                  <span className="hero-perk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16"><path d="M1 3h15v13H1z"/><path d="M16 8h4l3 3v5h-7V8z"/></svg>Доставка по Казахстану</span>
-                  <span className="hero-perk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16"><path d="M12 2 4 6v6c0 5 3.4 8.7 8 10 4.6-1.3 8-5 8-10V6l-8-4Z"/></svg>Официальная гарантия</span>
-                  <span className="hero-perk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1A19.5 19.5 0 0 1 5.2 15.8 19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.7a2 2 0 0 1-.5 2.1L8 9.7a16 16 0 0 0 6 6Z"/></svg>Консультация экспертов</span>
-                  <span className="hero-perk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Более 5 лет на рынке</span>
-                </div>
-              </div>
-
-              <div className="hero-visual">
-                <div className="float-badge b1">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="15" height="15"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 2v2M15 2v2M9 20v2M15 20v2M2 9h2M2 15h2M20 9h2M20 15h2"/></svg>
-                  RTX 5080 · 240 Гц
-                </div>
-                <div className="float-badge b2">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="15" height="15"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 9h6v6H9z"/></svg>
-                  2 ТБ NVMe Gen5
-                </div>
-                <div className="float-badge b3">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="15" height="15"><path d="M12 2v20M2 12h20"/></svg>
-                  32 ГБ DDR5
-                </div>
-                <LaptopSVG color1="#5b2a86" color2="#ff5a1f" size={440} />
-              </div>
-            </div>
+            <HomeHeroSlider />
 
             {/* Quick Stats */}
-            <div className="stats-grid">
-              {[
-                { num: "500+", label: "Моделей в каталоге" },
-                { num: "5000+", label: "Довольных клиентов" },
-                { num: "5 лет", label: "На рынке Казахстана" },
-                { num: "0%", label: "Рассрочка без переплат" },
-              ].map((s) => (
-                <div key={s.label}>
-                  <div className="stat-num">{s.num}</div>
-                  <div className="stat-label">{s.label}</div>
-                </div>
-              ))}
-            </div>
+            <ClientStatsGrid />
           </div>
         </section>
 
@@ -317,7 +235,7 @@ export default function HomePage() {
 
             {/* Stats row */}
             <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginTop: 32, justifyContent: "center" }} className="reveal">
-              {["✔ Более 5 лет опыта","✔ Более 500 моделей","✔ Тысячи довольных клиентов","✔ Официальная гарантия","✔ Проверенная техника","✔ Лучшие цены","✔ Быстрая доставка","✔ Собственный сервис"].map(s => (
+              {["✔ Более 5 лет опыта","✔ Огромный выбор моделей","✔ Тысячи довольных клиентов","✔ Гарантия 1 год","✔ Проверенная техника","✔ Лучшие цены","✔ Быстрая доставка","✔ Собственный сервис"].map(s => (
                 <span key={s} style={{ background: "#fff", border: "1.5px solid var(--border)", borderRadius: 100, padding: "8px 16px", fontSize: 13.5, fontWeight: 600, color: "var(--text)" }}>{s}</span>
               ))}
             </div>

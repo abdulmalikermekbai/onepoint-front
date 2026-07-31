@@ -12,7 +12,7 @@ export default function Footer() {
               OnePoint
             </div>
             <p className="footer-about">
-              Премиальный магазин оригинальных ноутбуков в Казахстане. Официальная гарантия, экспертный подбор и сервис мирового уровня.
+              Премиальный магазин оригинальных ноутбуков в Казахстане. Гарантия 1 год, экспертный подбор и сервис мирового уровня.
             </p>
             <div className="footer-social">
               <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" title="Instagram">

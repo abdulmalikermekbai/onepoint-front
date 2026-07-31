@@ -1,6 +1,7 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import BuyModal from "@/components/BuyModal";
+import { trackEvent } from "@/lib/analytics";
 import LaptopSVG from "@/components/LaptopSVG";
 
 interface GalleryImage {
@@ -26,6 +27,15 @@ interface Props {
 export default function ProductPageClient({ product, waLink }: Props) {
   const [buyModalOpen, setBuyModalOpen] = useState(false);
 
+  useEffect(() => {
+    trackEvent('view_item', {
+      content_name: product.name,
+      content_id: product.id,
+      value: product.price,
+      currency: 'KZT'
+    });
+  }, [product]);
+
   return (
     <>
       <button className="cta-primary" onClick={() => setBuyModalOpen(true)}>
@@ -37,7 +47,13 @@ export default function ProductPageClient({ product, waLink }: Props) {
         Купить сейчас
       </button>
 
-      <a href={waLink} target="_blank" rel="noopener noreferrer" className="cta-wa">
+      <a 
+        href={waLink} 
+        target="_blank" 
+        rel="noopener noreferrer" 
+        className="cta-wa"
+        onClick={() => trackEvent('click_whatsapp', { content_name: product.name, content_id: product.id })}
+      >
         <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
           <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
           <path d="M12 0C5.373 0 0 5.373 0 12c0 2.125.556 4.122 1.528 5.855L.057 23.082a1 1 0 0 0 1.224 1.3l5.396-1.416A11.942 11.942 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.896 0-3.665-.522-5.176-1.432l-.361-.217-3.742.981.999-3.648-.235-.374A9.96 9.96 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z" />
@@ -180,13 +196,12 @@ export function ProductGallery({ images, mainImage, productName }: {
 }
 
 /* ─── Product Tabs ─── */
-export function ProductTabsInteractive({ product, specs, reviews }: {
+export function ProductTabsInteractive({ product, specs }: {
   product: any;
   specs: [string, string][];
-  reviews?: Review[];
 }) {
-  const [activeTab, setActiveTab] = useState<"specs" | "desc" | "equipment" | "reviews">("specs");
-  const reviewList = reviews && reviews.length > 0 ? reviews : null;
+  const [activeTab, setActiveTab] = useState<"specs" | "desc" | "equipment">("specs");
+
 
   return (
     <div>
@@ -195,7 +210,7 @@ export function ProductTabsInteractive({ product, specs, reviews }: {
           { key: "specs", label: "Характеристики" },
           { key: "desc", label: "Описание" },
           { key: "equipment", label: "Комплектация" },
-          { key: "reviews", label: `Отзывы${reviewList ? ` (${reviewList.length})` : ""}` },
+
         ].map((t) => (
           <button
             key={t.key}
@@ -234,9 +249,18 @@ export function ProductTabsInteractive({ product, specs, reviews }: {
       )}
 
       {activeTab === "desc" && (
-        <div style={{ background: "var(--surface)", borderRadius: 20, padding: 32, lineHeight: 1.7, fontSize: 15.5 }}>
-          <h3 style={{ fontSize: 20, fontWeight: 800, marginBottom: 14 }}>О модели {product.name}</h3>
-          <p style={{ color: "var(--text)", marginBottom: 16 }}>{product.description || product.shortDescription || "Подробное описание готовит наш технический отдел."}</p>
+        <div style={{ background: "var(--surface)", borderRadius: 20, padding: 32 }}>
+          <h3 style={{ fontSize: 20, fontWeight: 800, marginBottom: 16, margin: 0 }}>О товаре</h3>
+          {product.description ? (
+            <div 
+              style={{ color: "var(--text)", lineHeight: 1.6 }} 
+              dangerouslySetInnerHTML={{ __html: product.description }} 
+            />
+          ) : (
+            <p style={{ color: "var(--text)", marginBottom: 16 }}>
+              {product.shortDescription || "Подробное описание готовит наш технический отдел."}
+            </p>
+          )}
           <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginTop: 20 }}>
             <span style={{ background: "#fff", border: "1px solid var(--border)", padding: "8px 16px", borderRadius: 100, fontSize: 13, fontWeight: 600 }}>100% Оригинал</span>
             <span style={{ background: "#fff", border: "1px solid var(--border)", padding: "8px 16px", borderRadius: 100, fontSize: 13, fontWeight: 600 }}>Заводская пломба</span>
@@ -264,53 +288,7 @@ export function ProductTabsInteractive({ product, specs, reviews }: {
         </div>
       )}
 
-      {activeTab === "reviews" && (
-        <div style={{ background: "var(--surface)", borderRadius: 20, padding: 32 }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20, flexWrap: "wrap", gap: 16 }}>
-            <div>
-              <h3 style={{ fontSize: 20, fontWeight: 800, margin: 0 }}>Отзывы покупателей</h3>
-              <div style={{ fontSize: 14, color: "var(--text-muted)", marginTop: 4 }}>
-                {reviewList ? `${reviewList.length} отзыв(а)` : "Средняя оценка 5.0 на основе отзывов покупателей"}
-              </div>
-            </div>
-            <a href="https://go.2gis.com/aduOr" target="_blank" rel="noopener noreferrer" className="btn btn-ghost btn-sm">
-              Оставить отзыв в 2ГИС
-            </a>
-          </div>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            {reviewList ? reviewList.map((rev, i) => (
-              <div key={i} style={{ background: "#fff", borderRadius: 16, padding: 20, border: "1px solid var(--border)" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
-                  <span style={{ fontWeight: 700, fontSize: 15 }}>
-                    {rev.initials || rev.author_name}
-                  </span>
-                  <span style={{ color: "var(--text-soft)", fontSize: 13 }}>
-                    {rev.created_at ? new Date(rev.created_at).toLocaleDateString("ru-RU") : ""}
-                  </span>
-                </div>
-                <div style={{ color: "#FFB100", fontSize: 14, marginBottom: 8 }}>{"★".repeat(rev.rating)}{"☆".repeat(5 - rev.rating)}</div>
-                <p style={{ fontSize: 14.5, color: "var(--text-muted)", lineHeight: 1.5, margin: 0 }}>{rev.body}</p>
-              </div>
-            )) : (
-              /* fallback static reviews */
-              [
-                { name: "Арман К.", rating: 5, date: "Вчера", text: "Отличный ноутбук! Заказывал с доставкой по Алматы, привезли день в день. Все пломбы на месте, проверили экран и нагрев." },
-                { name: "Елена М.", rating: 5, date: "3 дня назад", text: "Покупали для работы с графикой. Экран шикарный, производительность на высоте. Спасибо менеджеру OnePoint за консультацию." }
-              ].map((rev, i) => (
-                <div key={i} style={{ background: "#fff", borderRadius: 16, padding: 20, border: "1px solid var(--border)" }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
-                    <span style={{ fontWeight: 700, fontSize: 15 }}>{rev.name}</span>
-                    <span style={{ color: "var(--text-soft)", fontSize: 13 }}>{rev.date}</span>
-                  </div>
-                  <div style={{ color: "#FFB100", fontSize: 14, marginBottom: 8 }}>{"★".repeat(rev.rating)}</div>
-                  <p style={{ fontSize: 14.5, color: "var(--text-muted)", lineHeight: 1.5, margin: 0 }}>{rev.text}</p>
-                </div>
-              ))
-            )}
-          </div>
-        </div>
-      )}
     </div>
   );
 }

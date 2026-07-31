@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { ClientAboutStats } from "@/components/ClientStats";
 
 export default function AboutPage() {
   return (
@@ -33,19 +34,7 @@ export default function AboutPage() {
               </p>
               <a href="https://wa.me/77075511979" target="_blank" rel="noopener noreferrer" className="btn btn-green">Связаться с нами</a>
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-              {[
-                { num: "5+", label: "Лет на рынке" },
-                { num: "500+", label: "Моделей ноутбуков" },
-                { num: "5000+", label: "Довольных клиентов" },
-                { num: "4.9", label: "Рейтинг в 2GIS" },
-              ].map(s => (
-                <div key={s.label} style={{ background: "var(--surface)", borderRadius: 20, padding: 28, textAlign: "center" }}>
-                  <div style={{ fontSize: 40, fontWeight: 900, color: "var(--accent)", letterSpacing: "-.02em", lineHeight: 1 }}>{s.num}</div>
-                  <div style={{ fontSize: 14, color: "var(--text-muted)", marginTop: 8, fontWeight: 500 }}>{s.label}</div>
-                </div>
-              ))}
-            </div>
+            <ClientAboutStats />
           </div>
 
           {/* Values */}
@@ -53,8 +42,8 @@ export default function AboutPage() {
           <h2 className="section-title" style={{ marginBottom: 32 }}>Почему нам доверяют</h2>
           <div className="adv-grid" style={{ marginBottom: 72 }}>
             {[
-              { icon: "✅", title: "Только оригиналы", desc: "Работаем исключительно с официальными поставщиками. Каждый ноутбук — подлинный, с гарантией производителя." },
-              { icon: "💰", title: "Честные цены", desc: "Никаких скрытых наценок. Регулярные акции, рассрочка 0% и Trade-In для максимальной выгоды." },
+              { icon: "✅", title: "Только оригиналы", desc: "Работаем исключительно с официальными поставщиками. Каждый ноутбук — подлинный, с гарантией 1 год." },
+              { icon: "💰", title: "Честные цены", desc: "Никаких скрытых наценок. Регулярные акции для максимальной выгоды." },
               { icon: "🎓", title: "Экспертная консультация", desc: "Наши специалисты помогут подобрать ноутбук для работы, учёбы, дизайна или игр — бесплатно." },
               { icon: "🔧", title: "Сервисный центр", desc: "Гарантийное и послегарантийное обслуживание. Быстрая диагностика и качественный ремонт." },
             ].map(v => (

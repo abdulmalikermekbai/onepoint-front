@@ -14,7 +14,6 @@ export interface Product {
   discountPercent?: number;
   saving?: number;
   image: string;
-  monthlyPayment: number;
   inStock: boolean;
   stockStatus: "in_stock" | "out_of_stock";
   isNew: boolean;
@@ -45,6 +44,8 @@ export interface Product {
   shortDescription?: string;
   description?: string;
   advantages?: string[];
+  whyBuyText?: string;
+  frequentlyBoughtIds?: string;
   bgGradient?: string;
   svgColor1?: string;
   svgColor2?: string;
@@ -103,7 +104,7 @@ export const BRANDS = [
 
 export const REVIEWS = [
   { author: "Данияр Т.", initials: "ДТ", color: "linear-gradient(135deg,#FF5A1F,#FF8A50)", product: "ASUS ROG Strix G16", rating: 5, text: "Взял ROG Strix для стрима и монтажа — тянет всё без единой просадки. Доставили на следующий день, курьер сам всё распаковал и помог настроить.", source: "2GIS" },
-  { author: "Айгерим К.", initials: "АК", color: "linear-gradient(135deg,#6b6b72,#3a3a40)", product: "Lenovo Legion Pro 5", rating: 5, text: "Оформила Legion Pro 5 в рассрочку без первого взноса — всё прошло онлайн за 10 минут. Ноутбук пришёл в идеальной упаковке, консультант помог с переносом данных.", source: "2GIS" },
+  { author: "Айгерим К.", initials: "АК", color: "linear-gradient(135deg,#6b6b72,#3a3a40)", product: "Lenovo Legion Pro 5", rating: 5, text: "Купила Legion Pro 5 — всё прошло отлично. Ноутбук пришёл в идеальной упаковке, консультант помог с переносом данных.", source: "2GIS" },
   { author: "Руслан М.", initials: "РМ", color: "linear-gradient(135deg,#1AA35C,#2ECC71)", product: "HP Omen 16", rating: 5, text: "HP Omen 16 — лучший ноутбук, которым я владел. Экран потрясающий, батарея на удивление долго держит. OnePoint — рекомендую всем!", source: "2GIS" },
   { author: "Серик А.", initials: "СА", color: "linear-gradient(135deg,#3B82F6,#60A5FA)", product: "Lenovo IdeaPad Slim 3", rating: 5, text: "Брал ноутбук для дочери на учёбу. Отличный выбор за эти деньги! Быстро работает, красивый дизайн. Спасибо OnePoint за профессиональную консультацию.", source: "2GIS" },
   { author: "Малика Б.", initials: "МБ", color: "linear-gradient(135deg,#A855F7,#C084FC)", product: "ASUS TUF Gaming F16", rating: 5, text: "Долго выбирала первый игровой ноутбук — помогли подобрать TUF F16. Играю в сложные игры на максималках. Очень довольна покупкой!", source: "2GIS" },
@@ -132,7 +133,6 @@ export function normalizeDbProduct(p: any): Product {
     // Empty image is intentional: the card will show its visual fallback only
     // when the product has no main image in the database.
     image: productImageUrl(p.image_url),
-    monthlyPayment: Math.round(price / 12),
     inStock: Boolean(p.in_stock),
     stockStatus: p.in_stock ? "in_stock" : "out_of_stock",
     isNew: Boolean(p.is_new),
@@ -163,6 +163,8 @@ export function normalizeDbProduct(p: any): Product {
     shortDescription: p.short_description || "",
     description: p.description || "",
     advantages: p.advantages ? (Array.isArray(p.advantages) ? p.advantages : String(p.advantages).split("\n")) : [],
+    whyBuyText: p.why_buy_text || undefined,
+    frequentlyBoughtIds: p.frequently_bought_ids || undefined,
     bgGradient: "linear-gradient(150deg,#F1E9FB,#EAE1F9)",
     svgColor1: "#5b2a86",
     svgColor2: "#ff5a1f",
@@ -170,6 +172,16 @@ export function normalizeDbProduct(p: any): Product {
     reviews: p.reviews || [],
     related: p.related ? p.related.map((r: any) => normalizeDbProduct(r)) : [],
   };
+}
+
+export function formatGpu(gpu?: string): string {
+  if (!gpu) return "—";
+  let cleaned = gpu.replace(/NVIDIA|GeForce|AMD|Radeon|Intel/ig, "").trim();
+  // Standardize Wattage to "140W"
+  cleaned = cleaned.replace(/(\d+)\s*(W|Вт)/ig, "$1W");
+  cleaned = cleaned.replace(/\s+/g, " ");
+  // If it's just a number like "4060" without RTX, leave it, but usually it's "RTX 4060"
+  return cleaned || gpu;
 }
 
 export async function fetchLiveProducts(): Promise<Product[]> {
@@ -212,6 +224,22 @@ export async function fetchLiveProductBySlug(slug: string): Promise<Product | nu
     console.error(`Failed to fetch product by slug ${slug}:`, e);
   }
   return null;
+}
+
+export async function fetchSettings(): Promise<Record<string, string>> {
+  try {
+    const base = `${typeof window === "undefined"
+      ? (process.env.BACKEND_API_URL || "https://api.onepoint.kz")
+      : "https://api.onepoint.kz"}/api/settings.php`;
+    const res = await fetch(base, { cache: "no-store" });
+    if (res.ok) {
+      const data = await res.json();
+      return data.settings || {};
+    }
+  } catch (e) {
+    console.error(`Failed to fetch settings:`, e);
+  }
+  return {};
 }
 
 export function formatPrice(price: number): string {

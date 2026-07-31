@@ -4,7 +4,7 @@ import { useState } from "react";
 import LaptopSVG from "./LaptopSVG";
 import BuyModal from "./BuyModal";
 import type { Product } from "@/lib/data";
-import { formatPrice } from "@/lib/data";
+import { formatPrice, formatGpu } from "@/lib/data";
 
 interface ProductCardProps {
   product: Product;
@@ -15,6 +15,9 @@ export default function ProductCard({ product, onToast }: ProductCardProps) {
   const [fav, setFav] = useState(false);
   const [buyOpen, setBuyOpen] = useState(false);
   const [imageLoadError, setImageLoadError] = useState(false);
+  const [activeImg, setActiveImg] = useState(0);
+
+  const gallery = product.images && product.images.length > 0 ? product.images : (product.image ? [product.image] : []);
 
   const waLink = `https://wa.me/77075511979?text=Здравствуйте!%20Хочу%20заказать:%20${encodeURIComponent(product.name)}%20за%20${encodeURIComponent(formatPrice(product.price))}`;
 
@@ -44,14 +47,39 @@ export default function ProductCard({ product, onToast }: ProductCardProps) {
               </svg>
             </button>
           </div>
-          {product.image && !imageLoadError ? (
-            <img
-              className="product-photo"
-              src={product.image}
-              alt={product.name}
-              loading="lazy"
-              onError={() => setImageLoadError(true)}
-            />
+          {gallery.length > 0 && !imageLoadError ? (
+            <div style={{ position: "relative", width: "100%", paddingBottom: gallery.length > 1 ? 16 : 0 }}>
+              <img
+                className="product-photo"
+                src={gallery[activeImg]}
+                alt={product.name}
+                loading="lazy"
+                style={{ mixBlendMode: "normal" }}
+                onError={() => setImageLoadError(true)}
+              />
+              {gallery.length > 1 && (
+                <div style={{ display: "flex", justifyContent: "center", gap: 6, position: "absolute", bottom: -4, left: 0, right: 0 }}>
+                  {gallery.slice(0, 5).map((_, i) => (
+                    <button
+                      key={i}
+                      onMouseEnter={() => setActiveImg(i)}
+                      onClick={(e) => { e.preventDefault(); setActiveImg(i); }}
+                      style={{
+                        width: activeImg === i ? 16 : 6,
+                        height: 6,
+                        borderRadius: 6,
+                        background: activeImg === i ? "var(--accent)" : "rgba(0,0,0,0.2)",
+                        border: "none",
+                        cursor: "pointer",
+                        padding: 0,
+                        transition: "all 0.2s ease"
+                      }}
+                      aria-label={`Slide ${i + 1}`}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
           ) : (
             <LaptopSVG color1={product.svgColor1} color2={product.svgColor2} size={220} />
           )}
@@ -93,7 +121,7 @@ export default function ProductCard({ product, onToast }: ProductCardProps) {
               </svg>
               <div>
                 <div className="spec-label">Видеокарта</div>
-                <div className="spec-val">{product.gpu?.split(" ").slice(-2).join(" ")}</div>
+                <div className="spec-val">{formatGpu(product.gpu)}</div>
               </div>
             </div>
             <div className="spec-item">
@@ -131,9 +159,6 @@ export default function ProductCard({ product, onToast }: ProductCardProps) {
                 <div className="price-new">{formatPrice(product.price)}</div>
                 {product.saving && (
                   <div className="price-saving">Экономия {formatPrice(product.saving)}</div>
-                )}
-                {product.monthlyPayment && (
-                  <div className="installment">от {formatPrice(product.monthlyPayment)}/мес в рассрочку</div>
                 )}
               </div>
             </div>

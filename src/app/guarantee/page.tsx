@@ -14,7 +14,7 @@ export default function GuaranteePage() {
             <span>Гарантия</span>
           </div>
           <h1>🛡️ Гарантия</h1>
-          <p>Официальная гарантия на всю технику. Собственный сервисный центр для быстрого решения любых вопросов.</p>
+          <p>Гарантия 1 год на всю технику. Собственный сервисный центр для быстрого решения любых вопросов.</p>
         </div>
       </div>
 
@@ -24,14 +24,14 @@ export default function GuaranteePage() {
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, marginBottom: 48 }}>
             <div style={{ background: "linear-gradient(135deg,#1AA35C,#16a34a)", borderRadius: 24, padding: 40, color: "#fff" }}>
               <span style={{ fontSize: 56, display: "block", marginBottom: 16 }}>🛡️</span>
-              <h2 style={{ fontSize: 28, fontWeight: 800, marginBottom: 12 }}>Официальная гарантия</h2>
+              <h2 style={{ fontSize: 28, fontWeight: 800, marginBottom: 12 }}>Гарантия 1 год</h2>
               <p style={{ fontSize: 15.5, opacity: .9, lineHeight: 1.6 }}>
-                Мы работаем только с официальными поставщиками. На всю технику распространяется официальная гарантия производителя.
+                Мы работаем только с официальными поставщиками. На всю технику предоставляется гарантия 1 год.
               </p>
               <div style={{ marginTop: 24, display: "flex", gap: 20 }}>
                 <div style={{ textAlign: "center" }}>
-                  <div style={{ fontSize: 32, fontWeight: 900 }}>1–2</div>
-                  <div style={{ fontSize: 13, opacity: .8 }}>года гарантии</div>
+                  <div style={{ fontSize: 32, fontWeight: 900 }}>1</div>
+                  <div style={{ fontSize: 13, opacity: .8 }}>год гарантии</div>
                 </div>
                 <div style={{ width: 1, background: "rgba(255,255,255,.2)" }} />
                 <div style={{ textAlign: "center" }}>

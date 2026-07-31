@@ -303,19 +303,26 @@ export function ProductTabsInteractive({ product, specs }: {
       {activeTab === "equipment" && (
         <div style={{ background: "var(--surface)", borderRadius: 20, padding: 32 }}>
           <h3 style={{ fontSize: 20, fontWeight: 800, marginBottom: 18 }}>Что входит в комплект</h3>
-          <ul style={{ display: "flex", flexDirection: "column", gap: 14, listStyle: "none", padding: 0 }}>
-            {[
-              "Ноутбук " + product.name,
-              "Оригинальное зарядное устройство и кабель питания",
-              "Гарантийный талон и техническая документация",
-              "Фирменная заводская упаковка с защитными демпферами"
-            ].map((item, index) => (
-              <li key={index} style={{ display: "flex", alignItems: "center", gap: 12, fontSize: 15, fontWeight: 600 }}>
-                <span style={{ width: 24, height: 24, borderRadius: "50%", background: "var(--success-tint)", color: "var(--success)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 800 }}>✓</span>
-                {item}
-              </li>
-            ))}
-          </ul>
+          {(() => {
+            const list = product.equipment 
+              ? product.equipment.split("\n").map(item => item.trim()).filter(Boolean)
+              : [
+                  "Ноутбук " + product.name,
+                  "Оригинальное зарядное устройство и кабель питания",
+                  "Гарантийный талон и техническая документация",
+                  "Фирменная заводская упаковка с защитными демпферами"
+                ];
+            return (
+              <ul style={{ display: "flex", flexDirection: "column", gap: 14, listStyle: "none", padding: 0 }}>
+                {list.map((item, index) => (
+                  <li key={index} style={{ display: "flex", alignItems: "center", gap: 12, fontSize: 15, fontWeight: 600 }}>
+                    <span style={{ width: 24, height: 24, borderRadius: "50%", background: "var(--success-tint)", color: "var(--success)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 800 }}>✓</span>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            );
+          })()}
         </div>
       )}
 

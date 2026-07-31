@@ -46,6 +46,7 @@ export interface Product {
   advantages?: string[];
   whyBuyText?: string;
   frequentlyBoughtIds?: string;
+  equipment?: string;
   bgGradient?: string;
   svgColor1?: string;
   svgColor2?: string;
@@ -166,6 +167,7 @@ export function normalizeDbProduct(p: any): Product {
     advantages: p.advantages ? (Array.isArray(p.advantages) ? p.advantages : String(p.advantages).split("\n")) : [],
     whyBuyText: p.why_buy_text || undefined,
     frequentlyBoughtIds: p.frequently_bought_ids || undefined,
+    equipment: p.equipment || undefined,
     bgGradient: "linear-gradient(150deg,#F1E9FB,#EAE1F9)",
     svgColor1: "#5b2a86",
     svgColor2: "#ff5a1f",

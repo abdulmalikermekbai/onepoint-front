@@ -134,11 +134,11 @@ export function normalizeDbProduct(p: any): Product {
     // Empty image is intentional: the card will show its visual fallback only
     // when the product has no main image in the database.
     image: productImageUrl(p.image_url),
-    inStock: Boolean(p.in_stock),
-    stockStatus: p.in_stock ? "in_stock" : "out_of_stock",
-    isNew: Boolean(p.is_new),
-    isHit: Boolean(p.is_hit),
-    isSale: Boolean(p.is_sale),
+    inStock: Number(p.in_stock) === 1,
+    stockStatus: Number(p.in_stock) === 1 ? "in_stock" : "out_of_stock",
+    isNew: Number(p.is_new) === 1,
+    isHit: Number(p.is_hit) === 1,
+    isSale: Number(p.is_sale) === 1,
     rating: Number(p.rating) || 5.0,
     reviewCount: Number(p.review_count) || 0,
     color: p.color || "Grey",

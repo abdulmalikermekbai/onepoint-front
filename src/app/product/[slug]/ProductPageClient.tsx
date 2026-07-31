@@ -305,7 +305,7 @@ export function ProductTabsInteractive({ product, specs }: {
           <h3 style={{ fontSize: 20, fontWeight: 800, marginBottom: 18 }}>Что входит в комплект</h3>
           {(() => {
             const list = product.equipment 
-              ? product.equipment.split("\n").map(item => item.trim()).filter(Boolean)
+              ? product.equipment.split("\n").map((item: string) => item.trim()).filter(Boolean)
               : [
                   "Ноутбук " + product.name,
                   "Оригинальное зарядное устройство и кабель питания",

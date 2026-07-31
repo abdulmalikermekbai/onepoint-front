@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import LaptopSVG from "./LaptopSVG";
-import BuyModal from "./BuyModal";
+
 import type { Product } from "@/lib/data";
 import { formatPrice, formatGpu } from "@/lib/data";
 
@@ -13,7 +13,7 @@ interface ProductCardProps {
 
 export default function ProductCard({ product, onToast }: ProductCardProps) {
   const [fav, setFav] = useState(false);
-  const [buyOpen, setBuyOpen] = useState(false);
+
   const [imageLoadError, setImageLoadError] = useState(false);
   const [activeImg, setActiveImg] = useState(0);
 
@@ -100,7 +100,7 @@ export default function ProductCard({ product, onToast }: ProductCardProps) {
           <div className="rating-row">
             <span className="stars">{"★".repeat(Math.round(product.rating))}</span>
             <span className="rating-num">{product.rating}</span>
-            <span className="rating-count">({product.reviewCount} отзывов)</span>
+
           </div>
 
           <div className="spec-grid">
@@ -164,16 +164,7 @@ export default function ProductCard({ product, onToast }: ProductCardProps) {
             </div>
           </div>
 
-          <button className="buy-btn" style={{ width: "100%" }} onClick={() => setBuyOpen(true)}>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16">
-              <circle cx="9" cy="21" r="1" />
-              <circle cx="20" cy="21" r="1" />
-              <path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6" />
-            </svg>
-            Купить
-          </button>
-
-          <a href={waLink} target="_blank" rel="noopener noreferrer" className="wa-btn-card">
+          <button className="wa-btn-card" style={{ width: "100%" }} onClick={() => window.open(waLink, "_blank")}>
             <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
               <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
               <path d="M12 0C5.373 0 0 5.373 0 12c0 2.125.556 4.122 1.528 5.855L.057 23.082a1 1 0 0 0 1.224 1.3l5.396-1.416A11.942 11.942 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.896 0-3.665-.522-5.176-1.432l-.361-.217-3.742.981.999-3.648-.235-.374A9.96 9.96 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z" />
@@ -183,7 +174,7 @@ export default function ProductCard({ product, onToast }: ProductCardProps) {
         </div>
       </div>
 
-      <BuyModal isOpen={buyOpen} onClose={() => setBuyOpen(false)} product={product} />
+
     </>
   );
 }

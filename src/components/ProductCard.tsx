@@ -25,7 +25,7 @@ export default function ProductCard({ product, onToast }: ProductCardProps) {
     <>
       <div className="product-card">
         {/* Media */}
-        <div className="product-media">
+        <div className="product-media" style={{ background: (gallery.length > 0 && !imageLoadError) ? "#ffffff" : undefined }}>
           <div className="media-top-row">
             <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
               {Boolean(product.discountPercent) && (
@@ -82,7 +82,7 @@ export default function ProductCard({ product, onToast }: ProductCardProps) {
                   src={gallery[activeImg]}
                   alt={product.name}
                   loading="lazy"
-                  style={{ mixBlendMode: "normal", objectFit: "contain", width: "100%", height: "100%", padding: "16px 20px" }}
+                  style={{ mixBlendMode: "normal", objectFit: "contain", width: "100%", height: "100%", padding: 0 }}
                   onError={() => setImageLoadError(true)}
                 />
                 {gallery.length > 1 && (

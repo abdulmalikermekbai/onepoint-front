@@ -97,11 +97,7 @@ export default function ProductCard({ product, onToast }: ProductCardProps) {
             </Link>
           </div>
 
-          <div className="rating-row">
-            <span className="stars">{"★".repeat(Math.round(product.rating))}</span>
-            <span className="rating-num">{product.rating}</span>
-
-          </div>
+<div className="rating-row"></div>
 
           <div className="spec-grid">
             <div className="spec-item">
@@ -170,7 +166,7 @@ export default function ProductCard({ product, onToast }: ProductCardProps) {
               <path d="M12 0C5.373 0 0 5.373 0 12c0 2.125.556 4.122 1.528 5.855L.057 23.082a1 1 0 0 0 1.224 1.3l5.396-1.416A11.942 11.942 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.896 0-3.665-.522-5.176-1.432l-.361-.217-3.742.981.999-3.648-.235-.374A9.96 9.96 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z" />
             </svg>
             Заказать в WhatsApp
-          </a>
+          </button>
         </div>
       </div>
 

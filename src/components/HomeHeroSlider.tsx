@@ -45,28 +45,23 @@ export default function HomeHeroSlider() {
         <div className="hero-text reveal">
           <div className="hero-badge">
             <span className="ping" />
-            НОВИНКА 2025 · ЛУЧШИЕ ЦЕНЫ В КАЗАХСТАНЕ
+            АКЦИИ И НОВИНКИ
           </div>
-          <h1 className="hero-title">
-            Ноутбуки для работы,<br />
-            учёбы и игр —<br />
-            по <em>лучшим ценам</em>.
-          </h1>
+          <h2 className="hero-title">Ноутбуки OnePoint</h2>
           <p className="hero-desc">
-            Оригинальные ноутбуки ASUS, Lenovo, HP, Acer, Dell, MSI, Apple. Гарантия 1 год, доставка по всему Казахстану и выгодные цены каждый день.
+            Оригинальные ноутбуки ведущих мировых брендов с гарантией 1 год и быстрой доставкой по всему Казахстану.
           </p>
           <div className="hero-cta-row">
             <Link href="/catalog" className="btn btn-primary">
-              Перейти в каталог
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" width="16" height="16"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+              Смотрите каталог
             </Link>
             <a
-              href="https://wa.me/77075511979?text=Здравствуйте!%20Помогите%20подобрать%20ноутбук."
+              href="https://wa.me/77075511979?text=Здравствуйте!%20Заинтересовал%20блок%20главного%20слайда"
               target="_blank"
               rel="noopener noreferrer"
               className="btn btn-green"
             >
-              Написать в WhatsApp
+              Заказать в WhatsApp
             </a>
           </div>
         </div>

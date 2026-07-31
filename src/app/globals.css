@@ -503,6 +503,14 @@ html, body {
   position: sticky;
   top: 90px;
 }
+
+@media (max-width: 680px) {
+  .product-gallery {
+    position: relative;
+    top: 0;
+  }
+}
+
 .product-gallery__main {
   position: relative;
   border-radius: 20px;

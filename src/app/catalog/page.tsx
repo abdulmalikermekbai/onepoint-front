@@ -42,6 +42,7 @@ function CatalogContent() {
 }
 
 function CatalogFilters({ initialCat, initialBrand }: { initialCat: string; initialBrand: string }) {
+  const [isLoading, setIsLoading] = useState(true);
   const [productsList, setProductsList] = useState<any[]>(PRODUCTS);
   const [category, setCategory] = useState(initialCat);
   const [brand, setBrand] = useState(initialBrand);
@@ -60,10 +61,15 @@ function CatalogFilters({ initialCat, initialBrand }: { initialCat: string; init
   const [filterOpen, setFilterOpen] = useState(false);
 
   useEffect(() => {
+    setIsLoading(true);
     fetchLiveProducts().then(list => {
       if (list && list.length > 0) setProductsList(list);
+      setIsLoading(false);
+    }).catch(() => {
+      setIsLoading(false);
     });
   }, []);
+
 
   const toggle = (arr: string[], val: string, set: (v: string[]) => void) => {
     set(arr.includes(val) ? arr.filter(v => v !== val) : [...arr, val]);
@@ -321,7 +327,17 @@ function CatalogFilters({ initialCat, initialBrand }: { initialCat: string; init
             </div>
           )}
 
-          {filtered.length === 0 ? (
+          {isLoading ? (
+            <div style={{ textAlign: "center", padding: "120px 20px", background: "var(--surface)", borderRadius: 24, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 16 }}>
+              <div className="spinner" style={{ width: 44, height: 44, borderRadius: "50%", border: "4px solid var(--border)", borderTopColor: "var(--accent)", animation: "spin 1s linear infinite" }}></div>
+              <p style={{ color: "var(--text-muted)", fontWeight: 600 }}>Загрузка ноутбуков...</p>
+              <style>{`
+                @keyframes spin {
+                  to { transform: rotate(360deg); }
+                }
+              `}</style>
+            </div>
+          ) : filtered.length === 0 ? (
             <div style={{ textAlign: "center", padding: "80px 20px", background: "var(--surface)", borderRadius: 24 }}>
               <div style={{ fontSize: 60, marginBottom: 16 }}>🔍</div>
               <h3 style={{ fontSize: 22, fontWeight: 800, marginBottom: 8 }}>Ничего не найдено</h3>
@@ -329,7 +345,7 @@ function CatalogFilters({ initialCat, initialBrand }: { initialCat: string; init
               <button className="btn btn-primary" onClick={resetFilters}>Сбросить все фильтры</button>
             </div>
           ) : (
-            <div className="product-grid">
+            <div className="product-grid product-grid-3">
               {filtered.map(p => (
                 <ProductCard key={p.id} product={p} />
               ))}

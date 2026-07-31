@@ -235,7 +235,7 @@ section { padding: 88px 0; }
 .product-card:hover { transform: translateY(-8px); box-shadow: var(--shadow-pop); border-color: transparent; }
 .product-media {
   position: relative; display: flex; align-items: center; justify-content: center;
-  height: 200px; overflow: hidden; background: #f3f3f7; padding: 12px;
+  height: 200px; overflow: hidden; background: #f3f3f7;
 }
 .product-photo { width: 100%; height: 100%; object-fit: contain; display: block; position: relative; z-index: 1; }
 .products-empty { color: var(--text-muted); padding: 24px 0; }

@@ -55,10 +55,8 @@ export default function ProductCard({ product, onToast }: ProductCardProps) {
                   width: "100%", 
                   height: "100%", 
                   display: "flex", 
-                  flexDirection: "column", 
                   justifyContent: "center", 
-                  alignItems: "center",
-                  paddingBottom: gallery.length > 1 ? 16 : 0
+                  alignItems: "center"
                 }}
                 onTouchStart={(e) => {
                   const clientX = e.targetTouches[0].clientX;
@@ -84,11 +82,11 @@ export default function ProductCard({ product, onToast }: ProductCardProps) {
                   src={gallery[activeImg]}
                   alt={product.name}
                   loading="lazy"
-                  style={{ mixBlendMode: "normal", objectFit: "contain", maxHeight: "150px" }}
+                  style={{ mixBlendMode: "normal", objectFit: "contain", width: "100%", height: "100%", padding: "16px 20px" }}
                   onError={() => setImageLoadError(true)}
                 />
                 {gallery.length > 1 && (
-                  <div style={{ display: "flex", justifyContent: "center", gap: 6, position: "absolute", bottom: 8, left: 0, right: 0, zIndex: 5 }}>
+                  <div style={{ display: "flex", justifyContent: "center", gap: 6, position: "absolute", bottom: 12, left: 0, right: 0, zIndex: 10 }}>
                     {gallery.slice(0, 5).map((_, i) => (
                       <button
                         key={i}
@@ -98,7 +96,7 @@ export default function ProductCard({ product, onToast }: ProductCardProps) {
                           width: activeImg === i ? 16 : 6,
                           height: 6,
                           borderRadius: 6,
-                          background: activeImg === i ? "var(--accent)" : "rgba(0,0,0,0.2)",
+                          background: activeImg === i ? "var(--accent)" : "rgba(0,0,0,0.22)",
                           border: "none",
                           cursor: "pointer",
                           padding: 0,

@@ -36,48 +36,142 @@ export default function HomeHeroSlider() {
     return () => clearInterval(t);
   }, [slides]);
 
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+  const minSwipeDistance = 50;
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (slides.length <= 1) return;
+      if (e.key === "ArrowRight") {
+        setCurrent((c) => (c + 1) % slides.length);
+      } else if (e.key === "ArrowLeft") {
+        setCurrent((c) => (c - 1 + slides.length) % slides.length);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [slides]);
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+
+    if (isLeftSwipe && slides.length > 1) {
+      setCurrent((c) => (c + 1) % slides.length);
+    } else if (isRightSwipe && slides.length > 1) {
+      setCurrent((c) => (c - 1 + slides.length) % slides.length);
+    }
+  };
+
   if (slides.length === 0) {
-    // Default static slide fallback
+    // Return empty sized box that collapses instead of showing error placeholders during fetch
     return (
-      <div style={{ position: "relative", width: "100%", borderRadius: 28, overflow: "hidden", display: "flex", justifyContent: "center", alignItems: "center" }}>
-        <img
-          src="/hero-laptop.png"
-          alt="Ноутбуки"
-          style={{
-            width: "100%",
-            maxHeight: 520,
-            objectFit: "cover",
-            borderRadius: 28,
-            filter: "drop-shadow(0 20px 40px rgba(0,0,0,.3))"
-          }}
-          onError={(e) => { e.currentTarget.style.display = "none"; }}
-        />
+      <div style={{ position: "relative", width: "100%", aspectRatio: "16 / 6.1", borderRadius: 28, overflow: "hidden", display: "flex", justifyContent: "center", alignItems: "center" }}>
+        {/* Empty container with height mapping - no placeholder icon */}
       </div>
     );
   }
 
   return (
-    <div style={{ position: "relative", width: "100%", borderRadius: 28, overflow: "hidden" }}>
+    <div 
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
+      style={{ position: "relative", width: "100%", borderRadius: 28, overflow: "hidden" }}
+    >
       {slides.map((s, idx) => {
         const isCurrent = idx === current;
         return (
-            <div key={s.id} style={{ display: isCurrent ? "flex" : "none", justifyContent: "center", alignItems: "center" }}>
-              <img
-                src={s.image_url}
-                alt={s.title || "Слайд"}
-                style={{
-                  width: "100%",
-                  maxHeight: 520,
-                  objectFit: "cover",
-                  borderRadius: 28,
-                  filter: "drop-shadow(0 20px 40px rgba(0,0,0,.3))"
-                }}
-              />
-            </div>
+          <div key={s.id} style={{ display: isCurrent ? "flex" : "none", justifyContent: "center", alignItems: "center", position: "relative" }}>
+            <img
+              src={s.image_url}
+              alt={s.title || "Слайд"}
+              style={{
+                width: "100%",
+                maxHeight: 520,
+                objectFit: "contain",
+                borderRadius: 28,
+                filter: "drop-shadow(0 20px 40px rgba(0,0,0,.3))"
+              }}
+            />
+          </div>
         );
       })}
+
+      {/* Navigation Arrows */}
       {slides.length > 1 && (
-        <div style={{ position: "absolute", bottom: 20, left: 64, display: "flex", gap: 8, zIndex: 10 }}>
+        <>
+          <button
+            onClick={() => setCurrent((c) => (c - 1 + slides.length) % slides.length)}
+            style={{
+              position: "absolute",
+              left: 20,
+              top: "50%",
+              transform: "translateY(-50%)",
+              background: "rgba(0,0,0,0.4)",
+              color: "#fff",
+              border: "none",
+              borderRadius: "50%",
+              width: 44,
+              height: 44,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer",
+              zIndex: 10,
+              transition: "background 0.2s"
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.background = "rgba(0,0,0,0.7)"}
+            onMouseLeave={(e) => e.currentTarget.style.background = "rgba(0,0,0,0.4)"}
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" width="20" height="20">
+              <path d="M15 18l-6-6 6-6" />
+            </svg>
+          </button>
+          <button
+            onClick={() => setCurrent((c) => (c + 1) % slides.length)}
+            style={{
+              position: "absolute",
+              right: 20,
+              top: "50%",
+              transform: "translateY(-50%)",
+              background: "rgba(0,0,0,0.4)",
+              color: "#fff",
+              border: "none",
+              borderRadius: "50%",
+              width: 44,
+              height: 44,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer",
+              zIndex: 10,
+              transition: "background 0.2s"
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.background = "rgba(0,0,0,0.7)"}
+            onMouseLeave={(e) => e.currentTarget.style.background = "rgba(0,0,0,0.4)"}
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" width="20" height="20">
+              <path d="M9 18l6-6-6-6" />
+            </svg>
+          </button>
+        </>
+      )}
+
+      {slides.length > 1 && (
+        <div style={{ position: "absolute", bottom: 20, left: "50%", transform: "translateX(-50%)", display: "flex", gap: 8, zIndex: 10 }}>
           {slides.map((_, idx) => (
             <button
               key={idx}
@@ -86,7 +180,7 @@ export default function HomeHeroSlider() {
                 width: current === idx ? 24 : 8,
                 height: 8,
                 borderRadius: 4,
-                background: current === idx ? "var(--accent)" : "rgba(255,255,255,.3)",
+                background: current === idx ? "var(--accent)" : "rgba(255,255,255,.4)",
                 transition: "all .3s ease"
               }}
             />

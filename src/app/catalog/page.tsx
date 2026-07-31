@@ -100,7 +100,14 @@ function CatalogFilters({ initialCat, initialBrand }: { initialCat: string; init
       case "price_desc": result.sort((a, b) => b.price - a.price); break;
       case "rating": result.sort((a, b) => b.rating - a.rating); break;
       case "new": result.sort((a, b) => (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0)); break;
-      default: result.sort((a, b) => (b.isHit ? 1 : 0) - (a.isHit ? 1 : 0));
+      default:
+        result.sort((a, b) => {
+          const sa = a.sortOrder ?? 0;
+          const sb = b.sortOrder ?? 0;
+          if (sa !== sb) return sa - sb;
+          return (b.isHit ? 1 : 0) - (a.isHit ? 1 : 0);
+        });
+
     }
     return result;
   }, [productsList, category, brand, priceMin, priceMax, selectedProcs, selectedGPUs, selectedRAMs, selectedDisplays, selectedHz, selectedMatrix, inStockOnly, saleOnly, newOnly, sortBy]);

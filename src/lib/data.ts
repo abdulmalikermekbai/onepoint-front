@@ -52,6 +52,7 @@ export interface Product {
   images?: string[];
   reviews?: any[];
   related?: any[];
+  sortOrder?: number;
 }
 
 export const PRODUCTS: Product[] = [];
@@ -171,6 +172,7 @@ export function normalizeDbProduct(p: any): Product {
     images: p.gallery ? p.gallery.map((g: any) => productImageUrl(g.image_url)) : (p.image_url ? [productImageUrl(p.image_url)] : []),
     reviews: p.reviews || [],
     related: p.related ? p.related.map((r: any) => normalizeDbProduct(r)) : [],
+    sortOrder: Number(p.sort_order) || 0,
   };
 }
 

@@ -48,7 +48,26 @@ export default function ProductCard({ product, onToast }: ProductCardProps) {
             </button>
           </div>
           {gallery.length > 0 && !imageLoadError ? (
-            <div style={{ position: "relative", width: "100%", paddingBottom: gallery.length > 1 ? 16 : 0 }}>
+            <div 
+              style={{ position: "relative", width: "100%", paddingBottom: gallery.length > 1 ? 16 : 0 }}
+              onTouchStart={(e) => {
+                const clientX = e.targetTouches[0].clientX;
+                (e.currentTarget as any)._startX = clientX;
+              }}
+              onTouchEnd={(e) => {
+                const startX = (e.currentTarget as any)._startX;
+                if (startX === undefined) return;
+                const endX = e.changedTouches[0].clientX;
+                const diff = startX - endX;
+                if (Math.abs(diff) > 50) {
+                  if (diff > 0) {
+                    setActiveImg((prev) => (prev + 1) % gallery.length);
+                  } else {
+                    setActiveImg((prev) => (prev - 1 + gallery.length) % gallery.length);
+                  }
+                }
+              }}
+            >
               <img
                 className="product-photo"
                 src={gallery[activeImg]}

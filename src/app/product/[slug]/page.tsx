@@ -262,18 +262,19 @@ export default async function ProductPage({ params }: Props) {
 
           {/* ====== FREQUENTLY BOUGHT ====== */}
           <div style={{ marginTop: 48, background: "var(--surface)", borderRadius: 24, padding: 32 }}>
-            <h3 style={{ fontSize: 22, fontWeight: 800, marginBottom: 20 }}>Часто покупают вместе</h3>
+            <h3 style={{ fontSize: 22, fontWeight: 800, marginBottom: 20 }}>Часто покупают вместе (Аксессуары)</h3>
             <div className="bought-together-grid">
               {frequentlyBoughtList.length > 0 ? (
                 frequentlyBoughtList.map(acc => (
-                  <div key={acc.id} style={{ background: "#fff", borderRadius: 14, padding: 16, border: "1.5px solid var(--border)", display: "flex", flexDirection: "column", gap: 10 }}>
-                    <div style={{ width: 44, height: 44, borderRadius: 12, background: "var(--accent-tint)", color: "var(--accent)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 4px" }}>
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="24" height="24">
-                        <rect x="5" y="2" width="14" height="20" rx="7" />
-                        <line x1="12" y1="6" x2="12" y2="10" />
-                      </svg>
+                  <div key={acc.id} style={{ background: "#fff", borderRadius: 14, padding: 16, border: "1.5px solid var(--border)", display: "flex", flexDirection: "column", gap: 10, textAlign: "center" }}>
+                    <div style={{ height: 120, display: "flex", alignItems: "center", justifyContent: "center", background: "#f8f9fa", borderRadius: 8, padding: 8 }}>
+                      {acc.image ? (
+                        <img src={acc.image} alt={acc.name} style={{ maxHeight: "100%", maxWidth: "100%", objectFit: "contain" }} />
+                      ) : (
+                        <div style={{ color: "var(--text-soft)" }}>🛒</div>
+                      )}
                     </div>
-                    <div style={{ fontSize: 13.5, fontWeight: 600, lineHeight: 1.3 }}>
+                    <div style={{ fontSize: 13.5, fontWeight: 600, lineHeight: 1.3, height: 36, overflow: "hidden", textOverflow: "ellipsis" }}>
                       <Link href={`/product/${acc.slug}`} style={{ textDecoration: "none", color: "inherit" }}>{acc.name}</Link>
                     </div>
                     <div style={{ fontSize: 15, fontWeight: 800, color: "var(--accent)" }}>{formatPrice(acc.price)}</div>
@@ -282,7 +283,7 @@ export default async function ProductPage({ params }: Props) {
                       target="_blank"
                       rel="noopener noreferrer"
                       className="btn btn-ghost btn-xs"
-                      style={{ textAlign: "center" }}
+                      style={{ textAlign: "center", width: "100%" }}
                     >
                       Добавить
                     </a>
@@ -290,26 +291,23 @@ export default async function ProductPage({ params }: Props) {
                 ))
               ) : (
                 [
-                  { name: "Мышь беспроводная Logitech MX Master 3", price: 45990 },
-                  { name: "Сумка-рюкзак для ноутбука 15.6\"", price: 18990 },
-                  { name: "Охлаждающая подставка", price: 12990 },
-                  { name: "USB-C хаб 7-in-1", price: 15990 },
+                  { name: "Мышь беспроводная Logitech MX Master 3", price: 45990, image: "https://api.onepoint.kz/uploads/logitech_mx.png" },
+                  { name: "Сумка-рюкзак для ноутбука 15.6\"", price: 18990, image: "https://api.onepoint.kz/uploads/backpack.png" },
+                  { name: "Охлаждающая подставка для ноутбука", price: 12990, image: "https://api.onepoint.kz/uploads/cooler.png" },
+                  { name: "USB-C хаб 7-in-1 мультипорт", price: 15990, image: "https://api.onepoint.kz/uploads/hub.png" },
                 ].map(acc => (
-                  <div key={acc.name} style={{ background: "#fff", borderRadius: 14, padding: 16, border: "1.5px solid var(--border)", display: "flex", flexDirection: "column", gap: 10 }}>
-                    <div style={{ width: 44, height: 44, borderRadius: 12, background: "var(--accent-tint)", color: "var(--accent)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 4px" }}>
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="24" height="24">
-                        <rect x="5" y="2" width="14" height="20" rx="7" />
-                        <line x1="12" y1="6" x2="12" y2="10" />
-                      </svg>
+                  <div key={acc.name} style={{ background: "#fff", borderRadius: 14, padding: 16, border: "1.5px solid var(--border)", display: "flex", flexDirection: "column", gap: 10, textAlign: "center" }}>
+                    <div style={{ height: 120, display: "flex", alignItems: "center", justifyContent: "center", background: "#f8f9fa", borderRadius: 8, padding: 8 }}>
+                      <img src={acc.image} alt={acc.name} style={{ maxHeight: "100%", maxWidth: "100%", objectFit: "contain" }} onError={(e) => { e.currentTarget.src = ""; }} />
                     </div>
-                    <div style={{ fontSize: 13.5, fontWeight: 600, lineHeight: 1.3 }}>{acc.name}</div>
+                    <div style={{ fontSize: 13.5, fontWeight: 600, lineHeight: 1.3, height: 36, overflow: "hidden", textOverflow: "ellipsis" }}>{acc.name}</div>
                     <div style={{ fontSize: 15, fontWeight: 800, color: "var(--accent)" }}>{formatPrice(acc.price)}</div>
                     <a
                       href={`https://wa.me/77075511979?text=Хочу%20добавить%20к%20заказу:%20${encodeURIComponent(acc.name)}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="btn btn-ghost btn-xs"
-                      style={{ textAlign: "center" }}
+                      style={{ textAlign: "center", width: "100%" }}
                     >
                       Добавить
                     </a>

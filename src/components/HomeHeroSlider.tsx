@@ -39,35 +39,19 @@ export default function HomeHeroSlider() {
   if (slides.length === 0) {
     // Default static slide fallback
     return (
-      <div className="hero-banner">
-        <div className="hero-glow" />
-        <div className="hero-glow-2" />
-        <div className="hero-text reveal">
-          <div className="hero-badge">
-            <span className="ping" />
-            АКЦИИ И НОВИНКИ
-          </div>
-          <h2 className="hero-title">Ноутбуки OnePoint</h2>
-          <p className="hero-desc">
-            Оригинальные ноутбуки ведущих мировых брендов с гарантией 1 год и быстрой доставкой по всему Казахстану.
-          </p>
-          <div className="hero-cta-row">
-            <Link href="/catalog" className="btn btn-primary">
-              Смотрите каталог
-            </Link>
-            <a
-              href="https://wa.me/77075511979?text=Здравствуйте!%20Заинтересовал%20блок%20главного%20слайда"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn btn-green"
-            >
-              Заказать в WhatsApp
-            </a>
-          </div>
-        </div>
-        <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-          <img src="/hero-laptop.png" alt="Ноутбуки" style={{ maxWidth: "100%", maxHeight: 380, objectFit: "contain" }} onError={(e) => { e.currentTarget.style.display = "none"; }} />
-        </div>
+      <div style={{ position: "relative", width: "100%", borderRadius: 28, overflow: "hidden", display: "flex", justifyContent: "center", alignItems: "center" }}>
+        <img
+          src="/hero-laptop.png"
+          alt="Ноутбуки"
+          style={{
+            width: "100%",
+            maxHeight: 520,
+            objectFit: "cover",
+            borderRadius: 28,
+            filter: "drop-shadow(0 20px 40px rgba(0,0,0,.3))"
+          }}
+          onError={(e) => { e.currentTarget.style.display = "none"; }}
+        />
       </div>
     );
   }
@@ -77,61 +61,19 @@ export default function HomeHeroSlider() {
       {slides.map((s, idx) => {
         const isCurrent = idx === current;
         return (
-          <div
-            key={s.id}
-            style={{
-              display: isCurrent ? "grid" : "none",
-              gridTemplateColumns: "1fr 1fr",
-              gap: 32,
-              alignItems: "center",
-              minHeight: 520,
-              padding: "64px 64px",
-              background: `radial-gradient(ellipse 900px 600px at 78% 20%, rgba(255,90,31,0.18) 0%, transparent 60%), linear-gradient(135deg, #0d0d11 0%, #151519 55%, #181410 100%)`,
-              position: "relative",
-              animation: "fadeIn .6s ease-in-out"
-            }}
-          >
-            <div className="hero-glow" />
-            <div className="hero-text">
-              <div className="hero-badge">
-                <span className="ping" />
-                АКЦИИ И НОВИНКИ
-              </div>
-              <h2 style={{ color: "#fff", fontSize: 44, fontWeight: 800, lineHeight: 1.1, letterSpacing: "-.02em", marginBottom: 16 }}>
-                {s.title || "Ноутбуки OnePoint"}
-              </h2>
-              <p style={{ color: "rgba(255,255,255,.7)", fontSize: 16, lineHeight: 1.6, marginBottom: 28, maxWidth: 440 }}>
-                {s.subtitle || "Оригинальные ноутбуки ведущих мировых брендов с гарантией 1 год и быстрой доставкой по всему Казахстану."}
-              </p>
-              <div className="hero-cta-row">
-                <Link href={s.link_url || "/catalog"} className="btn btn-primary">
-                  {s.button_text || "Смотреть детали"}
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" width="16" height="16"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-                </Link>
-                <a
-                  href={`https://wa.me/77075511979?text=${encodeURIComponent("Здравствуйте! Заинтересовал слайд: " + (s.title || "Слайдер OnePoint"))}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn btn-green"
-                >
-                  Заказать в WhatsApp
-                </a>
-              </div>
-            </div>
-            <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+            <div key={s.id} style={{ display: isCurrent ? "flex" : "none", justifyContent: "center", alignItems: "center" }}>
               <img
                 src={s.image_url}
                 alt={s.title || "Слайд"}
                 style={{
-                  maxWidth: "100%",
-                  maxHeight: 380,
-                  objectFit: "contain",
-                  borderRadius: 12,
+                  width: "100%",
+                  maxHeight: 520,
+                  objectFit: "cover",
+                  borderRadius: 28,
                   filter: "drop-shadow(0 20px 40px rgba(0,0,0,.3))"
                 }}
               />
             </div>
-          </div>
         );
       })}
       {slides.length > 1 && (

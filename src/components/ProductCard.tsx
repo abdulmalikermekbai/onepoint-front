@@ -50,7 +50,7 @@ export default function ProductCard({ product, onToast }: ProductCardProps) {
           {gallery.length > 0 && !imageLoadError ? (
             <Link href={`/product/${product.slug}`} style={{ display: "block", width: "100%" }} tabIndex={-1}>
               <div 
-                style={{ position: "relative", width: "100%", paddingBottom: gallery.length > 1 ? 16 : 0 }}
+                style={{ position: "relative", width: "100%", height: "100%", paddingBottom: gallery.length > 1 ? 12 : 0 }}
                 onTouchStart={(e) => {
                   const clientX = e.targetTouches[0].clientX;
                   (e.currentTarget as any)._startX = clientX;
@@ -79,7 +79,7 @@ export default function ProductCard({ product, onToast }: ProductCardProps) {
                   onError={() => setImageLoadError(true)}
                 />
                 {gallery.length > 1 && (
-                  <div style={{ display: "flex", justifyContent: "center", gap: 6, position: "absolute", bottom: -4, left: 0, right: 0 }}>
+                  <div style={{ display: "flex", justifyContent: "center", gap: 6, position: "absolute", bottom: 0, left: 0, right: 0, zIndex: 5 }}>
                     {gallery.slice(0, 5).map((_, i) => (
                       <button
                         key={i}

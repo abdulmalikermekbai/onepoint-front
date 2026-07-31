@@ -48,9 +48,18 @@ export default function ProductCard({ product, onToast }: ProductCardProps) {
             </button>
           </div>
           {gallery.length > 0 && !imageLoadError ? (
-            <Link href={`/product/${product.slug}`} style={{ display: "block", width: "100%" }} tabIndex={-1}>
+            <Link href={`/product/${product.slug}`} style={{ display: "flex", width: "100%", height: "100%", justifyContent: "center", alignItems: "center" }} tabIndex={-1}>
               <div 
-                style={{ position: "relative", width: "100%", height: "100%", paddingBottom: gallery.length > 1 ? 12 : 0 }}
+                style={{ 
+                  position: "relative", 
+                  width: "100%", 
+                  height: "100%", 
+                  display: "flex", 
+                  flexDirection: "column", 
+                  justifyContent: "center", 
+                  alignItems: "center",
+                  paddingBottom: gallery.length > 1 ? 16 : 0
+                }}
                 onTouchStart={(e) => {
                   const clientX = e.targetTouches[0].clientX;
                   (e.currentTarget as any)._startX = clientX;
@@ -75,11 +84,11 @@ export default function ProductCard({ product, onToast }: ProductCardProps) {
                   src={gallery[activeImg]}
                   alt={product.name}
                   loading="lazy"
-                  style={{ mixBlendMode: "normal" }}
+                  style={{ mixBlendMode: "normal", objectFit: "contain", maxHeight: "150px" }}
                   onError={() => setImageLoadError(true)}
                 />
                 {gallery.length > 1 && (
-                  <div style={{ display: "flex", justifyContent: "center", gap: 6, position: "absolute", bottom: 0, left: 0, right: 0, zIndex: 5 }}>
+                  <div style={{ display: "flex", justifyContent: "center", gap: 6, position: "absolute", bottom: 8, left: 0, right: 0, zIndex: 5 }}>
                     {gallery.slice(0, 5).map((_, i) => (
                       <button
                         key={i}

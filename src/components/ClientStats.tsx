@@ -40,7 +40,7 @@ export function ClientAboutStats() {
     { num: "5+", label: "Лет на рынке" },
     { num: "100%", label: "Оригинальная техника" },
     { num: "5000+", label: "Довольных клиентов" },
-    { num: "4.9", label: "Рейтинг в 2GIS" },
+    { num: "5.0", label: "Рейтинг в 2GIS" },
   ]);
 
   useEffect(() => {

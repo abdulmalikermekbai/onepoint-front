@@ -121,25 +121,36 @@ export function ProductGallery({ images, mainImage, productName }: {
   return (
     <>
       <div className="product-gallery">
-        {/* Main image */}
+      {/* Main image */}
         <div
           className="product-gallery__main"
           onClick={() => showImage && setLightbox(true)}
           onTouchStart={onTouchStart}
           onTouchMove={onTouchMove}
           onTouchEnd={onTouchEnd}
-          style={{ cursor: showImage ? "zoom-in" : "default", position: "relative" }}
+          style={{ cursor: showImage ? "zoom-in" : "default", position: "relative", overflow: "hidden", borderRadius: 18, background: "#ffffff", border: "1px solid var(--border)" }}
         >
           {showImage ? (
-            <img
-              src={allImages[active]?.image_url}
-              alt={allImages[active]?.alt_text || productName}
-              style={{
-                width: "100%", height: 380, objectFit: "contain", borderRadius: 18,
-                background: "#ffffff", display: "block",
-              }}
-              onError={() => setImageError(true)}
-            />
+            <>
+              <img
+                src={allImages[active]?.image_url}
+                alt={allImages[active]?.alt_text || productName}
+                style={{
+                  width: "100%", height: 380, objectFit: "contain", borderRadius: 18,
+                  background: "#ffffff", display: "block", transition: "transform .25s ease, opacity .2s ease"
+                }}
+                onError={() => setImageError(true)}
+              />
+              <div style={{
+                position: "absolute", top: 14, left: 14,
+                background: "rgba(0,0,0,0.6)", backdropFilter: "blur(6px)", color: "#fff",
+                padding: "6px 12px", borderRadius: 100, fontSize: 12, fontWeight: 700,
+                display: "inline-flex", alignItems: "center", gap: 6, opacity: 0.85
+              }}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" width="14" height="14"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+                Нажмите для увеличения
+              </div>
+            </>
           ) : (
             <div className="product-gallery__placeholder" aria-label={`Изображение ${productName} пока не добавлено`}>
               <LaptopSVG color1="#5b2a86" color2="#ff5a1f" size={320} />
@@ -149,8 +160,8 @@ export function ProductGallery({ images, mainImage, productName }: {
           {showImage && allImages.length > 1 && (
             <span style={{
               position: "absolute", bottom: 14, right: 14,
-              background: "rgba(0,0,0,0.55)", color: "#fff",
-              padding: "4px 10px", borderRadius: 100, fontSize: 12, fontWeight: 700
+              background: "rgba(0,0,0,0.65)", color: "#fff", backdropFilter: "blur(4px)",
+              padding: "5px 12px", borderRadius: 100, fontSize: 12.5, fontWeight: 800
             }}>
               {active + 1} / {allImages.length}
             </span>
@@ -159,20 +170,22 @@ export function ProductGallery({ images, mainImage, productName }: {
 
         {/* Thumbnails */}
         {showImage && allImages.length > 1 && (
-          <div className="product-gallery__thumbs">
+          <div className="product-gallery__thumbs" style={{ display: "flex", gap: 10, overflowX: "auto", padding: "4px 0", marginTop: 12 }}>
             {allImages.map((img, i) => (
               <button
                 key={i}
                 onClick={() => { setActive(i); setImageError(false); }}
                 style={{
-                  border: i === active ? "2.5px solid var(--accent)" : "2px solid transparent",
+                  border: i === active ? "2.5px solid var(--accent)" : "2px solid #e2e4e9",
                   borderRadius: 12,
                   padding: 3,
                   background: "#ffffff",
                   cursor: "pointer",
                   flexShrink: 0,
                   outline: "none",
-                  transition: "border-color .2s",
+                  boxShadow: i === active ? "0 4px 12px rgba(255,90,31,0.25)" : "none",
+                  transition: "all .2s ease",
+                  transform: i === active ? "scale(1.04)" : "scale(1)"
                 }}
               >
                 <img
@@ -191,32 +204,57 @@ export function ProductGallery({ images, mainImage, productName }: {
         <div
           onClick={() => setLightbox(false)}
           style={{
-            position: "fixed", inset: 0, background: "rgba(0,0,0,0.92)",
-            zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center",
-            cursor: "zoom-out",
+            position: "fixed", inset: 0, background: "rgba(0,0,0,0.94)", backdropFilter: "blur(10px)",
+            zIndex: 99999, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+            padding: 20
           }}
         >
-          <img
-            src={allImages[active]?.image_url}
-            alt={productName}
-            style={{ maxWidth: "90vw", maxHeight: "90vh", objectFit: "contain", borderRadius: 16 }}
-            onClick={(e) => e.stopPropagation()}
-          />
           <button onClick={() => setLightbox(false)} style={{
-            position: "absolute", top: 20, right: 28, background: "none", border: "none",
-            color: "#fff", fontSize: 36, cursor: "pointer", lineHeight: 1
-          }}>×</button>
+            position: "absolute", top: 20, right: 28, background: "rgba(255,255,255,0.15)", border: "none",
+            color: "#fff", width: 44, height: 44, borderRadius: "50%", fontSize: 24, cursor: "pointer",
+            display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100000
+          }}>✕</button>
+
+          <div style={{ position: "relative", maxWidth: "92vw", maxHeight: "78vh", display: "flex", alignItems: "center", justifyContent: "center" }} onClick={(e) => e.stopPropagation()}>
+            <img
+              src={allImages[active]?.image_url}
+              alt={productName}
+              style={{ maxWidth: "100%", maxHeight: "78vh", objectFit: "contain", borderRadius: 16, boxShadow: "0 20px 50px rgba(0,0,0,0.5)" }}
+            />
+          </div>
+
+          {/* Lightbox Thumbnails Bottom Bar */}
+          {allImages.length > 1 && (
+            <div style={{ display: "flex", gap: 8, marginTop: 20, overflowX: "auto", maxWidth: "90vw", padding: "8px 0" }} onClick={(e) => e.stopPropagation()}>
+              {allImages.map((img, i) => (
+                <img
+                  key={i}
+                  src={img.image_url}
+                  alt=""
+                  onClick={() => setActive(i)}
+                  style={{
+                    width: 56, height: 56, objectFit: "contain", borderRadius: 10, background: "#fff",
+                    border: i === active ? "3px solid #ff5a1f" : "2px solid rgba(255,255,255,0.3)",
+                    cursor: "pointer", opacity: i === active ? 1 : 0.6, transition: "all .2s"
+                  }}
+                />
+              ))}
+            </div>
+          )}
+
           {allImages.length > 1 && (
             <>
               <button onClick={(e) => { e.stopPropagation(); setActive(i => (i - 1 + allImages.length) % allImages.length); }} style={{
-                position: "absolute", left: 20, top: "50%", transform: "translateY(-50%)",
-                background: "rgba(255,255,255,0.15)", border: "none", color: "#fff",
-                width: 48, height: 48, borderRadius: "50%", fontSize: 24, cursor: "pointer"
+                position: "absolute", left: 24, top: "50%", transform: "translateY(-50%)",
+                background: "rgba(255,255,255,0.2)", border: "none", color: "#fff",
+                width: 52, height: 52, borderRadius: "50%", fontSize: 28, cursor: "pointer",
+                display: "flex", alignItems: "center", justifyContent: "center"
               }}>‹</button>
               <button onClick={(e) => { e.stopPropagation(); setActive(i => (i + 1) % allImages.length); }} style={{
-                position: "absolute", right: 20, top: "50%", transform: "translateY(-50%)",
-                background: "rgba(255,255,255,0.15)", border: "none", color: "#fff",
-                width: 48, height: 48, borderRadius: "50%", fontSize: 24, cursor: "pointer"
+                position: "absolute", right: 24, top: "50%", transform: "translateY(-50%)",
+                background: "rgba(255,255,255,0.2)", border: "none", color: "#fff",
+                width: 52, height: 52, borderRadius: "50%", fontSize: 28, cursor: "pointer",
+                display: "flex", alignItems: "center", justifyContent: "center"
               }}>›</button>
             </>
           )}

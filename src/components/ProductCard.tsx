@@ -33,6 +33,7 @@ export default function ProductCard({ product, onToast }: ProductCardProps) {
               )}
               {product.isNew && <span className="new-badge">Новинка</span>}
               {product.isHit && !product.isNew && <span className="hit-badge">Хит</span>}
+              {product.isUpcoming && <span className="upcoming-badge">Скоро</span>}
             </div>
             <button
               className={`fav-btn${fav ? " active" : ""}`}
@@ -138,7 +139,7 @@ export default function ProductCard({ product, onToast }: ProductCardProps) {
               </svg>
               <div>
                 <div className="spec-label">Процессор</div>
-                <div className="spec-val">{product.processor?.split(" ").slice(0, 3).join(" ")}</div>
+                <div className="spec-val">{product.cardProcessor || product.processor?.split(" ").slice(0, 3).join(" ")}</div>
               </div>
             </div>
             <div className="spec-item">
@@ -148,7 +149,7 @@ export default function ProductCard({ product, onToast }: ProductCardProps) {
               </svg>
               <div>
                 <div className="spec-label">Видеокарта</div>
-                <div className="spec-val">{formatGpu(product.gpu)}</div>
+                <div className="spec-val">{product.cardGpu || formatGpu(product.gpu)}</div>
               </div>
             </div>
             <div className="spec-item">
@@ -157,7 +158,7 @@ export default function ProductCard({ product, onToast }: ProductCardProps) {
               </svg>
               <div>
                 <div className="spec-label">Память</div>
-                <div className="spec-val">{product.ram}</div>
+                <div className="spec-val">{product.cardRam || product.ram}</div>
               </div>
             </div>
             <div className="spec-item">
@@ -167,7 +168,7 @@ export default function ProductCard({ product, onToast }: ProductCardProps) {
               </svg>
               <div>
                 <div className="spec-label">Накопитель</div>
-                <div className="spec-val">{product.storage}</div>
+                <div className="spec-val">{product.cardStorage || product.storage}</div>
               </div>
             </div>
           </div>

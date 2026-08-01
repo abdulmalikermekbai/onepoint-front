@@ -18,16 +18,18 @@ export async function generateMetadata({ params }: Props): Promise<import("next"
   if (!product) return {};
 
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://onepoint.kz';
+  const seoTitle = product.metaTitle || product.name;
+  const seoDescription = product.metaDescription || product.shortDescription || `Купить ${product.name} в интернет-магазине OnePoint. Лучшая цена, гарантия.`;
 
   return {
-    title: product.name,
-    description: product.shortDescription || `Купить ${product.name} в интернет-магазине OnePoint. Лучшая цена, гарантия.`,
+    title: seoTitle,
+    description: seoDescription,
     alternates: {
       canonical: `/product/${product.slug}`,
     },
     openGraph: {
-      title: product.name,
-      description: product.shortDescription || `Купить ${product.name} по выгодной цене`,
+      title: seoTitle,
+      description: seoDescription,
       url: `${baseUrl}/product/${product.slug}`,
       images: product.images && product.images[0] ? [
         { url: product.images[0] }
@@ -147,6 +149,7 @@ export default async function ProductPage({ params }: Props) {
                 {product.isNew && <span className="new-badge">Новинка</span>}
                 {product.isHit && <span className="hit-badge">Хит продаж</span>}
                 {product.isSale && <span className="discount-badge">Акция</span>}
+                {product.isUpcoming && <span className="upcoming-badge">Скоро в продаже</span>}
               </div>
 
               <div className="product-brand" style={{ fontSize: 13, marginBottom: 8 }}>{product.brand} · {product.series}</div>

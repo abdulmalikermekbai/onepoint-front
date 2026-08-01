@@ -243,6 +243,7 @@ section { padding: 88px 0; }
 .discount-badge { background: var(--accent); color: #fff; font-size: 12px; font-weight: 800; padding: 6px 11px; border-radius: 100px; box-shadow: 0 6px 16px -4px rgba(255,90,31,.5); }
 .new-badge { background: var(--success); color: #fff; font-size: 12px; font-weight: 800; padding: 6px 11px; border-radius: 100px; }
 .hit-badge { background: var(--dark); color: #fff; font-size: 12px; font-weight: 800; padding: 6px 11px; border-radius: 100px; }
+.upcoming-badge { background: #8b5cf6; color: #fff; font-size: 12px; font-weight: 800; padding: 6px 11px; border-radius: 100px; }
 .fav-btn { width: 34px; height: 34px; border-radius: 50%; background: #fff; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-card); transition: transform .2s, background .2s; }
 .fav-btn:hover { transform: scale(1.1); }
 .fav-btn svg { width: 16px; height: 16px; color: var(--text-muted); transition: color .2s, fill .2s; }

@@ -54,6 +54,16 @@ export interface Product {
   reviews?: any[];
   related?: any[];
   sortOrder?: number;
+  isUpcoming?: boolean;
+  cardProcessor?: string;
+  cardGpu?: string;
+  cardRam?: string;
+  cardStorage?: string;
+  metaTitle?: string;
+  metaDescription?: string;
+  h1?: string;
+  imageAlt?: string;
+  createdAt?: string;
 }
 
 export const PRODUCTS: Product[] = [];
@@ -88,7 +98,6 @@ export const CATEGORIES = [
   { slug: "rtx", name: "Ноутбуки с RTX", icon: "cpu", count: 87, desc: "NVIDIA GeForce RTX 40/50 серии" },
   { slug: "oled", name: "Ноутбуки с OLED", icon: "monitor", count: 34, desc: "OLED-матрица для идеальной картинки" },
   { slug: "business", name: "Для бизнеса", icon: "target", count: 45, desc: "Корпоративные решения" },
-  { slug: "accessories", name: "Аксессуары", icon: "package", count: 210, desc: "Мыши, сумки, коврики, хабы" },
 ];
 
 export const BRANDS = [
@@ -137,9 +146,10 @@ export function normalizeDbProduct(p: any): Product {
     image: productImageUrl(p.image_url),
     inStock: Number(p.in_stock) === 1,
     stockStatus: Number(p.in_stock) === 1 ? "in_stock" : "out_of_stock",
-    isNew: Number(p.is_new) === 1,
+    isNew: (p.created_at && (Date.now() - new Date(p.created_at).getTime()) > 30 * 24 * 60 * 60 * 1000) ? false : (Number(p.is_new) === 1),
     isHit: Number(p.is_hit) === 1,
     isSale: Number(p.is_sale) === 1,
+    isUpcoming: Number(p.is_upcoming) === 1,
     rating: Number(p.rating) || 5.0,
     reviewCount: Number(p.review_count) || 0,
     color: p.color || "Grey",
@@ -180,6 +190,15 @@ export function normalizeDbProduct(p: any): Product {
     reviews: p.reviews || [],
     related: p.related ? p.related.map((r: any) => normalizeDbProduct(r)) : [],
     sortOrder: Number(p.sort_order) || 0,
+    cardProcessor: p.card_processor || undefined,
+    cardGpu: p.card_gpu || undefined,
+    cardRam: p.card_ram || undefined,
+    cardStorage: p.card_storage || undefined,
+    metaTitle: p.meta_title || undefined,
+    metaDescription: p.meta_description || undefined,
+    h1: p.h1 || undefined,
+    imageAlt: p.image_alt || undefined,
+    createdAt: p.created_at || undefined,
   };
 }
 

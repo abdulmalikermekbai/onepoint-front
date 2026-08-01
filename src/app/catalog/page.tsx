@@ -32,20 +32,23 @@ const MATRIX_TYPES = ["IPS", "OLED", "Mini-LED", "VA", "TN", "WVA"];
 
 function CatalogContent() {
   const searchParams = useSearchParams();
+  const query = searchParams.get("q") || searchParams.get("search") || searchParams.get("query") || "";
   return (
     <CatalogFilters
       key={searchParams.toString()}
       initialCat={searchParams.get("cat") || ""}
       initialBrand={searchParams.get("brand") || ""}
+      initialSearch={query}
     />
   );
 }
 
-function CatalogFilters({ initialCat, initialBrand }: { initialCat: string; initialBrand: string }) {
+function CatalogFilters({ initialCat, initialBrand, initialSearch }: { initialCat: string; initialBrand: string; initialSearch: string }) {
   const [isLoading, setIsLoading] = useState(true);
   const [productsList, setProductsList] = useState<any[]>(PRODUCTS);
   const [category, setCategory] = useState(initialCat);
   const [brand, setBrand] = useState(initialBrand);
+  const [searchQuery, setSearchQuery] = useState(initialSearch);
   const [priceMin, setPriceMin] = useState("");
   const [priceMax, setPriceMax] = useState("");
   const [selectedProcs, setSelectedProcs] = useState<string[]>([]);
@@ -70,17 +73,44 @@ function CatalogFilters({ initialCat, initialBrand }: { initialCat: string; init
     });
   }, []);
 
-
   const toggle = (arr: string[], val: string, set: (v: string[]) => void) => {
     set(arr.includes(val) ? arr.filter(v => v !== val) : [...arr, val]);
   };
 
   const filtered = useMemo(() => {
     let result = [...productsList];
+    
+    if (searchQuery.trim()) {
+      const q = searchQuery.trim().toLowerCase();
+      result = result.filter(p =>
+        p.name?.toLowerCase().includes(q) ||
+        p.brand?.toLowerCase().includes(q) ||
+        p.processor?.toLowerCase().includes(q) ||
+        p.gpu?.toLowerCase().includes(q) ||
+        p.categoryName?.toLowerCase().includes(q) ||
+        p.cardProcessor?.toLowerCase().includes(q) ||
+        p.cardGpu?.toLowerCase().includes(q)
+      );
+    }
+
     if (category) {
-      if (category === "rtx") result = result.filter(p => p.gpu?.includes("RTX"));
-      else if (category === "oled") result = result.filter(p => p.matrixType === "OLED");
-      else result = result.filter(p => p.categorySlug === category);
+      if (category === "rtx") {
+        result = result.filter(p => p.gpu?.includes("RTX") || p.cardGpu?.includes("RTX"));
+      } else if (category === "oled") {
+        result = result.filter(p => p.matrixType === "OLED" || p.display?.includes("OLED"));
+      } else if (category === "designer") {
+        result = result.filter(p => p.categorySlug === "designer" || (p.categories && p.categories.includes("designer")) || p.gpu?.includes("RTX") || p.ram?.includes("16") || p.ram?.includes("32"));
+      } else if (category === "dev" || category === "programmer") {
+        result = result.filter(p => p.categorySlug === "dev" || p.categorySlug === "programmer" || (p.categories && (p.categories.includes("dev") || p.categories.includes("programmer"))) || p.ram?.includes("16") || p.ram?.includes("32") || p.processor?.includes("Core i7") || p.processor?.includes("Core i9") || p.processor?.includes("Ryzen 7") || p.processor?.includes("Ryzen 9") || p.processor?.includes("Ultra"));
+      } else if (category === "student") {
+        result = result.filter(p => p.categorySlug === "student" || (p.categories && p.categories.includes("student")) || p.categorySlug === "office" || p.categorySlug === "ultrabook");
+      } else if (category === "office") {
+        result = result.filter(p => p.categorySlug === "office" || (p.categories && p.categories.includes("office")) || p.categorySlug === "ultrabook" || p.categorySlug === "business" || p.categorySlug === "student");
+      } else if (category === "gaming") {
+        result = result.filter(p => p.categorySlug === "gaming" || (p.categories && p.categories.includes("gaming")) || p.gpu?.includes("RTX") || p.gpu?.includes("GTX") || p.gpu?.includes("Radeon RX"));
+      } else {
+        result = result.filter(p => p.categorySlug === category || (p.categories && p.categories.includes(category)));
+      }
     }
     if (brand) result = result.filter(p => p.brand.toLowerCase() === brand.toLowerCase());
     if (priceMin) result = result.filter(p => p.price >= parseInt(priceMin));

@@ -9,6 +9,7 @@ export interface Product {
   sku?: string;
   categorySlug: string;
   categoryName: string;
+  categories?: string[];
   price: number;
   oldPrice?: number;
   discountPercent?: number;
@@ -199,6 +200,7 @@ export function normalizeDbProduct(p: any): Product {
     h1: p.h1 || undefined,
     imageAlt: p.image_alt || undefined,
     createdAt: p.created_at || undefined,
+    categories: p.categories && Array.isArray(p.categories) ? p.categories : (p.category_slug ? [p.category_slug] : []),
   };
 }
 

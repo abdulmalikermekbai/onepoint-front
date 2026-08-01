@@ -74,7 +74,15 @@ export default function Header() {
             ))}
           </nav>
 
-          <div className="searchbar">
+          <form
+            className="searchbar"
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (search.trim()) {
+                window.location.href = `/catalog?q=${encodeURIComponent(search.trim())}`;
+              }
+            }}
+          >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
               <circle cx="11" cy="11" r="7" />
               <path d="m21 21-4.3-4.3" />
@@ -85,7 +93,7 @@ export default function Header() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
-          </div>
+          </form>
 
           <div className="header-actions">
             <a

@@ -29,7 +29,7 @@ export default function ProductCard({ product, onToast }: ProductCardProps) {
           <div className="media-top-row">
             <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
               {Boolean(product.discountPercent) && (
-                <span className="discount-badge">-{product.discountPercent}% Скидка</span>
+                <span className="discount-badge">🔥 -{product.discountPercent}% · Успейте купить!</span>
               )}
               {product.isNew && <span className="new-badge">Новинка</span>}
               {product.isHit && !product.isNew && <span className="hit-badge">Хит продаж</span>}

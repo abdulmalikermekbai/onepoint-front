@@ -19,7 +19,7 @@ export default function ContactsPage() {
   const shopPhone = settings.shop_phone || "+7 (707) 551-19-79";
   const shopPhoneClean = shopPhone.replace(/[^\d+]/g, "");
   const shopWorkHours = settings.shop_work_hours || "Ежедневно: 10:00 – 20:00";
-  const shopAddress = settings.shop_address || "г. Алматы, проспект Абылай хана, ТЦ Алтын-Тараз, 2 этаж, бутик 20";
+  const shopAddress = settings.shop_address || "г. Алматы, проспект Абылай хана, ТЦ Алтын-Тараз, 1 этаж, магазин 32-33";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -75,6 +75,20 @@ export default function ContactsPage() {
                     <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 4, color: "var(--text-muted)" }}>WhatsApp</div>
                     <div style={{ fontSize: 20, fontWeight: 800 }}>{shopPhone}</div>
                     <div style={{ fontSize: 13, color: "var(--text-muted)", marginTop: 4 }}>Быстрый ответ в мессенджере</div>
+                  </div>
+                </a>
+                <a href="https://www.instagram.com/onepoint.kz/" target="_blank" rel="noopener noreferrer" className="contact-card">
+                  <div className="contact-icon" style={{ background: "rgba(225, 48, 108, 0.1)" }}>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#E1306C" strokeWidth="2" width="26" height="26">
+                      <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+                      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                      <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 4, color: "var(--text-muted)" }}>Instagram</div>
+                    <div style={{ fontSize: 20, fontWeight: 800 }}>@onepoint.kz</div>
+                    <div style={{ fontSize: 13, color: "#E1306C", marginTop: 4, fontWeight: 700 }}>instagram.com/onepoint.kz</div>
                   </div>
                 </a>
                 <a href="mailto:info@onepoint.kz" className="contact-card">

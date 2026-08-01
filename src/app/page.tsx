@@ -1,29 +1,80 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
 import LaptopSVG from "@/components/LaptopSVG";
-import { BRANDS, REVIEWS, formatPrice } from "@/lib/data";
+import { BRANDS, REVIEWS, formatPrice, fetchLiveProducts, Product } from "@/lib/data";
 import HomeClient from "./HomeClient";
 import HomeHeroSlider from "@/components/HomeHeroSlider";
 import { ClientStatsGrid } from "@/components/ClientStats";
 import { HitProductsGrid, NewProductsGrid } from "./HomePageProducts";
 
 const CATEGORIES = [
-  { slug: "gaming", name: "Игровые ноутбуки", count: "128 моделей", icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="24" height="24"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg> },
-  { slug: "office", name: "Для работы", count: "96 моделей", icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="24" height="24"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M3 17h18M9 21h6"/></svg> },
-  { slug: "student", name: "Для учёбы", count: "64 модели", icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="24" height="24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg> },
-  { slug: "ultrabook", name: "Ультрабуки", count: "52 модели", icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="24" height="24"><rect x="4" y="5" width="16" height="11" rx="2"/><path d="M9 20h6"/></svg> },
-  { slug: "macbook", name: "MacBook", count: "22 модели", icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="24" height="24"><path d="M4 4h16v10H4z"/><path d="M2 18h20l-1.5 2h-17z"/></svg> },
-  { slug: "rtx", name: "Ноутбуки с RTX", count: "87 моделей", icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="24" height="24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 2v2M15 2v2M9 20v2M15 20v2M2 9h2M2 15h2M20 9h2M20 15h2"/></svg> },
-  { slug: "oled", name: "OLED-дисплеи", count: "34 модели", icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="24" height="24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg> },
-  { slug: "designer", name: "Для дизайнеров", count: "31 модель", icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="24" height="24"><circle cx="13" cy="13" r="8"/><path d="M5 5l4 4"/><path d="m17 9-4 4-4 4"/></svg> },
-  { slug: "dev", name: "Для программистов", count: "44 модели", icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="24" height="24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg> },
-  { slug: "video", name: "Видеомонтаж", count: "28 моделей", icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="24" height="24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg> },
-  { slug: "business", name: "Для бизнеса", count: "45 моделей", icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="24" height="24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg> },
+  { slug: "gaming", name: "Игровые ноутбуки", fallbackCount: "128 моделей", icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="24" height="24"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg> },
+  { slug: "office", name: "Для работы", fallbackCount: "96 моделей", icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="24" height="24"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M3 17h18M9 21h6"/></svg> },
+  { slug: "student", name: "Для учёбы", fallbackCount: "64 модели", icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="24" height="24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg> },
+  { slug: "ultrabook", name: "Ультрабуки", fallbackCount: "52 модели", icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="24" height="24"><rect x="4" y="5" width="16" height="11" rx="2"/><path d="M9 20h6"/></svg> },
+  { slug: "macbook", name: "MacBook", fallbackCount: "22 модели", icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="24" height="24"><path d="M4 4h16v10H4z"/><path d="M2 18h20l-1.5 2h-17z"/></svg> },
+  { slug: "rtx", name: "Ноутбуки с RTX", fallbackCount: "87 моделей", icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="24" height="24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 2v2M15 2v2M9 20v2M15 20v2M2 9h2M2 15h2M20 9h2M20 15h2"/></svg> },
+  { slug: "oled", name: "OLED-дисплеи", fallbackCount: "34 модели", icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="24" height="24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg> },
+  { slug: "designer", name: "Для дизайнеров", fallbackCount: "31 модель", icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="24" height="24"><circle cx="13" cy="13" r="8"/><path d="M5 5l4 4"/><path d="m17 9-4 4-4 4"/></svg> },
+  { slug: "dev", name: "Для программистов", fallbackCount: "44 модели", icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="24" height="24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg> },
+  { slug: "video", name: "Видеомонтаж", fallbackCount: "28 моделей", icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="24" height="24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg> },
+  { slug: "business", name: "Для бизнеса", fallbackCount: "45 моделей", icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="24" height="24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg> },
 ];
+
+function formatModelCount(num: number): string {
+  const abs = Math.abs(num) % 100;
+  const last = abs % 10;
+  if (abs > 10 && abs < 20) return `${num} моделей`;
+  if (last > 1 && last < 5) return `${num} модели`;
+  if (last === 1) return `${num} модель`;
+  return `${num} моделей`;
+}
+
+function DynamicCategoryGrid() {
+  const [productsList, setProductsList] = useState<Product[]>([]);
+
+  useEffect(() => {
+    fetchLiveProducts().then(list => {
+      if (list && list.length > 0) setProductsList(list);
+    }).catch(() => {});
+  }, []);
+
+  return (
+    <div className="cat-grid reveal">
+      {CATEGORIES.map((cat) => {
+        let countNum = 0;
+        if (productsList.length > 0) {
+          countNum = productsList.filter(p => {
+            if (cat.slug === "rtx") return p.gpu?.toLowerCase().includes("rtx") || p.cardGpu?.toLowerCase().includes("rtx");
+            if (cat.slug === "oled") return p.matrixType === "OLED" || p.display?.toLowerCase().includes("oled");
+            if (p.categories && p.categories.includes(cat.slug)) return true;
+            if (p.categorySlug === cat.slug) return true;
+            if (cat.slug === "gaming") return p.categorySlug === "gaming" || p.gpu?.toLowerCase().includes("rtx") || p.gpu?.toLowerCase().includes("gtx");
+            if (cat.slug === "office" || cat.slug === "student" || cat.slug === "business") return p.categorySlug === cat.slug || p.categorySlug === "office" || p.categorySlug === "ultrabook" || p.categorySlug === "business";
+            if (cat.slug === "designer" || cat.slug === "video" || cat.slug === "dev") return p.categorySlug === cat.slug || p.gpu?.toLowerCase().includes("rtx") || (parseInt(p.ram || "0") >= 16);
+            return false;
+          }).length;
+        }
+
+        const countText = countNum > 0 ? formatModelCount(countNum) : cat.fallbackCount;
+
+        return (
+          <Link key={cat.slug} href={`/catalog?cat=${cat.slug}`} className="cat-card">
+            <div className="cat-icon-wrap">{cat.icon}</div>
+            <div>
+              <div className="cat-name">{cat.name}</div>
+              <div className="cat-count">{countText}</div>
+            </div>
+          </Link>
+        );
+      })}
+    </div>
+  );
+}
 
 const ADVANTAGES = [
   { icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="25" height="25"><path d="M1 3h15v13H1zM16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>, title: "Надежная доставка", desc: "По всему Казахстану СДЭК и Индрайв со страховкой груза." },
@@ -110,17 +161,7 @@ export default function HomePage() {
               </Link>
             </div>
 
-            <div className="cat-grid reveal">
-              {CATEGORIES.map((cat) => (
-                <Link key={cat.slug} href={`/catalog?cat=${cat.slug}`} className="cat-card">
-                  <div className="cat-icon-wrap">{cat.icon}</div>
-                  <div>
-                    <div className="cat-name">{cat.name}</div>
-                    <div className="cat-count">{cat.count}</div>
-                  </div>
-                </Link>
-              ))}
-            </div>
+            <DynamicCategoryGrid />
           </div>
         </section>
 
@@ -339,7 +380,7 @@ export default function HomePage() {
               {[
                 { icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="28" height="28"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>, title: "Алматы", desc: "Курьерская доставка в день заказа или на следующий день. Сборка и проверка при вас." },
                 { icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="28" height="28"><path d="M1 3h15v13H1zM16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>, title: "По Казахстану", desc: "Отправляем во все города надёжными транспортными компаниями. Страхование груза." },
-                { icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="28" height="28"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>, title: "Самовывоз", desc: "г. Алматы, пр. Абылай хана, ТЦ Алтын-Тараз, 2 этаж, бутик 20. Ежедневно 10:00–19:00" },
+                { icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="28" height="28"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>, title: "Самовывоз", desc: "г. Алматы, пр. Абылай хана, ТЦ Алтын-Тараз, 1 этаж, магазин 32-33. Ежедневно 10:00–20:00" },
               ].map((d) => (
                 <div key={d.title} className="info-card delivery-card">
                   <div className="delivery-icon-wrap">{d.icon}</div>

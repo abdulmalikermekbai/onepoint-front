@@ -148,7 +148,7 @@ export default async function ProductPage({ params }: Props) {
               <div style={{ display: "flex", gap: 8, marginBottom: 12, flexWrap: "wrap" }}>
                 {product.isNew && <span className="new-badge">Новинка</span>}
                 {product.isHit && <span className="hit-badge">Хит продаж</span>}
-                {product.isSale && <span className="discount-badge">Акция</span>}
+                {product.isSale && <span className="discount-badge">🔥 Скидка · Успейте заказать!</span>}
                 {product.isUpcoming && <span className="upcoming-badge">Скоро в продаже</span>}
               </div>
 
@@ -156,8 +156,6 @@ export default async function ProductPage({ params }: Props) {
               <h1 style={{ fontSize: 28, fontWeight: 800, letterSpacing: "-.02em", lineHeight: 1.2, marginBottom: 16 }}>
                 {product.name}
               </h1>
-
-
 
               {/* Price block */}
               <div style={{ background: "var(--surface)", borderRadius: 20, padding: 24, marginBottom: 24 }}>
@@ -174,11 +172,17 @@ export default async function ProductPage({ params }: Props) {
                     )}
                   </div>
                   {Boolean(product.discountPercent) && (
-                    <span className="product-page-badge badge-sale" style={{ fontSize: 16, padding: "8px 16px", marginTop: 4 }}>
-                      -{product.discountPercent}%
+                    <span className="product-page-badge badge-sale" style={{ fontSize: 15, padding: "8px 16px", marginTop: 4 }}>
+                      🔥 -{product.discountPercent}% Скидка
                     </span>
                   )}
                 </div>
+
+                {Boolean(product.discountPercent || product.oldPrice) && (
+                  <div style={{ marginTop: 12, background: "rgba(255,90,31,0.08)", border: "1px solid rgba(255,90,31,0.25)", color: "var(--accent)", padding: "10px 14px", borderRadius: 12, fontSize: 13.5, fontWeight: 700, display: "flex", alignItems: "center", gap: 8 }}>
+                    <span>🔥 Спеццена! Акция скоро закончится — успейте заказать по выгодной цене!</span>
+                  </div>
+                )}
               </div>
 
               {/* Availability */}

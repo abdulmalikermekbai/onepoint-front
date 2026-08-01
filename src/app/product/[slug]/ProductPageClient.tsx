@@ -136,7 +136,7 @@ export function ProductGallery({ images, mainImage, productName }: {
               alt={allImages[active]?.alt_text || productName}
               style={{
                 width: "100%", height: 380, objectFit: "contain", borderRadius: 18,
-                background: "#f8f9fa", display: "block",
+                background: "#ffffff", display: "block",
               }}
               onError={() => setImageError(true)}
             />
@@ -168,7 +168,7 @@ export function ProductGallery({ images, mainImage, productName }: {
                   border: i === active ? "2.5px solid var(--accent)" : "2px solid transparent",
                   borderRadius: 12,
                   padding: 3,
-                  background: "#f8f9fa",
+                  background: "#ffffff",
                   cursor: "pointer",
                   flexShrink: 0,
                   outline: "none",

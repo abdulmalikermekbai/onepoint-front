@@ -34,12 +34,23 @@ export default function Header() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  const [announcement, setAnnouncement] = useState("Доставка по Казахстану СДЭК и Индрайв · Консультация: +7 (707) 551-19-79");
+
+  useEffect(() => {
+    import("@/lib/data").then(({ fetchSettings }) => {
+      fetchSettings().then(settings => {
+        if (settings.header_announcement) {
+          setAnnouncement(settings.header_announcement);
+        }
+      });
+    }).catch(() => {});
+  }, []);
+
   return (
     <>
       {/* Announcement */}
       <div className="announce">
-        Бесплатная доставка по Казахстану при заказе от <b>200 000 ₸</b> · Подарок к выбранным моделям · Консультация:{" "}
-        <b>+7 (707) 551-19-79</b>
+        {announcement}
       </div>
 
       {/* Main Header */}

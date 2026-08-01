@@ -1,8 +1,31 @@
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { fetchSettings } from "@/lib/data";
 
-export default function DeliveryPage() {
+export const dynamic = "force-dynamic";
+
+export default async function DeliveryPage() {
+  const settings = await fetchSettings();
+
+  const almatyPrice = settings.delivery_almaty_price || "Платная доставка курьером";
+  const almatyDays = settings.delivery_almaty_days || "В день заказа или на следующий день";
+  const almatyDesc = settings.delivery_almaty_desc || "Курьер доставит ноутбук, распакует при вас и поможет с первоначальной настройкой.";
+
+  const kzPrice = settings.delivery_kazakhstan_price || "По тарифам ТК";
+  const kzDays = settings.delivery_kazakhstan_days || "2–5 рабочих дней";
+  const kzDesc = settings.delivery_kazakhstan_desc || "Доставляем во все города Казахстана со страховкой транспортными компаниями СДЭК и Индрайв.";
+
+  const pickupPrice = settings.delivery_pickup_price || "Бесплатно";
+  const pickupDays = settings.delivery_pickup_days || "Готово за 30 минут";
+  const pickupDesc = settings.delivery_pickup_desc || "Заберите ноутбук в нашем магазине в ТЦ Алтын-Тараз, Алматы. Проверьте устройство перед покупкой.";
+
+  const shopPhone = settings.shop_phone || "+7 (707) 551-19-79";
+  const shopPhoneClean = shopPhone.replace(/[^\d+]/g, "");
+  const shopWorkHours = settings.shop_work_hours || "Ежедневно: 10:00 – 20:00";
+  const shopAddress = settings.shop_address || "г. Алматы, проспект Абылай хана, ТЦ Алтын-Тараз, 2 этаж, бутик 20";
+  const shop2gis = settings.shop_2gis || "https://go.2gis.com/aduOr";
+
   return (
     <>
       <Header />
@@ -29,9 +52,9 @@ export default function DeliveryPage() {
                   </svg>
                 ),
                 title: "По Алматы",
-                price: "Бесплатно от 200 000 ₸",
-                days: "В день заказа или на следующий день",
-                desc: "Курьер доставит ноутбук, распакует при вас и поможет с первоначальной настройкой."
+                price: almatyPrice,
+                days: almatyDays,
+                desc: almatyDesc
               },
               {
                 icon: (
@@ -42,9 +65,9 @@ export default function DeliveryPage() {
                   </svg>
                 ),
                 title: "По Казахстану",
-                price: "Бесплатно от 200 000 ₸",
-                days: "2–5 рабочих дней",
-                desc: "Доставляем во все города Казахстана транспортными компаниями СДЭК, Kaspi Доставка, Пакет.кз."
+                price: kzPrice,
+                days: kzDays,
+                desc: kzDesc
               },
               {
                 icon: (
@@ -54,9 +77,9 @@ export default function DeliveryPage() {
                   </svg>
                 ),
                 title: "Самовывоз",
-                price: "Бесплатно",
-                days: "Готово за 30 минут",
-                desc: "Заберите ноутбук в нашем магазине в ТЦ Алтын-Тараз, Алматы. Проверьте устройство перед покупкой."
+                price: pickupPrice,
+                days: pickupDays,
+                desc: pickupDesc
               },
             ].map(d => (
               <div key={d.title} style={{ background: "#fff", border: "1.5px solid var(--border)", borderRadius: 20, padding: 28, display: "flex", flexDirection: "column", gap: 12 }}>
@@ -77,7 +100,7 @@ export default function DeliveryPage() {
           <h2 style={{ fontSize: 26, fontWeight: 800, marginBottom: 24 }}>Как оформить заказ</h2>
           {[
             { step: 1, title: "Выберите ноутбук", desc: "Просмотрите каталог или обратитесь к нашему консультанту для подбора модели." },
-            { step: 2, title: "Оформите заказ", desc: "Нажмите «Купить», «Заказать в WhatsApp» или позвоните нам по телефону." },
+            { step: 2, title: "Оформите заказ", desc: "Нажмите «Заказать в WhatsApp» или позвоните нам по телефону." },
             { step: 3, title: "Подтверждение", desc: "Наш менеджер свяжется с вами в течение 15 минут для подтверждения заказа." },
             { step: 4, title: "Оплата и доставка", desc: "Выберите удобный способ оплаты. Курьер доставит ноутбук в указанный срок." },
           ].map(s => (
@@ -105,7 +128,7 @@ export default function DeliveryPage() {
                     </div>
                     <div>
                       <div style={{ fontWeight: 700, marginBottom: 4 }}>OnePoint</div>
-                      <div style={{ color: "var(--text-muted)", fontSize: 14.5 }}>г. Алматы, проспект Абылай хана<br />ТЦ Алтын-Тараз, 2 этаж, бутик 20</div>
+                      <div style={{ color: "var(--text-muted)", fontSize: 14.5 }} dangerouslySetInnerHTML={{ __html: shopAddress.replace(/\n/g, "<br/>") }} />
                     </div>
                   </div>
                   <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
@@ -117,7 +140,7 @@ export default function DeliveryPage() {
                     </div>
                     <div>
                       <div style={{ fontWeight: 700, marginBottom: 4 }}>Время работы</div>
-                      <div style={{ color: "var(--text-muted)", fontSize: 14.5 }}>Ежедневно: 10:00 – 19:00</div>
+                      <div style={{ color: "var(--text-muted)", fontSize: 14.5 }}>{shopWorkHours}</div>
                     </div>
                   </div>
                   <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
@@ -128,13 +151,13 @@ export default function DeliveryPage() {
                     </div>
                     <div>
                       <div style={{ fontWeight: 700, marginBottom: 4 }}>Телефон</div>
-                      <a href="tel:+77075511979" style={{ color: "var(--accent)", fontSize: 14.5, fontWeight: 700 }}>+7 (707) 551-19-79</a>
+                      <a href={`tel:${shopPhoneClean}`} style={{ color: "var(--accent)", fontSize: 14.5, fontWeight: 700 }}>{shopPhone}</a>
                     </div>
                   </div>
                 </div>
               </div>
               <div style={{ background: "#fff", border: "1px solid var(--border)", borderRadius: 16, padding: 24, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: 180, textAlign: "center" }}>
-                <a href="https://go.2gis.com/aduOr" target="_blank" rel="noopener noreferrer" className="btn btn-primary btn-sm">
+                <a href={shop2gis} target="_blank" rel="noopener noreferrer" className="btn btn-primary btn-sm">
                   Открыть местоположение в 2ГИС
                 </a>
               </div>
@@ -143,7 +166,7 @@ export default function DeliveryPage() {
 
           {/* CTA */}
           <div style={{ marginTop: 40, textAlign: "center" }}>
-            <a href="https://wa.me/77075511979?text=Здравствуйте!%20Хочу%20оформить%20заказ%20с%20доставкой." target="_blank" rel="noopener noreferrer" className="btn btn-green" style={{ fontSize: 17, padding: "18px 40px" }}>
+            <a href={`https://wa.me/${shopPhoneClean}?text=${encodeURIComponent("Здравствуйте! Хочу оформить заказ с доставкой.")}`} target="_blank" rel="noopener noreferrer" className="btn btn-green" style={{ fontSize: 17, padding: "18px 40px" }}>
               <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
                 <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
                 <path d="M12 0C5.373 0 0 5.373 0 12c0 2.125.556 4.122 1.528 5.855L.057 23.082a1 1 0 0 0 1.224 1.3l5.396-1.416A11.942 11.942 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.896 0-3.665-.522-5.176-1.432l-.361-.217-3.742.981.999-3.648-.235-.374A9.96 9.96 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/>

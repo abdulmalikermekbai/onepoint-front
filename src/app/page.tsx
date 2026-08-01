@@ -1,4 +1,5 @@
 "use client";
+import { useState } from "react";
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -135,16 +136,16 @@ export default function HomePage() {
             <div className="promo-grid reveal">
               <div className="promo-card orange">
                 <div className="promo-orb" />
-                <span className="promo-tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="14" height="14" style={{verticalAlign:"middle",marginRight:4}}><rect x="3" y="8" width="18" height="14" rx="2"/><path d="M12 8v14M3 12h18M7.5 8C7.5 6 9 4 12 4s4.5 2 4.5 4"/></svg>ПОДАРОК К ПОКУПКЕ</span>
-                <div className="promo-title">Полезный аксессуар к выбранным ноутбукам</div>
-                <p className="promo-desc">Подскажем актуальный подарок и поможем подобрать комплект для вашей модели.</p>
+                <span className="promo-tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="14" height="14" style={{verticalAlign:"middle",marginRight:4}}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>БЕСПЛАТНАЯ УСЛУГА</span>
+                <div className="promo-title">Полная подготовка ноутбука</div>
+                <p className="promo-desc">От нашего магазина получаете бесплатную услугу — полностью подготовить ноутбук. То есть установка Windows, установка всех необходимых драйверов для корректной работы, так же сейчас по акции вы получаете лицензионный, бессрочный Microsoft Office Pro Plus в подарок.</p>
                 <a
-                  href="https://wa.me/77075511979?text=Здравствуйте!%20Хочу%20узнать%20про%20подарок%20к%20ноутбуку."
+                  href={`https://wa.me/77075511979?text=${encodeURIComponent("Здравствуйте! Хочу уточнить наличие конкретной модели, время работы, адрес магазина или оформить заказ.")}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="btn btn-dark btn-sm"
                 >
-                  Узнать условия
+                  Написать в WhatsApp
                 </a>
               </div>
               <div className="promo-card dark" style={{ backgroundImage: "linear-gradient(135deg,#1B1B21,#0D0D11)", position: "relative" }}>
@@ -310,20 +311,20 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* ============ NEWSLETTER ============ */}
+        {/* ============ CONSULTATION ============ */}
         <section>
           <div className="wrap">
             <div className="newsletter-card reveal">
               <div className="newsletter-glow" />
               <div style={{ position: "relative", zIndex: 2, maxWidth: 460 }}>
                 <h3 style={{ color: "#fff", fontSize: 30, fontWeight: 800, letterSpacing: "-.02em", marginBottom: 12, lineHeight: 1.15 }}>
-                  Первыми узнавайте о новинках и акциях
+                  Нужна помощь в выборе ноутбука?
                 </h3>
                 <p style={{ color: "rgba(255,255,255,.6)", fontSize: 15, lineHeight: 1.6 }}>
-                  Подпишитесь и получите скидку 5% на первый заказ + ранний доступ к акциям.
+                  Оставьте свой номер телефона, и наш эксперт перезвонит вам в течение 10 минут для бесплатной консультации.
                 </p>
               </div>
-              <NewsletterForm />
+              <ConsultationForm />
             </div>
           </div>
         </section>
@@ -390,32 +391,44 @@ export default function HomePage() {
   );
 }
 
-// Newsletter form component (client-side interaction handled via CSS/JS fallback)
-function NewsletterForm() {
+// Consultation form component (sends name and phone to Telegram bot/database)
+function ConsultationForm() {
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [sent, setSent] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await fetch("/api/lead", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ type: "consultation", name, phone, message: "Заявка на консультацию с главной страницы" }),
+    }).catch(() => {});
+    setSent(true);
+  };
+
+  if (sent) {
+    return (
+      <div style={{ color: "#fff", fontSize: 16, fontWeight: 700, padding: "10px 0", position: "relative", zIndex: 2 }}>
+        Спасибо! Мы свяжемся с вами в течение 10 минут.
+      </div>
+    );
+  }
+
   return (
     <div style={{ position: "relative", zIndex: 2 }}>
       <form
-        style={{ display: "flex", gap: 10 }}
-        onSubmit={(e) => {
-          e.preventDefault();
-          const input = (e.target as HTMLFormElement).querySelector("input") as HTMLInputElement;
-          if (input?.value) {
-            fetch("/api/newsletter", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ email: input.value }),
-            }).catch(() => {});
-            input.value = "";
-            alert("Спасибо! Промокод отправлен на почту.");
-          }
-        }}
+        style={{ display: "flex", gap: 10, flexWrap: "wrap" }}
+        onSubmit={handleSubmit}
       >
         <input
-          type="email"
+          type="text"
           required
-          placeholder="Ваш email"
+          placeholder="Ваше имя"
+          value={name}
+          onChange={e => setName(e.target.value)}
           style={{
-            width: 280,
+            width: 180,
             padding: "16px 20px",
             borderRadius: 100,
             border: "1.5px solid rgba(255,255,255,.18)",
@@ -426,7 +439,25 @@ function NewsletterForm() {
             fontFamily: "inherit",
           }}
         />
-        <button type="submit" className="btn btn-primary">Подписаться</button>
+        <input
+          type="tel"
+          required
+          placeholder="Ваш телефон"
+          value={phone}
+          onChange={e => setPhone(e.target.value)}
+          style={{
+            width: 220,
+            padding: "16px 20px",
+            borderRadius: 100,
+            border: "1.5px solid rgba(255,255,255,.18)",
+            background: "rgba(255,255,255,.06)",
+            color: "#fff",
+            fontSize: 14.5,
+            outline: "none",
+            fontFamily: "inherit",
+          }}
+        />
+        <button type="submit" className="btn btn-primary" style={{ padding: "16px 30px" }}>Заказать звонок</button>
       </form>
       <div style={{ color: "rgba(255,255,255,.35)", fontSize: 11.5, marginTop: 10 }}>
         Отправляя форму, вы соглашаетесь с{" "}

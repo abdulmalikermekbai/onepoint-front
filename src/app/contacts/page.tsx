@@ -1,14 +1,25 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { fetchSettings } from "@/lib/data";
 
 export default function ContactsPage() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [message, setMessage] = useState("");
   const [sent, setSent] = useState(false);
+  const [settings, setSettings] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    fetchSettings().then(setSettings).catch(() => {});
+  }, []);
+
+  const shopPhone = settings.shop_phone || "+7 (707) 551-19-79";
+  const shopPhoneClean = shopPhone.replace(/[^\d+]/g, "");
+  const shopWorkHours = settings.shop_work_hours || "Ежедневно: 10:00 – 20:00";
+  const shopAddress = settings.shop_address || "г. Алматы, проспект Абылай хана, ТЦ Алтын-Тараз, 2 этаж, бутик 20";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,7 +42,7 @@ export default function ContactsPage() {
             <span>Контакты</span>
           </div>
           <h1>Контакты</h1>
-          <p>Свяжитесь с нами любым удобным способом. Работаем ежедневно с 10:00 до 19:00.</p>
+          <p>Свяжитесь с нами любым удобным способом. Работаем ежедневно с {shopWorkHours.replace("Ежедневно: ", "")}.</p>
         </div>
       </div>
 
@@ -41,7 +52,7 @@ export default function ContactsPage() {
             {/* Contact cards */}
             <div>
               <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-                <a href="tel:+77075511979" className="contact-card">
+                <a href={`tel:${shopPhoneClean}`} className="contact-card">
                   <div className="contact-icon">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="26" height="26">
                       <path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.7a2 2 0 0 1-.5 2.1L8 9.7a16 16 0 0 0 6 6l1.2-1.2a2 2 0 0 1 2.1-.5c.9.3 1.8.5 2.7.6a2 2 0 0 1 1.7 2Z" />
@@ -49,11 +60,11 @@ export default function ContactsPage() {
                   </div>
                   <div>
                     <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 4, color: "var(--text-muted)" }}>Телефон</div>
-                    <div style={{ fontSize: 20, fontWeight: 800 }}>+7 (707) 551-19-79</div>
-                    <div style={{ fontSize: 13, color: "var(--text-muted)", marginTop: 4 }}>Ежедневно 10:00–19:00</div>
+                    <div style={{ fontSize: 20, fontWeight: 800 }}>{shopPhone}</div>
+                    <div style={{ fontSize: 13, color: "var(--text-muted)", marginTop: 4 }}>{shopWorkHours}</div>
                   </div>
                 </a>
-                <a href="https://wa.me/77075511979" target="_blank" rel="noopener noreferrer" className="contact-card">
+                <a href={`https://wa.me/${shopPhoneClean}`} target="_blank" rel="noopener noreferrer" className="contact-card">
                   <div className="contact-icon" style={{ background: "#f0fdf4" }}>
                     <svg viewBox="0 0 24 24" fill="#25D366" width="26" height="26">
                       <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
@@ -62,7 +73,7 @@ export default function ContactsPage() {
                   </div>
                   <div>
                     <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 4, color: "var(--text-muted)" }}>WhatsApp</div>
-                    <div style={{ fontSize: 20, fontWeight: 800 }}>+7 (707) 551-19-79</div>
+                    <div style={{ fontSize: 20, fontWeight: 800 }}>{shopPhone}</div>
                     <div style={{ fontSize: 13, color: "var(--text-muted)", marginTop: 4 }}>Быстрый ответ в мессенджере</div>
                   </div>
                 </a>
@@ -87,7 +98,7 @@ export default function ContactsPage() {
                   <div>
                     <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 4, color: "var(--text-muted)" }}>Адрес магазина</div>
                     <div style={{ fontSize: 16, fontWeight: 700 }}>г. Алматы</div>
-                    <div style={{ fontSize: 14, color: "var(--text-muted)", marginTop: 2 }}>пр. Абылай хана, ТЦ Алтын-Тараз<br />2 этаж, бутик 20<br />Ежедневно 10:00–19:00</div>
+                    <div style={{ fontSize: 14, color: "var(--text-muted)", marginTop: 2 }} dangerouslySetInnerHTML={{ __html: shopAddress.replace(/\n/g, "<br/>") + "<br/>" + shopWorkHours }} />
                   </div>
                 </div>
               </div>

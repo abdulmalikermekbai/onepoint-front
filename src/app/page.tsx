@@ -90,6 +90,7 @@ function DynamicReviewsGrid() {
           rating: Number(r.rating) || 5,
           color: "linear-gradient(135deg,#059669,#10b981)",
           source: r.source || "2GIS",
+          link: r.review_link || "https://go.2gis.com/LvGaV",
         }));
         setReviewsList(mapped);
       }
@@ -107,7 +108,7 @@ function DynamicReviewsGrid() {
               </svg>
             </div>
             <a
-              href="https://go.2gis.com/LvGaV"
+              href={r.link || "https://go.2gis.com/LvGaV"}
               target="_blank"
               rel="noopener noreferrer"
               className="badge-2gis-review"

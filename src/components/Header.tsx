@@ -34,7 +34,7 @@ export default function Header() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const [announcement, setAnnouncement] = useState("Доставка по Казахстану СДЭК и Индрайв · Консультация: +7 (707) 551-19-79");
+  const [announcement, setAnnouncement] = useState("Доставка по всему Казахстану (СДЭК / inDrive) · Консультация: +7 (707) 551-19-79");
 
   useEffect(() => {
     import("@/lib/data").then(({ fetchSettings }) => {

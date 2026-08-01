@@ -138,9 +138,9 @@ export default function HomePage() {
                 <div className="promo-orb" />
                 <span className="promo-tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="14" height="14" style={{verticalAlign:"middle",marginRight:4}}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>БЕСПЛАТНАЯ УСЛУГА</span>
                 <div className="promo-title">Полная подготовка ноутбука</div>
-                <p className="promo-desc">От нашего магазина получаете бесплатную услугу — полностью подготовить ноутбук. То есть установка Windows, установка всех необходимых драйверов для корректной работы, так же сейчас по акции вы получаете лицензионный, бессрочный Microsoft Office Pro Plus в подарок.</p>
+                <p className="promo-desc">Бесплатно установим Windows, настроим все необходимые драйверы для работы и подарим лицензионный бессрочный Microsoft Office Pro Plus.</p>
                 <a
-                  href={`https://wa.me/77075511979?text=${encodeURIComponent("Здравствуйте! Хочу уточнить наличие конкретной модели, время работы, адрес магазина или оформить заказ.")}`}
+                  href={`https://wa.me/77075511979?text=${encodeURIComponent("Здравствуйте! Подскажите, пожалуйста, по наличию ноутбуков и консультации.")}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="btn btn-dark btn-sm"

@@ -26,11 +26,11 @@ const CATEGORIES = [
 ];
 
 const ADVANTAGES = [
-  { icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="25" height="25"><path d="M1 3h15v13H1zM16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>, title: "Бесплатная доставка", desc: "По всему Казахстану за 1–3 дня. Надежная упаковка и полное страхование груза." },
-  { icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="25" height="25"><path d="M12 2 4 6v6c0 5 3.4 8.7 8 10 4.6-1.3 8-5 8-10V6l-8-4Z"/><path d="m9 12 2 2 4-4"/></svg>, title: "Гарантия 12–24 месяцев", desc: "Гарантия 1 год и сервисная поддержка по всему Казахстану." },
+  { icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="25" height="25"><path d="M1 3h15v13H1zM16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>, title: "Надежная доставка", desc: "По всему Казахстану СДЭК и Индрайв со страховкой груза." },
+  { icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="25" height="25"><path d="M12 2 4 6v6c0 5 3.4 8.7 8 10 4.6-1.3 8-5 8-10V6l-8-4Z"/><path d="m9 12 2 2 4-4"/></svg>, title: "Гарантия до 1 года", desc: "Гарантия 1 год и надежная сервисная поддержка." },
   { icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="25" height="25"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>, title: "Проверка перед отправкой", desc: "Каждый ноутбук проходит полную диагностику экранов, тесты и предпродажную проверку." },
   { icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="25" height="25"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.7a2 2 0 0 1-.5 2.1L8 9.7a16 16 0 0 0 6 6l1.2-1.2a2 2 0 0 1 2.1-.5c.9.3 1.8.5 2.7.6a2 2 0 0 1 1.7 2Z"/></svg>, title: "Помощь в подборе", desc: "Опытные специалисты подберут идеальный ноутбук под ваши задачи и бюджет." },
-  { icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="25" height="25"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>, title: "Консультация 24/7", desc: "Всегда на связи в мессенджерах. Ответим на любые технические вопросы." },
+  { icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="25" height="25"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>, title: "Консультация 10/7", desc: "На связи ежедневно с 10:00 до 20:00 в мессенджерах и по телефону." },
   { icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="25" height="25"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>, title: "Более 5 лет опыта", desc: "Тысячи довольных покупателей по всему Казахстану. Оригинальная продукция." },
 ];
 
@@ -235,7 +235,7 @@ export default function HomePage() {
 
             {/* Stats row */}
             <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginTop: 32, justifyContent: "center" }} className="reveal">
-              {["✔ Более 5 лет опыта","✔ Огромный выбор моделей","✔ Тысячи довольных клиентов","✔ Гарантия 1 год","✔ Проверенная техника","✔ Лучшие цены","✔ Быстрая доставка","✔ Собственный сервис"].map(s => (
+              {["✔ Более 5 лет опыта","✔ Огромный выбор моделей","✔ Тысячи довольных клиентов","✔ Гарантия 1 год","✔ Проверенная техника","✔ Лучшие цены","✔ Быстрая доставка"].map(s => (
                 <span key={s} style={{ background: "#fff", border: "1.5px solid var(--border)", borderRadius: 100, padding: "8px 16px", fontSize: 13.5, fontWeight: 600, color: "var(--text)" }}>{s}</span>
               ))}
             </div>

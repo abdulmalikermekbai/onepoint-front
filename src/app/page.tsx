@@ -5,7 +5,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
 import LaptopSVG from "@/components/LaptopSVG";
-import { BRANDS, REVIEWS, formatPrice, fetchLiveProducts, Product } from "@/lib/data";
+import { BRANDS, REVIEWS, formatPrice, fetchLiveProducts, fetchLiveReviews, Product } from "@/lib/data";
 import HomeClient from "./HomeClient";
 import HomeHeroSlider from "@/components/HomeHeroSlider";
 import { ClientStatsGrid } from "@/components/ClientStats";
@@ -72,6 +72,60 @@ function DynamicCategoryGrid() {
           </Link>
         );
       })}
+    </div>
+  );
+}
+
+function DynamicReviewsGrid() {
+  const [reviewsList, setReviewsList] = useState<any[]>(REVIEWS);
+
+  useEffect(() => {
+    fetchLiveReviews().then((dbRevs) => {
+      if (dbRevs && dbRevs.length > 0) {
+        const mapped = dbRevs.map((r: any) => ({
+          author: r.author_name,
+          initials: r.initials || (r.author_name ? r.author_name.charAt(0) + "." : "А.Б."),
+          text: r.body,
+          product: r.pname || "Покупатель в 2ГИС",
+          rating: Number(r.rating) || 5,
+          color: "linear-gradient(135deg,#059669,#10b981)",
+          source: r.source || "2GIS",
+        }));
+        setReviewsList(mapped);
+      }
+    }).catch(() => {});
+  }, []);
+
+  return (
+    <div className="reviews-grid reveal">
+      {reviewsList.map((r, i) => (
+        <div key={i} className="review-card">
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+            <div style={{ color: "var(--accent-tint-2)" }}>
+              <svg viewBox="0 0 24 24" fill="currentColor" width="28" height="28">
+                <path d="M9.5 5C6 5 3 8 3 12.5S6 20 9.5 20c1 0 1.8-.8 1.8-1.8s-.8-1.7-1.8-1.7c-1.6 0-3-1.4-3-3.2 0-.4.1-.8.2-1.1.4.2.9.3 1.3.3 1.7 0 3-1.4 3-3.2S11.2 5 9.5 5Zm10 0c-3.5 0-6.5 3-6.5 7.5S16 20 19.5 20c1 0 1.8-.8 1.8-1.8s-.8-1.7-1.8-1.7c-1.6 0-3-1.4-3-3.2 0-.4.1-.8.2-1.1.4.2.9.3 1.3.3 1.7 0 3-1.4 3-3.2S21.2 5 19.5 5Z" />
+              </svg>
+            </div>
+            <a
+              href="https://go.2gis.com/LvGaV"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="badge-2gis-review"
+            >
+              <span>2ГИС</span> Проверенный отзыв ↗
+            </a>
+          </div>
+          <p className="review-text">{r.text}</p>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: "auto", paddingTop: 6 }}>
+            <div className="review-avatar" style={{ background: r.color || "linear-gradient(135deg,#059669,#10b981)" }}>{r.initials}</div>
+            <div>
+              <div style={{ fontSize: 14, fontWeight: 700 }}>{r.author}</div>
+              <div style={{ fontSize: 12, color: "var(--text-soft)" }}>{r.product}</div>
+            </div>
+            <div style={{ marginLeft: "auto", color: "#FFB100", fontSize: 12 }}>{"★".repeat(r.rating)}</div>
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
@@ -334,49 +388,31 @@ export default function HomePage() {
                 <h2 className="section-title">Что говорят клиенты</h2>
                 <p className="section-sub">Отзывы реальных покупателей из 2GIS</p>
               </div>
-              <a
-                href="https://go.2gis.com/aduOr"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="twogis-rating-card"
-              >
-                <div className="twogis-logo-badge">2ГИС</div>
-                <div className="twogis-stars-val">
-                  <span>★★★★★</span> 4.9 / 5.0
-                </div>
-                <span style={{ fontSize: 13, fontWeight: 700, color: "#65a30d" }}>Все отзывы в 2ГИС ↗</span>
-              </a>
-            </div>
-            <div className="reviews-grid reveal">
-              {REVIEWS.map((r) => (
-                <div key={r.author} className="review-card">
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-                    <div style={{ color: "var(--accent-tint-2)" }}>
-                      <svg viewBox="0 0 24 24" fill="currentColor" width="28" height="28">
-                        <path d="M9.5 5C6 5 3 8 3 12.5S6 20 9.5 20c1 0 1.8-.8 1.8-1.8s-.8-1.7-1.8-1.7c-1.6 0-3-1.4-3-3.2 0-.4.1-.8.2-1.1.4.2.9.3 1.3.3 1.7 0 3-1.4 3-3.2S11.2 5 9.5 5Zm10 0c-3.5 0-6.5 3-6.5 7.5S16 20 19.5 20c1 0 1.8-.8 1.8-1.8s-.8-1.7-1.8-1.7c-1.6 0-3-1.4-3-3.2 0-.4.1-.8.2-1.1.4.2.9.3 1.3.3 1.7 0 3-1.4 3-3.2S21.2 5 19.5 5Z" />
-                      </svg>
-                    </div>
-                    <a
-                      href="https://go.2gis.com/aduOr"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="badge-2gis-review"
-                    >
-                      <span>2ГИС</span> Проверенный отзыв ↗
-                    </a>
+              <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 12 }}>
+                <a
+                  href="https://go.2gis.com/LvGaV"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="twogis-rating-card"
+                >
+                  <div className="twogis-logo-badge">2ГИС</div>
+                  <div className="twogis-stars-val">
+                    <span>★★★★★</span> 5.0 / 5.0
                   </div>
-                  <p className="review-text">{r.text}</p>
-                  <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: "auto", paddingTop: 6 }}>
-                    <div className="review-avatar" style={{ background: r.color }}>{r.initials}</div>
-                    <div>
-                      <div style={{ fontSize: 14, fontWeight: 700 }}>{r.author}</div>
-                      <div style={{ fontSize: 12, color: "var(--text-soft)" }}>{r.product}</div>
-                    </div>
-                    <div style={{ marginLeft: "auto", color: "#FFB100", fontSize: 12 }}>{"★".repeat(r.rating)}</div>
-                  </div>
-                </div>
-              ))}
+                </a>
+                <a
+                  href="https://go.2gis.com/LvGaV"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-secondary"
+                  style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "10px 18px", borderRadius: 16, fontSize: 13.5, fontWeight: 800, textDecoration: "none", background: "rgba(101, 163, 13, 0.12)", color: "#4d7c0f", border: "1px solid rgba(101, 163, 13, 0.3)" }}
+                >
+                  Посмотреть в 2ГИС ↗
+                </a>
+              </div>
             </div>
+
+            <DynamicReviewsGrid />
           </div>
         </section>
 

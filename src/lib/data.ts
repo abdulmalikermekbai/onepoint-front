@@ -275,3 +275,21 @@ export async function fetchSettings(): Promise<Record<string, string>> {
 export function formatPrice(price: number): string {
   return price.toLocaleString("ru-KZ") + " ₸";
 }
+
+export async function fetchLiveReviews(): Promise<any[]> {
+  try {
+    const base = `${typeof window === "undefined"
+      ? (process.env.BACKEND_API_URL || "https://api.onepoint.kz")
+      : "https://api.onepoint.kz"}/api/products.php?reviews=1`;
+    const res = await fetch(base, { cache: "no-store" });
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data.reviews) && data.reviews.length > 0) {
+        return data.reviews;
+      }
+    }
+  } catch (e) {
+    console.error(`Failed to fetch live reviews:`, e);
+  }
+  return [];
+}

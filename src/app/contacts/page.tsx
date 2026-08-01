@@ -5,6 +5,44 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { fetchSettings } from "@/lib/data";
 
+function TwoGisWidget() {
+  useEffect(() => {
+    const scriptId = "2gis-widget-script";
+    const initWidget = () => {
+      if ((window as any).DGWidgetLoader) {
+        new (window as any).DGWidgetLoader({
+          width: "100%",
+          height: 380,
+          borderColor: "#a3a3a3",
+          pos: { lat: 43.273471510698656, lon: 76.93839311599733, zoom: 17 },
+          opt: { city: "almaty" },
+          org: [{ id: "70000001033724894" }]
+        });
+      }
+    };
+
+    if (!document.getElementById(scriptId)) {
+      const script = document.createElement("script");
+      script.id = scriptId;
+      script.src = "https://widgets.2gis.com/js/DGWidgetLoader.js";
+      script.charset = "utf-8";
+      script.async = true;
+      script.onload = initWidget;
+      document.head.appendChild(script);
+    } else {
+      initWidget();
+    }
+  }, []);
+
+  return (
+    <div style={{ width: "100%", minHeight: 380, position: "relative" }}>
+      <a className="dg-widget-link" href="http://2gis.kz/almaty/firm/70000001033724894/center/76.93839311599733,43.273471510698656/zoom/17?utm_medium=widget-source&utm_campaign=firmsonmap&utm_source=bigMap">Посмотреть на карте Алматы</a>
+      <div className="dg-widget-link"><a href="http://2gis.kz/almaty/firm/70000001033724894/photos/70000001033724894/center/76.93839311599733,43.273471510698656/zoom/17?utm_medium=widget-source&utm_campaign=firmsonmap&utm_source=photos">Фотографии компании</a></div>
+      <div className="dg-widget-link"><a href="http://2gis.kz/almaty/center/76.938398,43.272874/zoom/17/routeTab/rsType/bus/to/76.938398,43.272874╎Onepoint, магазин?utm_medium=widget-source&utm_campaign=firmsonmap&utm_source=route">Найти проезд до Onepoint, магазин</a></div>
+    </div>
+  );
+}
+
 export default function ContactsPage() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -160,9 +198,9 @@ export default function ContactsPage() {
               <div>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
                   <span style={{ background: "#65a30d", color: "#fff", padding: "4px 10px", borderRadius: 8, fontSize: 12, fontWeight: 800 }}>2GIS</span>
-                  <h3 style={{ fontSize: 20, fontWeight: 800, margin: 0 }}>Наш адрес в 2ГИС</h3>
+                  <h3 style={{ fontSize: 20, fontWeight: 800, margin: 0 }}>Наш магазин на карте 2ГИС</h3>
                 </div>
-                <div style={{ fontSize: 14, color: "var(--text-muted)" }}>г. Алматы, пр. Абылай хана, ТЦ Алтын-Тараз (2 этаж, бутик 20)</div>
+                <div style={{ fontSize: 14, color: "var(--text-muted)" }}>г. Алматы, пр. Абылай хана, ТЦ Алтын-Тараз (1 этаж, магазин 32-33)</div>
               </div>
               <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
                 <a
@@ -181,29 +219,7 @@ export default function ContactsPage() {
               </div>
             </div>
 
-            <div style={{ width: "100%", minHeight: 320, position: "relative", background: "radial-gradient(circle at 50% 50%, #f0fdf4 0%, #e8f5e9 100%)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 24, textAlign: "center" }}>
-              <div style={{ width: 56, height: 56, borderRadius: "50%", background: "#65a30d", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 16, boxShadow: "0 8px 24px rgba(101,163,13,0.3)" }}>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" width="28" height="28">
-                  <path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z" />
-                  <circle cx="12" cy="10" r="3" />
-                </svg>
-              </div>
-              <h4 style={{ fontSize: 20, fontWeight: 800, marginBottom: 8, color: "#1b4332" }}>
-                Магазин OnePoint на карте 2ГИС
-              </h4>
-              <p style={{ color: "var(--text-muted)", maxWidth: 500, fontSize: 14, lineHeight: 1.5, marginBottom: 20 }}>
-                г. Алматы, пр. Абылай хана, ТЦ Алтын-Тараз, 2 этаж, бутик 20. Постройте точный маршрут в приложении или браузере.
-              </p>
-              <a
-                href="https://go.2gis.com/aduOr"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn btn-primary"
-                style={{ padding: "14px 28px", fontSize: 15, fontWeight: 700, borderRadius: 100 }}
-              >
-                Построить маршрут в 2ГИС
-              </a>
-            </div>
+            <TwoGisWidget />
           </div>
         </div>
       </section>

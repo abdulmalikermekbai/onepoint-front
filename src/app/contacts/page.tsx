@@ -6,15 +6,14 @@ import Footer from "@/components/Footer";
 import { fetchSettings } from "@/lib/data";
 
 function TwoGisWidget() {
-  const widgetUrl = "https://widgets.2gis.com/widget?type=firmsonmap&options=%7B%22pos%22%3A%7B%22lat%22%3A43.273471510698656%2C%22lon%22%3A76.93839311599733%2C%22zoom%22%3A17%7D%2C%22opt%22%3A%7B%22city%22%3A%22almaty%22%7D%2C%22org%22%3A%5B%7B%22id%22%3A%2270000001033724894%22%7D%5D%7D";
+  const iframeHtml = `<!DOCTYPE html><html><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests"><style>html,body{margin:0;padding:0;overflow:hidden;width:100%;height:100%;}</style></head><body><a class="dg-widget-link" href="https://2gis.kz/almaty/firm/70000001033724894/center/76.93839311599733,43.273471510698656/zoom/17?utm_medium=widget-source&utm_campaign=firmsonmap&utm_source=bigMap">Посмотреть на карте Алматы</a><div class="dg-widget-link"><a href="https://2gis.kz/almaty/firm/70000001033724894/photos/70000001033724894/center/76.93839311599733,43.273471510698656/zoom/17?utm_medium=widget-source&utm_campaign=firmsonmap&utm_source=photos">Фотографии компании</a></div><div class="dg-widget-link"><a href="https://2gis.kz/almaty/center/76.938398,43.272874/zoom/17/routeTab/rsType/bus/to/76.938398,43.272874╎Onepoint, магазин?utm_medium=widget-source&utm_campaign=firmsonmap&utm_source=route">Найти проезд до Onepoint, магазин</a></div><script charset="utf-8" src="https://widgets.2gis.com/js/DGWidgetLoader.js"></script><script charset="utf-8">new DGWidgetLoader({"width":"100%","height":"400px","borderColor":"#a3a3a3","pos":{"lat":43.273471510698656,"lon":76.93839311599733,"zoom":17},"opt":{"city":"almaty"},"org":[{"id":"70000001033724894"}]});</script></body></html>`;
 
   return (
-    <div style={{ width: "100%", height: 420, overflow: "hidden", position: "relative", background: "#f8f9fa" }}>
+    <div style={{ width: "100%", height: 400, overflow: "hidden", position: "relative", background: "#f8f9fa" }}>
       <iframe
-        src={widgetUrl}
-        style={{ width: "100%", height: "420px", border: "none", display: "block" }}
+        srcDoc={iframeHtml}
+        style={{ width: "100%", height: "400px", border: "none", display: "block" }}
         title="2GIS Map Widget"
-        allowFullScreen
       />
     </div>
   );

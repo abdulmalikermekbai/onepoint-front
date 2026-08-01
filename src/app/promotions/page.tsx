@@ -31,7 +31,7 @@ export default async function PromotionsPage() {
             {[
               { emoji: "🎁", tag: "Подарок", title: "Полезный аксессуар к выбранным ноутбукам", desc: "Уточняйте комплект у консультанта", bg: "linear-gradient(135deg,#FF7A3D,#FF5A1F,#E64A12)", href: "https://wa.me/77075511979?text=Хочу%20узнать%20про%20подарок%20к%20ноутбуку" },
               { emoji: "⚡", tag: "Спеццена", title: "Скидки на популярные ноутбуки из наличия", desc: "Количество товаров по акции ограничено", bg: "linear-gradient(135deg,#1B1B21,#0D0D11)", href: "/catalog?sale=1" },
-              { emoji: "🚀", tag: "Доставка", title: "Бесплатная доставка от 200 000 ₸", desc: "По всему Казахстану 1–3 дня", bg: "linear-gradient(135deg,#1a2e6e,#0d0d11)", href: "/delivery" },
+              { emoji: "🚀", tag: "Доставка", title: "Бесплатная доставка по Алматы", desc: "По Алматы курьером · По Казахстану СДЭК / inDrive", bg: "linear-gradient(135deg,#1a2e6e,#0d0d11)", href: "/delivery" },
             ].map((promo) => (
               <a
                 key={promo.tag}

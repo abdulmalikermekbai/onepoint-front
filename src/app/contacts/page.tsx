@@ -6,39 +6,15 @@ import Footer from "@/components/Footer";
 import { fetchSettings } from "@/lib/data";
 
 function TwoGisWidget() {
-  useEffect(() => {
-    const scriptId = "2gis-widget-script";
-    const initWidget = () => {
-      if ((window as any).DGWidgetLoader) {
-        new (window as any).DGWidgetLoader({
-          width: "100%",
-          height: 380,
-          borderColor: "#a3a3a3",
-          pos: { lat: 43.273471510698656, lon: 76.93839311599733, zoom: 17 },
-          opt: { city: "almaty" },
-          org: [{ id: "70000001033724894" }]
-        });
-      }
-    };
-
-    if (!document.getElementById(scriptId)) {
-      const script = document.createElement("script");
-      script.id = scriptId;
-      script.src = "https://widgets.2gis.com/js/DGWidgetLoader.js";
-      script.charset = "utf-8";
-      script.async = true;
-      script.onload = initWidget;
-      document.head.appendChild(script);
-    } else {
-      initWidget();
-    }
-  }, []);
+  const iframeHtml = `<!DOCTYPE html><html><head><meta charset="utf-8"><style>html,body{margin:0;padding:0;overflow:hidden;width:100%;height:100%;}</style></head><body><a class="dg-widget-link" href="http://2gis.kz/almaty/firm/70000001033724894/center/76.93839311599733,43.273471510698656/zoom/17?utm_medium=widget-source&utm_campaign=firmsonmap&utm_source=bigMap">Посмотреть на карте Алматы</a><div class="dg-widget-link"><a href="http://2gis.kz/almaty/firm/70000001033724894/photos/70000001033724894/center/76.93839311599733,43.273471510698656/zoom/17?utm_medium=widget-source&utm_campaign=firmsonmap&utm_source=photos">Фотографии компании</a></div><div class="dg-widget-link"><a href="http://2gis.kz/almaty/center/76.938398,43.272874/zoom/17/routeTab/rsType/bus/to/76.938398,43.272874╎Onepoint, магазин?utm_medium=widget-source&utm_campaign=firmsonmap&utm_source=route">Найти проезд до Onepoint, магазин</a></div><script charset="utf-8" src="https://widgets.2gis.com/js/DGWidgetLoader.js"></script><script charset="utf-8">new DGWidgetLoader({"width":"100%","height":"420px","borderColor":"#e2e4e9","pos":{"lat":43.273471510698656,"lon":76.93839311599733,"zoom":17},"opt":{"city":"almaty"},"org":[{"id":"70000001033724894"}]});</script></body></html>`;
 
   return (
-    <div style={{ width: "100%", minHeight: 380, position: "relative" }}>
-      <a className="dg-widget-link" href="http://2gis.kz/almaty/firm/70000001033724894/center/76.93839311599733,43.273471510698656/zoom/17?utm_medium=widget-source&utm_campaign=firmsonmap&utm_source=bigMap">Посмотреть на карте Алматы</a>
-      <div className="dg-widget-link"><a href="http://2gis.kz/almaty/firm/70000001033724894/photos/70000001033724894/center/76.93839311599733,43.273471510698656/zoom/17?utm_medium=widget-source&utm_campaign=firmsonmap&utm_source=photos">Фотографии компании</a></div>
-      <div className="dg-widget-link"><a href="http://2gis.kz/almaty/center/76.938398,43.272874/zoom/17/routeTab/rsType/bus/to/76.938398,43.272874╎Onepoint, магазин?utm_medium=widget-source&utm_campaign=firmsonmap&utm_source=route">Найти проезд до Onepoint, магазин</a></div>
+    <div style={{ width: "100%", height: 420, overflow: "hidden", position: "relative" }}>
+      <iframe
+        srcDoc={iframeHtml}
+        style={{ width: "100%", height: "420px", border: "none", display: "block" }}
+        title="2GIS Map Widget"
+      />
     </div>
   );
 }

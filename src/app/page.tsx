@@ -387,7 +387,7 @@ export default function HomePage() {
               <div>
                 <div className="eyebrow">Отзывы покупателей</div>
                 <h2 className="section-title">Что говорят клиенты</h2>
-                <p className="section-sub">Отзывы реальных покупателей из 2GIS</p>
+                <p className="section-sub">Более 213 отзывов реальных покупателей в 2ГИС</p>
               </div>
               <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 12 }}>
                 <a
@@ -398,7 +398,7 @@ export default function HomePage() {
                 >
                   <div className="twogis-logo-badge">2ГИС</div>
                   <div className="twogis-stars-val">
-                    <span>★★★★★</span> 5.0 / 5.0
+                    <span>★★★★★</span> 5.0 · 213 отзывов
                   </div>
                 </a>
                 <a

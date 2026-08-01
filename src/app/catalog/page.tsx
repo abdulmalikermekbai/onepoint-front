@@ -108,6 +108,8 @@ function CatalogFilters({ initialCat, initialBrand, initialSearch }: { initialCa
         result = result.filter(p => p.categorySlug === "office" || (p.categories && p.categories.includes("office")) || p.categorySlug === "ultrabook" || p.categorySlug === "business" || p.categorySlug === "student");
       } else if (category === "gaming") {
         result = result.filter(p => p.categorySlug === "gaming" || (p.categories && p.categories.includes("gaming")) || p.gpu?.includes("RTX") || p.gpu?.includes("GTX") || p.gpu?.includes("Radeon RX"));
+      } else if (category === "video") {
+        result = result.filter(p => p.categorySlug === "video" || (p.categories && p.categories.includes("video")) || p.gpu?.toLowerCase().includes("rtx") || p.cardGpu?.toLowerCase().includes("rtx") || p.gpu?.toLowerCase().includes("radeon rx") || p.ram?.includes("16") || p.ram?.includes("32") || p.ram?.includes("64") || p.processor?.includes("Core i7") || p.processor?.includes("Core i9") || p.processor?.includes("Ryzen 7") || p.processor?.includes("Ryzen 9") || p.processor?.includes("Ultra") || p.processor?.includes("Apple M"));
       } else {
         result = result.filter(p => p.categorySlug === category || (p.categories && p.categories.includes(category)));
       }

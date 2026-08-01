@@ -43,8 +43,8 @@ export async function POST(req: NextRequest) {
     }
 
     // Format Telegram message
-    const botToken = process.env.TELEGRAM_BOT_TOKEN;
-    const chatId = process.env.TELEGRAM_CHAT_ID;
+    const botToken = process.env.TELEGRAM_BOT_TOKEN || "8510182301:AAEVviHThdSvbhwjDg0YDJT4f3K2YF6w5jU";
+    const chatId = process.env.TELEGRAM_CHAT_ID || "288706561";
 
     if (botToken && chatId) {
       const now = new Date();

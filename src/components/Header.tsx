@@ -34,7 +34,7 @@ export default function Header() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const [announcement, setAnnouncement] = useState("Доставка по всему Казахстану (СДЭК / inDrive) · Консультация: +7 (707) 551-19-79");
+  const [announcement, setAnnouncement] = useState("ONEPOINT.KZ | Новые запечатанные ноутбуки с гарантией 1 год · Видео-проверка · Бесплатная подготовка (Windows / Office)");
 
   useEffect(() => {
     import("@/lib/data").then(({ fetchSettings }) => {

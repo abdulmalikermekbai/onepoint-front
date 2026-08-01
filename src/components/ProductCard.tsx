@@ -29,11 +29,11 @@ export default function ProductCard({ product, onToast }: ProductCardProps) {
           <div className="media-top-row">
             <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
               {Boolean(product.discountPercent) && (
-                <span className="discount-badge">-{product.discountPercent}%</span>
+                <span className="discount-badge">-{product.discountPercent}% Скидка</span>
               )}
               {product.isNew && <span className="new-badge">Новинка</span>}
-              {product.isHit && !product.isNew && <span className="hit-badge">Хит</span>}
-              {product.isUpcoming && <span className="upcoming-badge">Скоро</span>}
+              {product.isHit && !product.isNew && <span className="hit-badge">Хит продаж</span>}
+              {product.isUpcoming && <span className="upcoming-badge">Скоро в продаже</span>}
             </div>
             <button
               className={`fav-btn${fav ? " active" : ""}`}

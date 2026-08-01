@@ -15,7 +15,7 @@ export default function Footer() {
               Премиальный магазин оригинальных ноутбуков в Казахстане. Гарантия 1 год, экспертный подбор и сервис мирового уровня.
             </p>
             <div className="footer-social">
-              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" title="Instagram">
+              <a href="https://www.instagram.com/onepoint.kz/" target="_blank" rel="noopener noreferrer" title="Instagram">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <rect x="3" y="3" width="18" height="18" rx="5" />
                   <circle cx="12" cy="12" r="4" />
@@ -53,7 +53,7 @@ export default function Footer() {
               <li><Link href="/catalog?cat=designer">Для дизайнеров</Link></li>
               <li><Link href="/catalog?cat=rtx">Ноутбуки с RTX</Link></li>
               <li><Link href="/promotions">Акции</Link></li>
-              <li><Link href="/new-arrivals">Новинки 2025</Link></li>
+              <li><Link href="/new-arrivals">Новинки 2026</Link></li>
             </ul>
           </div>
 
@@ -107,21 +107,21 @@ export default function Footer() {
                   <path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0 1 18 0Z" />
                   <circle cx="12" cy="10" r="3" />
                 </svg>
-                <span>г. Алматы, пр. Абылай хана, ТЦ Алтын-Тараз, 2 этаж, бутик 20</span>
+                <span>г. Алматы, пр. Абылай хана, ТЦ Алтын-Тараз, 1 этаж, магазин 32-33</span>
               </li>
               <li>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <circle cx="12" cy="12" r="10" />
                   <path d="M12 6v6l4 2" />
                 </svg>
-                <span>Ежедневно 10:00–19:00</span>
+                <span>Ежедневно 10:00–20:00</span>
               </li>
             </ul>
           </div>
         </div>
 
         <div className="footer-bottom">
-          <span>© 2025 OnePoint. Все права защищены.</span>
+          <span>© 2026 OnePoint. Все права защищены.</span>
           <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
             <Link href="/privacy" style={{ fontSize: 12.5, color: "rgba(255,255,255,.35)", transition: "color .2s" }}>
               Политика конфиденциальности

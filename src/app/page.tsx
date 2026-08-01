@@ -50,6 +50,48 @@ export default function HomePage() {
 
             {/* Quick Stats */}
             <ClientStatsGrid />
+
+            {/* Trust Highlights Bar */}
+            <div style={{ background: "linear-gradient(135deg, #111116 0%, #1c1c24 100%)", color: "#fff", borderRadius: 20, padding: "20px 24px", marginTop: 24, border: "1px solid rgba(255,255,255,0.08)", boxShadow: "0 10px 30px -10px rgba(0,0,0,0.3)" }} className="reveal">
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 16, alignItems: "center" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                  <div style={{ width: 42, height: 42, borderRadius: 12, background: "rgba(255,90,31,0.15)", color: "var(--accent)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="22" height="22"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                  </div>
+                  <div>
+                    <div style={{ fontWeight: 800, fontSize: 14.5, color: "#fff" }}>ONEPOINT.KZ</div>
+                    <div style={{ fontSize: 12.5, color: "rgba(255,255,255,0.65)" }}>Новые оригинальные ноутбуки</div>
+                  </div>
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                  <div style={{ width: 42, height: 42, borderRadius: 12, background: "rgba(34,197,94,0.15)", color: "#22c55e", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="22" height="22"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                  </div>
+                  <div>
+                    <div style={{ fontWeight: 800, fontSize: 14.5, color: "#fff" }}>Гарантия 1 год</div>
+                    <div style={{ fontSize: 12.5, color: "rgba(255,255,255,0.65)" }}>Оригиналы в запечатанной упаковке</div>
+                  </div>
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                  <div style={{ width: 42, height: 42, borderRadius: 12, background: "rgba(59,130,246,0.15)", color: "#3b82f6", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="22" height="22"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="m10 9 5 3-5 3Z"/></svg>
+                  </div>
+                  <div>
+                    <div style={{ fontWeight: 800, fontSize: 14.5, color: "#fff" }}>Видео-проверка</div>
+                    <div style={{ fontSize: 12.5, color: "rgba(255,255,255,0.65)" }}>Перед покупкой и отправкой</div>
+                  </div>
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                  <div style={{ width: 42, height: 42, borderRadius: 12, background: "rgba(168,85,247,0.15)", color: "#a855f7", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="22" height="22"><polyline points="20 6 9 17 4 12"/></svg>
+                  </div>
+                  <div>
+                    <div style={{ fontWeight: 800, fontSize: 14.5, color: "#fff" }}>Бесплатная подготовка</div>
+                    <div style={{ fontSize: 12.5, color: "rgba(255,255,255,0.65)" }}>Windows / Office / Драйверы</div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
 

@@ -90,6 +90,7 @@ export default function HomeHeroSlider() {
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
+      className="hero-slider-container"
       style={{ position: "relative", width: "100%", borderRadius: 28, overflow: "hidden" }}
     >
       {slides.map((s, idx) => {

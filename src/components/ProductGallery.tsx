@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef, TouchEvent } from "react";
+import { useState, useRef, useEffect, TouchEvent } from "react";
 import LaptopSVG from "./LaptopSVG";
 
 interface ProductGalleryProps {
@@ -57,6 +57,23 @@ export default function ProductGallery({
   const prevImage = () => {
     setActiveIndex((prev) => (prev - 1 + displayImages.length) % displayImages.length);
   };
+
+  useEffect(() => {
+    if (!lightboxOpen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setLightboxOpen(false);
+      } else if (e.key === "ArrowRight") {
+        nextImage();
+      } else if (e.key === "ArrowLeft") {
+        prevImage();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [lightboxOpen, displayImages.length]);
 
   const currentImg = displayImages[activeIndex];
 

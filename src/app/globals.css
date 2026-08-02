@@ -628,8 +628,9 @@ html, body {
 
   /* ── Main Hero Gallery enlargement for mobile ── */
   .hero-slider-img {
-    max-height: 280px !important;
-    object-fit: cover !important;
+    max-height: none !important;
+    height: auto !important;
+    object-fit: contain !important;
     border-radius: 16px !important;
   }
   .gallery-main-stage {

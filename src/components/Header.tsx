@@ -180,9 +180,13 @@ export default function Header() {
           .hamburger { display:flex !important; }
           .whatsapp-header-btn span { display:none; }
           .phone-header-btn span { display:none; }
+          .header-actions { margin-left: auto; gap: 6px; }
+          .whatsapp-header-btn { padding: 10px !important; width: 40px; height: 40px; border-radius: 50% !important; justify-content: center; }
+          .phone-header-btn { padding: 10px !important; width: 40px; height: 40px; border-radius: 50% !important; justify-content: center; }
         }
         @media(max-width:680px){
           .searchbar { display:none !important; }
+          .site-header .wrap.header-row { padding-left: 12px; padding-right: 12px; }
         }
       `}</style>
     </>

@@ -49,7 +49,7 @@ export default async function NewArrivalsPage() {
           )}
 
           {/* What's new section */}
-          <div style={{ marginTop: 72, background: "linear-gradient(135deg,#0D0D11,#1B1710)", borderRadius: 28, padding: 48, color: "#fff" }}>
+          <div style={{ marginTop: 72, background: "linear-gradient(135deg,#0D0D11,#1B1710)", borderRadius: 28, padding: "48px 40px", color: "#fff", overflow: "hidden" }} className="new-tech-section">
             <div className="eyebrow" style={{ color: "var(--accent)" }}>Технологии 2025</div>
             <h2 style={{ fontSize: 32, fontWeight: 800, marginBottom: 32, letterSpacing: "-.02em" }}>Что нового в ноутбуках 2025 года</h2>
             <div className="new-tech-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 24 }}>

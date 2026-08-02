@@ -43,7 +43,7 @@ export default async function DeliveryPage() {
 
       <section className="info-section">
         <div className="wrap">
-          <div className="bought-together-grid" style={{ marginBottom: 48 }}>
+          <div className="delivery-methods-grid" style={{ marginBottom: 48 }}>
             {[
               {
                 icon: (

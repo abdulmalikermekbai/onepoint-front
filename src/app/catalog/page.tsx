@@ -197,7 +197,8 @@ function CatalogFilters({ initialCat, initialBrand, initialSearch }: { initialCa
             maxWidth: filterOpen ? "85vw" : undefined,
             background: filterOpen ? "#fff" : undefined,
             overflowY: filterOpen ? "auto" : undefined,
-            padding: filterOpen ? "24px" : undefined,
+            paddingBottom: filterOpen ? "90px" : undefined,
+            padding: filterOpen ? "24px 24px 90px" : undefined,
             boxShadow: filterOpen ? "4px 0 24px rgba(0,0,0,0.15)" : undefined,
           }}
         >
@@ -326,13 +327,26 @@ function CatalogFilters({ initialCat, initialBrand, initialSearch }: { initialCa
           </div>
 
           {filterOpen && (
-            <button
-              className="btn btn-primary"
-              style={{ width: "100%", marginTop: 20, padding: 14 }}
-              onClick={() => setFilterOpen(false)}
-            >
-              Показать ({filtered.length})
-            </button>
+            <div style={{
+              position: "fixed",
+              bottom: 0,
+              left: 0,
+              width: "320px",
+              maxWidth: "85vw",
+              padding: "16px 24px",
+              background: "#fff",
+              borderTop: "1.5px solid var(--border)",
+              zIndex: 10000,
+              boxSizing: "border-box",
+            }}>
+              <button
+                className="btn btn-primary"
+                style={{ width: "100%", padding: 14, fontSize: 16, fontWeight: 800, borderRadius: 12 }}
+                onClick={() => setFilterOpen(false)}
+              >
+                Показать ({filtered.length})
+              </button>
+            </div>
           )}
         </aside>
 

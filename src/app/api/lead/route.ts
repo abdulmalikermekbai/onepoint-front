@@ -18,13 +18,10 @@ export async function POST(req: NextRequest) {
       pageUrl,
     } = body;
 
-    // Phone validation (KZ format +7 (7XX) XXX-XX-XX)
-    // Only basic check: extract digits, must be exactly 11 digits and start with 7
-    if (phone) {
-      const pureDigits = phone.replace(/\D/g, "");
-      if (pureDigits.length < 11 || !pureDigits.startsWith("7")) {
-        return NextResponse.json({ ok: false, error: "Некорректный номер телефона" }, { status: 400 });
-      }
+    // Basic phone check: just ensure something is provided (no strict format validation)
+    // Different users enter phones in different formats (+7, 8, etc.)
+    if (phone && phone.trim().replace(/\D/g, "").length < 7) {
+      return NextResponse.json({ ok: false, error: "Слишком короткий номер телефона" }, { status: 400 });
     }
 
     // Save lead to local database if database connection is available

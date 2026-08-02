@@ -24,6 +24,7 @@ export default function ContactsPage() {
   const [phone, setPhone] = useState("");
   const [message, setMessage] = useState("");
   const [sent, setSent] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [settings, setSettings] = useState<Record<string, string>>({});
 
   useEffect(() => {
@@ -37,11 +38,13 @@ export default function ContactsPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
     await fetch("/api/lead", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ type: "contact", name, phone, message }),
     }).catch(() => {});
+    setLoading(false);
     setSent(true);
   };
 
@@ -161,7 +164,21 @@ export default function ContactsPage() {
                       <label className="form-label">Сообщение</label>
                       <textarea className="form-input form-textarea" placeholder="Опишите ваш вопрос или запрос…" value={message} onChange={e => setMessage(e.target.value)} required />
                     </div>
-                    <button type="submit" className="btn btn-primary" style={{ width: "100%", padding: 16, fontSize: 16 }}>Отправить сообщение</button>
+                    <button
+                      type="submit"
+                      className="btn btn-primary"
+                      disabled={loading}
+                      style={{ width: "100%", padding: 16, fontSize: 16, opacity: loading ? 0.8 : 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 10 }}
+                    >
+                      {loading ? (
+                        <>
+                          <svg style={{ animation: "spin 0.9s linear infinite" }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" width="18" height="18">
+                            <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+                          </svg>
+                          Отправка...
+                        </>
+                      ) : "Отправить сообщение"}
+                    </button>
                   </form>
                 </>
               )}

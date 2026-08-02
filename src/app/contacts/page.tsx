@@ -4,6 +4,7 @@ import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { fetchSettings } from "@/lib/data";
+import { formatPhoneKZ } from "@/lib/phone";
 
 function TwoGisWidget() {
   const iframeHtml = `<!DOCTYPE html><html><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests"><style>html,body{margin:0;padding:0;overflow:hidden;width:100%;height:100%;}</style></head><body><a class="dg-widget-link" href="https://2gis.kz/almaty/firm/70000001033724894/center/76.93839311599733,43.273471510698656/zoom/17?utm_medium=widget-source&utm_campaign=firmsonmap&utm_source=bigMap">Посмотреть на карте Алматы</a><div class="dg-widget-link"><a href="https://2gis.kz/almaty/firm/70000001033724894/photos/70000001033724894/center/76.93839311599733,43.273471510698656/zoom/17?utm_medium=widget-source&utm_campaign=firmsonmap&utm_source=photos">Фотографии компании</a></div><div class="dg-widget-link"><a href="https://2gis.kz/almaty/center/76.938398,43.272874/zoom/17/routeTab/rsType/bus/to/76.938398,43.272874╎Onepoint, магазин?utm_medium=widget-source&utm_campaign=firmsonmap&utm_source=route">Найти проезд до Onepoint, магазин</a></div><script charset="utf-8" src="https://widgets.2gis.com/js/DGWidgetLoader.js"></script><script charset="utf-8">new DGWidgetLoader({"width":"100%","height":"400px","borderColor":"#a3a3a3","pos":{"lat":43.273471510698656,"lon":76.93839311599733,"zoom":17},"opt":{"city":"almaty"},"org":[{"id":"70000001033724894"}]});</script></body></html>`;
@@ -158,7 +159,7 @@ export default function ContactsPage() {
                     </div>
                     <div className="form-group">
                       <label className="form-label">Телефон</label>
-                      <input className="form-input" type="tel" placeholder="+7 (___) ___-__-__" value={phone} onChange={e => setPhone(e.target.value)} required />
+                      <input className="form-input" type="tel" placeholder="+7 (777) 000-00-00" value={phone} onChange={e => setPhone(formatPhoneKZ(e.target.value))} required />
                     </div>
                     <div className="form-group">
                       <label className="form-label">Сообщение</label>

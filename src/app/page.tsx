@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
 import LaptopSVG from "@/components/LaptopSVG";
 import { BRANDS, REVIEWS, formatPrice, fetchLiveProducts, fetchLiveReviews, fetchSettings, Product } from "@/lib/data";
+import { formatPhoneKZ } from "@/lib/phone";
 import HomeClient from "./HomeClient";
 import HomeHeroSlider from "@/components/HomeHeroSlider";
 import { ClientStatsGrid } from "@/components/ClientStats";
@@ -640,9 +641,9 @@ function ConsultationForm() {
         <input
           type="tel"
           required
-          placeholder="Ваш телефон"
+          placeholder="+7 (777) 000-00-00"
           value={phone}
-          onChange={e => setPhone(e.target.value)}
+          onChange={e => setPhone(formatPhoneKZ(e.target.value))}
           className="consultation-input"
           style={{
             flex: "1 1 150px",

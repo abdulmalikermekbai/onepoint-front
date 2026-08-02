@@ -402,7 +402,7 @@ footer { background: var(--dark); color: rgba(255,255,255,.55); padding-top: 72p
 
 /* ============ PAGE CONTENT ============ */
 .page-hero { background: var(--surface); padding: 60px 0; }
-.page-hero h1 { font-size: 42px; font-weight: 800; letter-spacing: -.02em; margin-bottom: 12px; }
+.page-hero h1 { font-size: 42px; font-weight: 800; letter-spacing: -.02em; margin-bottom: 12px; overflow-wrap: break-word; word-break: break-word; }
 .page-hero p { font-size: 17px; color: var(--text-muted); max-width: 560px; line-height: 1.6; }
 .breadcrumbs { display: flex; align-items: center; gap: 8px; font-size: 13.5px; color: var(--text-soft); margin-bottom: 24px; flex-wrap: wrap; }
 .breadcrumbs a { color: var(--text-soft); transition: color .2s; }
@@ -603,11 +603,30 @@ html, body {
   .adv-detail-grid { grid-template-columns: 1fr; }
   .bought-together-grid { grid-template-columns: 1fr; }
   .guarantee-main-grid { grid-template-columns: 1fr !important; }
-  
+
   /* Touch target sizes & spacing */
   .btn { min-height: 44px; padding: 12px 20px; font-size: 14px; }
   .contact-card { padding: 20px; flex-direction: column; text-align: center; }
   .contact-icon { margin: 0 auto; }
+
+  /* ── Mobile typography ── */
+  .page-hero { padding: 32px 0; }
+  .page-hero h1 { font-size: 26px; letter-spacing: -.01em; margin-bottom: 8px; }
+  .page-hero p { font-size: 14px; }
+  .section-title { font-size: 22px !important; word-break: break-word; }
+
+  /* ── Bestsellers podium ── */
+  .bestsellers-podium {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+
+  /* ── Promotions table → hidden on mobile ── */
+  .promotions-savings-table { display: none !important; }
+
+  /* ── Header phone number ── */
+  .phone-header-btn span { display: none; }
+  .phone-header-btn { padding: 8px !important; width: 40px; height: 40px; border-radius: 50% !important; justify-content: center; }
 }
 
 /* ============ LAPTOP SVG ILLUSTRATIONS ============ */
@@ -917,5 +936,18 @@ html, body {
   .categories-grid       { grid-template-columns: repeat(2,1fr) !important; gap: 12px !important; }
   .purpose-grid          { grid-template-columns: repeat(2,1fr) !important; gap: 10px !important; }
   .guarantee-main-grid   { grid-template-columns: 1fr !important; gap: 16px !important; }
+
+  /* Savings section */
+  .savings-section       { padding: 24px 16px !important; }
 }
+
+/* Desktop: show table, hide cards */
+.promotions-savings-cards { display: none; }
+
+/* Mobile: hide table, show cards */
+@media (max-width: 680px) {
+  .promotions-savings-table  { display: none !important; }
+  .promotions-savings-cards  { display: block; }
+}
+
 

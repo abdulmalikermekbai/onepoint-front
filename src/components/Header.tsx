@@ -179,6 +179,7 @@ export default function Header() {
         @media(max-width:960px){
           .hamburger { display:flex !important; }
           .whatsapp-header-btn span { display:none; }
+          .phone-header-btn span { display:none; }
         }
         @media(max-width:680px){
           .searchbar { display:none !important; }

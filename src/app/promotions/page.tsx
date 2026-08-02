@@ -86,9 +86,11 @@ export default async function PromotionsPage() {
 
           {/* Savings table */}
           {saleProducts.length > 0 && (
-            <div style={{ marginTop: 64, background: "var(--surface)", borderRadius: 24, padding: 40 }}>
+            <div style={{ marginTop: 64, background: "var(--surface)", borderRadius: 24, padding: 40 }} className="savings-section">
               <h2 style={{ fontSize: 26, fontWeight: 800, marginBottom: 24 }}>Топ экономии</h2>
-              <table style={{ width: "100%", borderCollapse: "collapse" }}>
+
+              {/* Desktop table */}
+              <table className="promotions-savings-table" style={{ width: "100%", borderCollapse: "collapse" }}>
                 <thead>
                   <tr style={{ borderBottom: "2px solid var(--border)" }}>
                     {["Модель", "Старая цена", "Новая цена", "Скидка", "Экономия", ""].map(h => (
@@ -113,8 +115,28 @@ export default async function PromotionsPage() {
                   ))}
                 </tbody>
               </table>
+
+              {/* Mobile cards — shown only on mobile via CSS */}
+              <div className="promotions-savings-cards">
+                {[...saleProducts].sort((a, b) => (b.saving || 0) - (a.saving || 0)).map(p => (
+                  <div key={p.id} style={{ borderBottom: "1px solid var(--border)", padding: "16px 0", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <Link href={`/product/${p.slug}`} style={{ fontWeight: 700, fontSize: 13.5, color: "var(--text)", display: "block", marginBottom: 4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        {p.brand} {p.name.split(" ").slice(1, 4).join(" ")}
+                      </Link>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                        <span style={{ fontWeight: 800, fontSize: 14 }}>{formatPrice(p.price)}</span>
+                        {p.oldPrice && <span style={{ textDecoration: "line-through", color: "var(--text-soft)", fontSize: 12 }}>{formatPrice(p.oldPrice)}</span>}
+                        <span className="discount-badge">-{p.discountPercent || 0}%</span>
+                      </div>
+                    </div>
+                    <a href={`https://wa.me/77075511979?text=Хочу%20купить:%20${encodeURIComponent(p.name)}`} target="_blank" rel="noopener noreferrer" className="btn btn-green btn-xs" style={{ flexShrink: 0, fontSize: 12, padding: "8px 14px" }}>WA</a>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
+
         </div>
       </section>
 

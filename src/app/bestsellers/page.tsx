@@ -33,7 +33,7 @@ export default async function BestsellersPage() {
         <div className="wrap">
           {/* Top-3 podium */}
           {hitProducts.length > 0 && (
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1.2fr 1fr", gap: 20, marginBottom: 60, alignItems: "flex-end" }}>
+            <div className="bestsellers-podium" style={{ display: "grid", gridTemplateColumns: "1fr 1.2fr 1fr", gap: 20, marginBottom: 60, alignItems: "flex-end" }}>
               {hitProducts.slice(0, 3).map((p, i) => (
                 <div key={p.id} style={{
                   background: i === 0 ? "linear-gradient(135deg,#FFD700,#FFA500)" : i === 1 ? "linear-gradient(135deg,#E8E8E8,#C0C0C0)" : "linear-gradient(135deg,#CD7F32,#A0522D)",

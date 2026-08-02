@@ -27,7 +27,7 @@ export default async function PromotionsPage() {
       <section>
         <div className="wrap">
           {/* Promo banners */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 20, marginBottom: 56 }}>
+          <div className="promotions-banners-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 20, marginBottom: 56 }}>
             {[
               { emoji: "🎁", tag: "Подарок", title: "Полезный аксессуар к выбранным ноутбукам", desc: "Уточняйте комплект у консультанта", bg: "linear-gradient(135deg,#FF7A3D,#FF5A1F,#E64A12)", href: "https://wa.me/77075511979?text=Хочу%20узнать%20про%20подарок%20к%20ноутбуку" },
               { emoji: "⚡", tag: "Спеццена", title: "Скидки на популярные ноутбуки из наличия", desc: "Количество товаров по акции ограничено", bg: "linear-gradient(135deg,#1B1B21,#0D0D11)", href: "/catalog?sale=1" },

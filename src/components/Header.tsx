@@ -50,14 +50,17 @@ export default function Header() {
     <>
       {/* Announcement */}
       <div className="announce">
-        {announcement}
+        <span className="announce-desktop">{announcement}</span>
+        <span className="announce-mobile">
+          Новые запечатанные ноутбуки с гарантией 1 год · Бесплатная подготовка (Windows / Office)
+        </span>
       </div>
 
       {/* Main Header */}
       <header className={`site-header${scrolled ? " scrolled" : ""}`}>
         <div className="wrap header-row">
           {/* Hamburger (mobile) */}
-          <button className="hamburger" style={{ display: "none" }} onClick={() => setMobileOpen(true)} aria-label="Меню">
+          <button className="hamburger" onClick={() => setMobileOpen(true)} aria-label="Меню">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M3 12h18M3 6h18M3 18h18" />
             </svg>

@@ -24,7 +24,7 @@ export default async function BestsellersPage() {
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="14" height="14"><path d="M9 18l6-6-6-6"/></svg>
             <span>Хиты продаж</span>
           </div>
-          <h1>⭐ Хиты продаж</h1>
+          <h1>Хиты продаж</h1>
           <p>Самые популярные ноутбуки, которые выбирают покупатели OnePoint каждый день.</p>
         </div>
       </div>

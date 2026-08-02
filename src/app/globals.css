@@ -608,6 +608,19 @@ html, body {
   .btn { min-height: 44px; padding: 12px 20px; font-size: 14px; }
   .contact-card { padding: 20px; flex-direction: column; text-align: center; }
   .contact-icon { margin: 0 auto; }
+  .info-card { padding: 20px !important; }
+  .not-covered-grid { grid-template-columns: 1fr !important; gap: 10px !important; }
+
+  /* ── Main Hero Gallery enlargement for mobile ── */
+  .hero-slider-img {
+    max-height: 280px !important;
+    object-fit: cover !important;
+    border-radius: 16px !important;
+  }
+  .gallery-main-stage {
+    aspect-ratio: 1 / 1 !important;
+    border-radius: 16px !important;
+  }
 
   /* ── Mobile typography ── */
   .page-hero { padding: 32px 0; }

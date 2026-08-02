@@ -63,7 +63,7 @@ export default function GuaranteePage() {
           {/* What is NOT covered */}
           <div className="info-card" style={{ borderLeft: "4px solid var(--warn)" }}>
             <h3>Случаи, не входящие в гарантию</h3>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginTop: 12 }}>
+            <div className="not-covered-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginTop: 12 }}>
               {["Механические повреждения (удары, падения)", "Повреждения от жидкостей", "Самостоятельный ремонт", "Вирусы и программные ошибки"].map(item => (
                 <div key={item} style={{ display: "flex", gap: 8, alignItems: "center", fontSize: 14.5, color: "var(--text-muted)" }}>
                   <span style={{ color: "#EF4444" }}>✗</span>

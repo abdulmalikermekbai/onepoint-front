@@ -100,6 +100,7 @@ export default function HomeHeroSlider() {
                 <img
                   src={s.image_url}
                   alt={s.title || "Слайд"}
+                  className="hero-slider-img"
                   style={{
                     width: "100%",
                     maxHeight: 520,

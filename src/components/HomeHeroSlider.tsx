@@ -114,9 +114,20 @@ export default function HomeHeroSlider() {
           if (!s.mobile_image_url) return mainImg;
 
           return (
-            <picture style={{ width: "100%", display: "block" }}>
+            <picture style={{ width: "100%", height: "100%", display: "block" }}>
               <source media="(max-width: 680px)" srcSet={s.mobile_image_url} />
-              {mainImg}
+              <img
+                src={s.image_url}
+                alt={s.title || "Слайд"}
+                className="hero-slider-img"
+                style={{
+                  width: "100%",
+                  maxHeight: 520,
+                  objectFit: "contain",
+                  borderRadius: 28,
+                  filter: "drop-shadow(0 20px 40px rgba(0,0,0,.3))"
+                }}
+              />
             </picture>
           );
         };

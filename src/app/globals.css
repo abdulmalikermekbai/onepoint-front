@@ -628,29 +628,33 @@ html, body {
 
   /* ── Main Hero Gallery enlargement for mobile ── */
   .hero-section {
-    padding: 8px 0 24px 0 !important;
+    padding: 0 0 20px 0 !important;
   }
   .hero-section > .wrap {
-    padding: 0 12px !important;
+    padding: 0 !important;
   }
   .hero-slider-container {
     border-radius: 20px !important;
     background: transparent !important;
-    aspect-ratio: 4 / 5 !important;
     overflow: hidden !important;
+    width: 100% !important;
   }
   .hero-slider-container > div {
-    height: 100% !important;
     width: 100% !important;
+    overflow: hidden !important;
+    border-radius: 20px !important;
   }
-  .hero-slider-container a {
-    height: 100% !important;
+  .hero-slider-container picture {
     width: 100% !important;
+    display: block !important;
+    border-radius: 20px !important;
+    overflow: hidden !important;
   }
   .hero-slider-img {
     width: 100% !important;
-    height: 100% !important;
     max-height: none !important;
+    height: auto !important;
+    display: block !important;
     object-fit: cover !important;
     border-radius: 20px !important;
     filter: none !important;

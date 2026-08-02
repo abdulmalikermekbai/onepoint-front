@@ -74,6 +74,7 @@ export default async function ProductPage({ params }: Props) {
     ["Веб-камера", product.camera || "—"],
     ["Разъёмы", product.ports || "—"],
     ["Размеры", product.dimensions || "—"],
+    ["Клавиатура", product.keyboard || "—"],
     ["Гарантия", product.warranty || "—"],
   ];
 

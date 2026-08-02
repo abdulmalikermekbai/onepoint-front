@@ -42,6 +42,7 @@ export interface Product {
   camera?: string;
   dimensions?: string;
   ports?: string;
+  keyboard?: string;
   shortDescription?: string;
   description?: string;
   advantages?: string[];
@@ -173,6 +174,7 @@ export function normalizeDbProduct(p: any): Product {
     camera: p.camera || "720p",
     dimensions: p.dimensions || "",
     ports: p.ports || "",
+    keyboard: p.keyboard || undefined,
     shortDescription: p.short_description || "",
     description: p.description || "",
     advantages: p.advantages ? (Array.isArray(p.advantages) ? p.advantages : String(p.advantages).split("\n")) : [],

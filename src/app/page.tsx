@@ -563,10 +563,10 @@ function ConsultationForm() {
   }
 
   return (
-    <div style={{ position: "relative", zIndex: 2 }}>
+    <div style={{ position: "relative", zIndex: 2, flex: 1 }}>
       <form
         className="consultation-form"
-        style={{ display: "flex", gap: 10, flexWrap: "wrap" }}
+        style={{ display: "flex", gap: 10, flexWrap: "nowrap", alignItems: "center" }}
         onSubmit={handleSubmit}
       >
         <input
@@ -577,7 +577,8 @@ function ConsultationForm() {
           onChange={e => setName(e.target.value)}
           className="consultation-input"
           style={{
-            flex: "1 1 180px",
+            flex: "1 1 140px",
+            minWidth: 0,
             padding: "16px 20px",
             borderRadius: 100,
             border: "1.5px solid rgba(255,255,255,.18)",
@@ -596,7 +597,8 @@ function ConsultationForm() {
           onChange={e => setPhone(e.target.value)}
           className="consultation-input"
           style={{
-            flex: "1 1 200px",
+            flex: "1 1 150px",
+            minWidth: 0,
             padding: "16px 20px",
             borderRadius: 100,
             border: "1.5px solid rgba(255,255,255,.18)",
@@ -607,7 +609,7 @@ function ConsultationForm() {
             fontFamily: "inherit",
           }}
         />
-        <button type="submit" className="btn btn-primary consultation-submit" style={{ padding: "16px 30px" }}>Заказать звонок</button>
+        <button type="submit" className="btn btn-primary consultation-submit" style={{ padding: "16px 28px", flexShrink: 0, whiteSpace: "nowrap" }}>Заказать звонок</button>
       </form>
       <div style={{ color: "rgba(255,255,255,.35)", fontSize: 11.5, marginTop: 10 }}>
         Отправляя форму, вы соглашаетесь с{" "}

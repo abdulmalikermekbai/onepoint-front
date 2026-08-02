@@ -274,7 +274,12 @@ export default function HomePage() {
             <div className="promo-grid reveal">
               <div className="promo-card orange">
                 <div className="promo-orb" />
-                <span className="promo-tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="14" height="14" style={{verticalAlign:"middle",marginRight:4}}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>БЕСПЛАТНАЯ УСЛУГА</span>
+                <span className="promo-tag">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="14" height="14">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                  </svg>
+                  БЕСПЛАТНАЯ УСЛУГА
+                </span>
                 <div className="promo-title">Полная подготовка ноутбука</div>
                 <p className="promo-desc">Бесплатно установим Windows, настроим все необходимые драйверы для работы и подарим лицензионный бессрочный Microsoft Office Pro Plus.</p>
                 <a
@@ -288,7 +293,12 @@ export default function HomePage() {
               </div>
               <div className="promo-card dark" style={{ backgroundImage: "linear-gradient(135deg,#1B1B21,#0D0D11)", position: "relative" }}>
                 <div style={{ position: "absolute", width: 220, height: 220, borderRadius: "50%", background: "rgba(255,90,31,.16)", bottom: -100, right: 20 }} />
-                <span className="promo-tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="14" height="14" style={{verticalAlign:"middle",marginRight:4}}><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>СПЕЦЦЕНЫ НЕДЕЛИ</span>
+                <span className="promo-tag">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="14" height="14">
+                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                  </svg>
+                  СПЕЦЦЕНЫ НЕДЕЛИ
+                </span>
                 <div className="promo-title">Популярные ноутбуки по выгодной цене</div>
                 <p className="promo-desc">Выбирайте модели со скидкой из наличия — количество ограничено.</p>
                 <Link href="/catalog?sale=1" className="btn btn-primary btn-sm">

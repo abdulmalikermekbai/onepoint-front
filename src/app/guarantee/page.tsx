@@ -21,7 +21,7 @@ export default function GuaranteePage() {
       <section className="info-section">
         <div className="wrap">
           {/* Main guarantee block */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, marginBottom: 48 }}>
+          <div className="guarantee-main-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, marginBottom: 48 }}>
             <div style={{ background: "linear-gradient(135deg,#1AA35C,#16a34a)", borderRadius: 24, padding: 40, color: "#fff" }}>
               <span style={{ fontSize: 56, display: "block", marginBottom: 16 }}>🛡️</span>
               <h2 style={{ fontSize: 28, fontWeight: 800, marginBottom: 12 }}>Гарантия 1 год</h2>
@@ -32,11 +32,6 @@ export default function GuaranteePage() {
                 <div style={{ textAlign: "center" }}>
                   <div style={{ fontSize: 32, fontWeight: 900 }}>1</div>
                   <div style={{ fontSize: 13, opacity: .8 }}>год гарантии</div>
-                </div>
-                <div style={{ width: 1, background: "rgba(255,255,255,.2)" }} />
-                <div style={{ textAlign: "center" }}>
-                  <div style={{ fontSize: 32, fontWeight: 900 }}>24/7</div>
-                  <div style={{ fontSize: 13, opacity: .8 }}>поддержка</div>
                 </div>
                 <div style={{ width: 1, background: "rgba(255,255,255,.2)" }} />
                 <div style={{ textAlign: "center" }}>

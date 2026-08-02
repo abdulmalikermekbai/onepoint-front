@@ -39,42 +39,45 @@ export async function POST(req: NextRequest) {
       // Ignore database save errors if database server is offline
     }
 
-    // Format Telegram message
+    // 1. Forward lead to main PHP backend API (which creates DB record & sends message to group -5319438603 with inline buttons)
+    const backendApiUrl = process.env.BACKEND_API_URL || "https://api.onepoint.kz";
+    try {
+      const phpRes = await fetch(`${backendApiUrl}/api/lead.php`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      if (phpRes.ok) {
+        return NextResponse.json({ ok: true });
+      }
+    } catch (_) {
+      // Fallback if PHP backend is temporarily unreachable
+    }
+
+    // 2. Fallback: direct Telegram message to group -5319438603
     const botToken = process.env.TELEGRAM_BOT_TOKEN || "8510182301:AAEVviHThdSvbhwjDg0YDJT4f3K2YF6w5jU";
-    const chatId = process.env.TELEGRAM_CHAT_ID || "288706561";
+    const groupId = process.env.TELEGRAM_GROUP_ID || "-5319438603";
 
-    if (botToken && chatId) {
+    if (botToken && groupId) {
       const now = new Date();
-      const dateStr = now.toLocaleString("ru-RU", { timeZone: "Asia/Almaty" });
+      const timeStr = now.toLocaleTimeString("ru-RU", { timeZone: "Asia/Almaty", hour: "2-digit", minute: "2-digit" });
 
-      let text = `<b>📥 Новая заявка</b>\n\n`;
-      text += `💻 <b>Ноутбук:</b>\n${productName || "Консультация / Запрос контактов"}\n\n`;
-
-      if (sku) {
-        text += `🆔 <b>Артикул:</b> ${sku}\n\n`;
-      }
+      let text = `<b>🆕 Новая заявка</b>\n\n`;
+      text += `<b>🆔 #${Math.floor(1000 + Math.random() * 9000)}</b>\n\n`;
+      text += `👤 <b>Имя:</b> ${name || "Не указано"}\n`;
+      text += `📞 <b>Телефон:</b> ${phone || "Не указан"}\n`;
+      text += `💻 <b>Товар:</b> ${productName || message || "Консультация"}\n`;
       if (price) {
-        text += `💰 <b>Цена:</b> ${typeof price === "number" ? price.toLocaleString("ru-RU") + " ₸" : price}\n\n`;
+        text += `💰 <b>Цена:</b> ${typeof price === "number" ? price.toLocaleString("ru-RU") + " ₸" : price}\n`;
       }
-
-      text += `👤 <b>Имя:</b>\n${name || "Не указано"}\n\n`;
-      text += `📞 <b>Телефон:</b>\n${phone || "Не указан"}\n\n`;
-
-      if (message) {
-        text += `💬 <b>Сообщение:</b>\n${message}\n\n`;
-      }
-
-      text += `🕒 <b>Дата:</b>\n${dateStr}\n\n`;
-
-      if (pageUrl) {
-        text += `🌐 <b>Страница:</b>\n${pageUrl}`;
-      }
+      text += `\n🌐 <b>Источник:</b> OnePoint.kz\n`;
+      text += `🕒 <b>Время:</b> ${timeStr}`;
 
       await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          chat_id: chatId,
+          chat_id: groupId,
           text: text.trim(),
           parse_mode: "HTML",
           disable_web_page_preview: true,

@@ -543,14 +543,17 @@ function ConsultationForm() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [sent, setSent] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
     await fetch("/api/lead", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ type: "consultation", name, phone, message: "Заявка на консультацию с главной страницы" }),
     }).catch(() => {});
+    setLoading(false);
     setSent(true);
   };
 
@@ -609,7 +612,21 @@ function ConsultationForm() {
             fontFamily: "inherit",
           }}
         />
-        <button type="submit" className="btn btn-primary consultation-submit" style={{ padding: "16px 28px", flexShrink: 0, whiteSpace: "nowrap" }}>Заказать звонок</button>
+        <button
+          type="submit"
+          disabled={loading}
+          className="btn btn-primary consultation-submit"
+          style={{ padding: "16px 28px", flexShrink: 0, whiteSpace: "nowrap", opacity: loading ? 0.8 : 1, display: "inline-flex", alignItems: "center", gap: 8 }}
+        >
+          {loading ? (
+            <>
+              <svg style={{ animation: "spin 0.9s linear infinite" }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" width="18" height="18">
+                <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+              </svg>
+              Отправка...
+            </>
+          ) : "Заказать звонок"}
+        </button>
       </form>
       <div style={{ color: "rgba(255,255,255,.35)", fontSize: 11.5, marginTop: 10 }}>
         Отправляя форму, вы соглашаетесь с{" "}

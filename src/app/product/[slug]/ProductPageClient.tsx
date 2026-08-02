@@ -34,6 +34,18 @@ export default function ProductPageClient({ product, waLink }: Props) {
       value: product.price,
       currency: 'KZT'
     });
+
+    // Track product view in our own analytics
+    try {
+      fetch('https://api.onepoint.kz/api/track.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          product_id: product.id,
+          referer: typeof document !== 'undefined' ? document.referrer : '',
+        }),
+      }).catch(() => {}); // fire-and-forget, never block the UI
+    } catch (_) {}
   }, [product]);
 
   return (

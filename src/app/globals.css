@@ -903,3 +903,19 @@ html, body {
 .badge-2gis-review:hover {
   background: rgba(101, 163, 13, 0.2);
 }
+
+/* ─── Responsive helpers for refactored pages ─── */
+@media (max-width: 960px) {
+  .about-mission-grid    { grid-template-columns: 1fr !important; gap: 32px !important; }
+  .payment-methods-grid  { grid-template-columns: 1fr 1fr !important; }
+  .categories-grid       { grid-template-columns: repeat(3,1fr) !important; }
+  .purpose-grid          { grid-template-columns: repeat(3,1fr) !important; }
+}
+@media (max-width: 680px) {
+  .about-mission-grid    { margin-bottom: 40px !important; }
+  .payment-methods-grid  { grid-template-columns: 1fr 1fr !important; gap: 12px !important; }
+  .categories-grid       { grid-template-columns: repeat(2,1fr) !important; gap: 12px !important; }
+  .purpose-grid          { grid-template-columns: repeat(2,1fr) !important; gap: 10px !important; }
+  .guarantee-main-grid   { grid-template-columns: 1fr !important; gap: 16px !important; }
+}
+

@@ -3,6 +3,47 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { ClientAboutStats } from "@/components/ClientStats";
 
+/* ── Inline SVG icons ── */
+function IconShield() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" width="32" height="32">
+      <path d="M12 2L4 6v5c0 5.25 3.5 10.15 8 11.35C16.5 21.15 20 16.25 20 11V6l-8-4z"/>
+      <path d="M9 12l2 2 4-4" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  );
+}
+function IconPriceTag() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" width="32" height="32">
+      <path d="M12 2H7a1 1 0 0 0-.707.293l-4 4A1 1 0 0 0 2 7v5a1 1 0 0 0 .293.707l9 9a1 1 0 0 0 1.414 0l9-9a1 1 0 0 0 0-1.414l-9-9A1 1 0 0 0 12 2z"/>
+      <circle cx="7.5" cy="7.5" r="1.5" fill="currentColor" stroke="none"/>
+    </svg>
+  );
+}
+function IconExpert() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" width="32" height="32">
+      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+      <circle cx="9" cy="7" r="4"/>
+      <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+    </svg>
+  );
+}
+function IconWrench() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" width="32" height="32">
+      <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+    </svg>
+  );
+}
+
+const VALUES = [
+  { Icon: IconShield,   title: "Только оригиналы",       desc: "Работаем исключительно с официальными поставщиками. Каждый ноутбук — подлинный, с гарантией 1 год." },
+  { Icon: IconPriceTag, title: "Честные цены",            desc: "Никаких скрытых наценок. Регулярные акции для максимальной выгоды." },
+  { Icon: IconExpert,   title: "Экспертная консультация", desc: "Наши специалисты помогут подобрать ноутбук для работы, учёбы, дизайна или игр — бесплатно." },
+  { Icon: IconWrench,   title: "Сервисный центр",         desc: "Гарантийное и послегарантийное обслуживание. Быстрая диагностика и качественный ремонт." },
+];
+
 export default function AboutPage() {
   return (
     <>
@@ -22,7 +63,7 @@ export default function AboutPage() {
       <section className="info-section">
         <div className="wrap">
           {/* Mission */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 48, alignItems: "center", marginBottom: 72 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 48, alignItems: "center", marginBottom: 72 }} className="about-mission-grid">
             <div>
               <div className="eyebrow">Наша миссия</div>
               <h2 className="section-title" style={{ marginBottom: 20 }}>Делаем технологии доступными</h2>
@@ -41,16 +82,18 @@ export default function AboutPage() {
           <div className="eyebrow" style={{ marginBottom: 8 }}>Наши ценности</div>
           <h2 className="section-title" style={{ marginBottom: 32 }}>Почему нам доверяют</h2>
           <div className="adv-grid" style={{ marginBottom: 72 }}>
-            {[
-              { icon: "✅", title: "Только оригиналы", desc: "Работаем исключительно с официальными поставщиками. Каждый ноутбук — подлинный, с гарантией 1 год." },
-              { icon: "💰", title: "Честные цены", desc: "Никаких скрытых наценок. Регулярные акции для максимальной выгоды." },
-              { icon: "🎓", title: "Экспертная консультация", desc: "Наши специалисты помогут подобрать ноутбук для работы, учёбы, дизайна или игр — бесплатно." },
-              { icon: "🔧", title: "Сервисный центр", desc: "Гарантийное и послегарантийное обслуживание. Быстрая диагностика и качественный ремонт." },
-            ].map(v => (
-              <div key={v.title} className="adv-card">
-                <div style={{ fontSize: 40 }}>{v.icon}</div>
-                <div className="adv-title">{v.title}</div>
-                <div className="adv-desc">{v.desc}</div>
+            {VALUES.map(({ Icon, title, desc }) => (
+              <div key={title} className="adv-card">
+                <div style={{
+                  width: 56, height: 56, borderRadius: 16,
+                  background: "linear-gradient(135deg,#edfaf3,#d1fae5)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  color: "var(--success)", marginBottom: 4,
+                }}>
+                  <Icon />
+                </div>
+                <div className="adv-title">{title}</div>
+                <div className="adv-desc">{desc}</div>
               </div>
             ))}
           </div>

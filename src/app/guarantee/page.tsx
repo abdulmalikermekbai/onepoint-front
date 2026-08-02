@@ -2,6 +2,15 @@ import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
+function ShieldIcon({ size = 28 }: { size?: number }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" width={size} height={size}>
+      <path d="M12 2L4 6v5c0 5.25 3.5 10.15 8 11.35C16.5 21.15 20 16.25 20 11V6l-8-4z"/>
+      <path d="M9 12l2 2 4-4" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  );
+}
+
 export default function GuaranteePage() {
   return (
     <>
@@ -13,7 +22,7 @@ export default function GuaranteePage() {
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="14" height="14"><path d="M9 18l6-6-6-6"/></svg>
             <span>Гарантия</span>
           </div>
-          <h1>🛡️ Гарантия</h1>
+          <h1>Гарантия</h1>
           <p>Гарантия 1 год на всю технику. Собственный сервисный центр для быстрого решения любых вопросов.</p>
         </div>
       </div>
@@ -23,7 +32,7 @@ export default function GuaranteePage() {
           {/* Main guarantee block */}
           <div className="guarantee-main-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, marginBottom: 48 }}>
             <div style={{ background: "linear-gradient(135deg,#1AA35C,#16a34a)", borderRadius: 24, padding: 40, color: "#fff" }}>
-              <span style={{ fontSize: 56, display: "block", marginBottom: 16 }}>🛡️</span>
+              <span style={{ display: "block", marginBottom: 16, opacity: 0.85 }}><ShieldIcon size={52} /></span>
               <h2 style={{ fontSize: 28, fontWeight: 800, marginBottom: 12 }}>Гарантия 1 год</h2>
               <p style={{ fontSize: 15.5, opacity: .9, lineHeight: 1.6 }}>
                 Мы работаем только с официальными поставщиками. На всю технику предоставляется гарантия 1 год.

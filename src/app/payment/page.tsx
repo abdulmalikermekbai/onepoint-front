@@ -2,6 +2,53 @@ import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
+function IconCash() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="40" height="40">
+      <rect x="2" y="6" width="20" height="14" rx="3"/>
+      <circle cx="12" cy="13" r="3"/>
+      <path d="M6 10h.01M18 10h.01M6 16h.01M18 16h.01"/>
+    </svg>
+  );
+}
+function IconCard() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="40" height="40">
+      <rect x="2" y="5" width="20" height="14" rx="2"/>
+      <line x1="2" y1="10" x2="22" y2="10"/>
+      <line x1="6" y1="15" x2="10" y2="15"/>
+    </svg>
+  );
+}
+function IconQR() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="40" height="40">
+      <rect x="3" y="3" width="7" height="7" rx="1"/>
+      <rect x="14" y="3" width="7" height="7" rx="1"/>
+      <rect x="3" y="14" width="7" height="7" rx="1"/>
+      <path d="M14 14h3v3h-3zM17 17h3v3h-3zM14 20h3"/>
+      <path d="M5 5h3v3H5zM16 5h3v3h-3zM5 16h3v3H5z" fill="currentColor" stroke="none"/>
+    </svg>
+  );
+}
+function IconBank() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="40" height="40">
+      <path d="M3 9l9-7 9 7"/>
+      <path d="M4 10v9h16v-9"/>
+      <path d="M8 10v9M12 10v9M16 10v9"/>
+      <line x1="2" y1="19" x2="22" y2="19"/>
+    </svg>
+  );
+}
+
+const PAYMENT_METHODS = [
+  { Icon: IconCash, title: "Наличные",          desc: "При получении курьером или в магазине" },
+  { Icon: IconCard, title: "Банковская карта",  desc: "Visa, Mastercard. Оплата на сайте или через терминал" },
+  { Icon: IconQR,   title: "Kaspi Pay",          desc: "Быстрая оплата через QR в приложении Kaspi" },
+  { Icon: IconBank, title: "Банковский перевод", desc: "Счёт на оплату для Halyk, Kaspi, Forte и др." },
+];
+
 export default function PaymentPage() {
   return (
     <>
@@ -13,7 +60,7 @@ export default function PaymentPage() {
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="14" height="14"><path d="M9 18l6-6-6-6"/></svg>
             <span>Оплата</span>
           </div>
-          <h1>💳 Способы оплаты</h1>
+          <h1>Способы оплаты</h1>
           <p>Оплачивайте покупки любым удобным способом в магазине OnePoint.</p>
         </div>
       </div>
@@ -22,17 +69,19 @@ export default function PaymentPage() {
         <div className="wrap">
           {/* Payment methods */}
           <h2 style={{ fontSize: 28, fontWeight: 800, marginBottom: 24 }}>Способы оплаты</h2>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 20, marginBottom: 56 }}>
-            {[
-              { icon: "💵", title: "Наличные", desc: "При получении курьером или в магазине" },
-              { icon: "💳", title: "Банковская карта", desc: "Visa, Mastercard. Оплата на сайте или через терминал" },
-              { icon: "📱", title: "Kaspi Pay", desc: "Быстрая оплата через QR в приложении Kaspi" },
-              { icon: "🏦", title: "Банковский перевод", desc: "Счёт на оплату для Halyk, Kaspi, Forte и др." },
-            ].map(m => (
-              <div key={m.title} style={{ background: "#fff", border: "1.5px solid var(--border)", borderRadius: 20, padding: 28, textAlign: "center" }}>
-                <span style={{ fontSize: 48, display: "block", marginBottom: 12 }}>{m.icon}</span>
-                <h3 style={{ fontSize: 17, fontWeight: 700, marginBottom: 8 }}>{m.title}</h3>
-                <p style={{ fontSize: 13.5, color: "var(--text-muted)", lineHeight: 1.5 }}>{m.desc}</p>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 20, marginBottom: 56 }} className="payment-methods-grid">
+            {PAYMENT_METHODS.map(({ Icon, title, desc }) => (
+              <div key={title} style={{ background: "#fff", border: "1.5px solid var(--border)", borderRadius: 20, padding: 28, textAlign: "center" }}>
+                <span style={{
+                  display: "inline-flex", alignItems: "center", justifyContent: "center",
+                  width: 72, height: 72, borderRadius: 20,
+                  background: "linear-gradient(135deg,#edfaf3,#d1fae5)",
+                  color: "var(--success)", marginBottom: 16,
+                }}>
+                  <Icon />
+                </span>
+                <h3 style={{ fontSize: 17, fontWeight: 700, marginBottom: 8 }}>{title}</h3>
+                <p style={{ fontSize: 13.5, color: "var(--text-muted)", lineHeight: 1.5 }}>{desc}</p>
               </div>
             ))}
           </div>

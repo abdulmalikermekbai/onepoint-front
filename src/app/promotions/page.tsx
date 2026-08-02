@@ -6,6 +6,17 @@ import { fetchLiveProductsByFlag, formatPrice } from "@/lib/data";
 
 export const revalidate = 0;
 
+function IcoGift() {
+  return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="36" height="36"><path d="M20 12v10H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>;
+}
+function IcoSale() {
+  return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="36" height="36"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>;
+}
+function IcoDelivery() {
+  return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="36" height="36"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 4v3h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>;
+}
+
+
 export default async function PromotionsPage() {
   const saleProducts = await fetchLiveProductsByFlag("is_sale");
 
@@ -19,7 +30,7 @@ export default async function PromotionsPage() {
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="14" height="14"><path d="M9 18l6-6-6-6"/></svg>
             <span>Акции</span>
           </div>
-          <h1>🔥 Акции и спецпредложения</h1>
+          <h1>Акции и спецпредложения</h1>
           <p>Скидки до 200 000 ₸ на лучшие модели ноутбуков. Ограниченное количество по акционной цене.</p>
         </div>
       </div>
@@ -29,9 +40,9 @@ export default async function PromotionsPage() {
           {/* Promo banners */}
           <div className="promotions-banners-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 20, marginBottom: 56 }}>
             {[
-              { emoji: "🎁", tag: "Подарок", title: "Полезный аксессуар к выбранным ноутбукам", desc: "Уточняйте комплект у консультанта", bg: "linear-gradient(135deg,#FF7A3D,#FF5A1F,#E64A12)", href: "https://wa.me/77075511979?text=Хочу%20узнать%20про%20подарок%20к%20ноутбуку" },
-              { emoji: "⚡", tag: "Спеццена", title: "Скидки на популярные ноутбуки из наличия", desc: "Количество товаров по акции ограничено", bg: "linear-gradient(135deg,#1B1B21,#0D0D11)", href: "/catalog?sale=1" },
-              { emoji: "🚀", tag: "Доставка", title: "Бесплатная доставка по Алматы", desc: "По Алматы курьером · По Казахстану СДЭК / inDrive", bg: "linear-gradient(135deg,#1a2e6e,#0d0d11)", href: "/delivery" },
+              { Icon: IcoGift,     tag: "Подарок",  title: "Полезный аксессуар к выбранным ноутбукам", desc: "Уточняйте комплект у консультанта",                    bg: "linear-gradient(135deg,#FF7A3D,#FF5A1F,#E64A12)", href: "https://wa.me/77075511979?text=Хочу%20узнать%20про%20подарок%20к%20ноутбуку" },
+              { Icon: IcoSale,     tag: "Спеццена", title: "Скидки на популярные ноутбуки из наличия",   desc: "Количество товаров по акции ограничено",           bg: "linear-gradient(135deg,#1B1B21,#0D0D11)",         href: "/catalog?sale=1" },
+              { Icon: IcoDelivery, tag: "Доставка", title: "Бесплатная доставка по Алматы",              desc: "По Алматы курьером · По Казахстану СДЭК / inDrive",bg: "linear-gradient(135deg,#1a2e6e,#0d0d11)",         href: "/delivery" },
             ].map((promo) => (
               <a
                 key={promo.tag}
@@ -48,7 +59,7 @@ export default async function PromotionsPage() {
                   transition: "transform .3s, box-shadow .3s",
                 }}
               >
-                <span style={{ fontSize: 36 }}>{promo.emoji}</span>
+                <span style={{ display: "inline-flex", opacity: 0.9, marginBottom: 4 }}><promo.Icon /></span>
                 <span style={{ background: "rgba(255,255,255,.18)", borderRadius: 100, padding: "4px 12px", fontSize: 12, fontWeight: 700, alignSelf: "flex-start" }}>{promo.tag}</span>
                 <h3 style={{ fontSize: 20, fontWeight: 800, lineHeight: 1.2 }}>{promo.title}</h3>
                 <p style={{ fontSize: 14, opacity: .8 }}>{promo.desc}</p>

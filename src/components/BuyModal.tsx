@@ -185,7 +185,9 @@ export default function BuyModal({ isOpen, onClose, product }: BuyModalProps) {
 
         {sent ? (
           <div style={{ textAlign: "center", padding: "16px 0" }}>
-            <div style={{ fontSize: 60, marginBottom: 16, animation: "popIn .3s ease" }}>✅</div>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 72, height: 72, background: "linear-gradient(135deg,#edfaf3,#d1fae5)", borderRadius: "50%", margin: "0 auto 20px" }}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2.5" width="36" height="36"><path d="M20 6 9 17l-5-5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            </div>
             <h3 style={{ fontSize: 24, fontWeight: 800, marginBottom: 8, color: "var(--text)" }}>Заявка успешно отправлена!</h3>
             <p style={{ color: "var(--text-muted)", fontSize: 14.5, lineHeight: 1.5, marginBottom: 24 }}>
               Наш специалист свяжется с вами в течение 15 минут для уточнения деталей и оформления.
@@ -209,7 +211,7 @@ export default function BuyModal({ isOpen, onClose, product }: BuyModalProps) {
               </h3>
               {product && (
                 <div style={{ marginTop: 10, padding: "10px 14px", background: "var(--surface)", borderRadius: 12, fontSize: 13.5, fontWeight: 600, color: "var(--text)" }}>
-                  💻 {product.name}
+                  <span style={{ display: "inline-flex", verticalAlign: "middle", marginRight: 6 }}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="15" height="15"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></span> {product.name}
                   {product.price ? <span style={{ color: "var(--accent)", fontWeight: 800, marginLeft: 6 }}>({product.price.toLocaleString("ru-RU")} ₸)</span> : null}
                 </div>
               )}
@@ -266,8 +268,9 @@ export default function BuyModal({ isOpen, onClose, product }: BuyModalProps) {
                 </div>
               )}
 
-              <div style={{ fontSize: 12, color: "var(--text-soft)", lineHeight: 1.4 }}>
-                🔒 Ваши данные под защитой.
+              <div style={{ fontSize: 12, color: "var(--text-soft)", lineHeight: 1.4, display: "flex", alignItems: "center", gap: 6 }}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="13" height="13"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4" strokeLinecap="round"/></svg>
+                Ваши данные под защитой.
               </div>
 
               <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 4 }}>

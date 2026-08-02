@@ -5,6 +5,7 @@ import Link from "next/link";
 interface Slide {
   id: number;
   image_url: string;
+  mobile_image_url?: string;
   title?: string;
   subtitle?: string;
   link_url?: string;
@@ -93,35 +94,40 @@ export default function HomeHeroSlider() {
     >
       {slides.map((s, idx) => {
         const isCurrent = idx === current;
+        const renderImage = () => {
+          const mainImg = (
+            <img
+              src={s.image_url}
+              alt={s.title || "Слайд"}
+              className={`hero-slider-img ${s.mobile_image_url ? "desktop-only-slide" : ""}`}
+              style={{
+                width: "100%",
+                maxHeight: 520,
+                objectFit: "contain",
+                borderRadius: 28,
+                filter: "drop-shadow(0 20px 40px rgba(0,0,0,.3))"
+              }}
+            />
+          );
+
+          if (!s.mobile_image_url) return mainImg;
+
+          return (
+            <picture style={{ width: "100%", display: "block" }}>
+              <source media="(max-width: 680px)" srcSet={s.mobile_image_url} />
+              {mainImg}
+            </picture>
+          );
+        };
+
         return (
           <div key={s.id} style={{ display: isCurrent ? "flex" : "none", justifyContent: "center", alignItems: "center", position: "relative" }}>
             {s.link_url ? (
               <Link href={s.link_url} style={{ display: "block", width: "100%", height: "100%" }}>
-                <img
-                  src={s.image_url}
-                  alt={s.title || "Слайд"}
-                  className="hero-slider-img"
-                  style={{
-                    width: "100%",
-                    maxHeight: 520,
-                    objectFit: "contain",
-                    borderRadius: 28,
-                    filter: "drop-shadow(0 20px 40px rgba(0,0,0,.3))"
-                  }}
-                />
+                {renderImage()}
               </Link>
             ) : (
-              <img
-                src={s.image_url}
-                alt={s.title || "Слайд"}
-                style={{
-                  width: "100%",
-                  maxHeight: 520,
-                  objectFit: "contain",
-                  borderRadius: 28,
-                  filter: "drop-shadow(0 20px 40px rgba(0,0,0,.3))"
-                }}
-              />
+              renderImage()
             )}
           </div>
         );

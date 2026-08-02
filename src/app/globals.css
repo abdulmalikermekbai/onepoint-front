@@ -611,6 +611,21 @@ html, body {
   .info-card { padding: 20px !important; }
   .not-covered-grid { grid-template-columns: 1fr !important; gap: 10px !important; }
 
+  /* ── Consultation Form Inputs on Mobile ── */
+  .consultation-form {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 12px !important;
+  }
+  .consultation-input {
+    width: 100% !important;
+    flex: none !important;
+    box-sizing: border-box !important;
+  }
+  .consultation-submit {
+    width: 100% !important;
+  }
+
   /* ── Main Hero Gallery enlargement for mobile ── */
   .hero-slider-img {
     max-height: 280px !important;

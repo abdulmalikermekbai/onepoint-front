@@ -628,21 +628,31 @@ html, body {
 
   /* ── Main Hero Gallery enlargement for mobile ── */
   .hero-section {
-    padding: 0 0 24px 0 !important;
+    padding: 8px 0 24px 0 !important;
   }
   .hero-section > .wrap {
-    padding: 0 !important;
+    padding: 0 12px !important;
   }
   .hero-slider-container {
-    border-radius: 0 !important;
+    border-radius: 20px !important;
     background: transparent !important;
+    aspect-ratio: 4 / 5 !important;
+    overflow: hidden !important;
+  }
+  .hero-slider-container > div {
+    height: 100% !important;
+    width: 100% !important;
+  }
+  .hero-slider-container a {
+    height: 100% !important;
+    width: 100% !important;
   }
   .hero-slider-img {
     width: 100% !important;
+    height: 100% !important;
     max-height: none !important;
-    height: auto !important;
     object-fit: cover !important;
-    border-radius: 0 !important;
+    border-radius: 20px !important;
     filter: none !important;
   }
   .gallery-main-stage {

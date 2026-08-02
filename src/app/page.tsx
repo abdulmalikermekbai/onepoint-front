@@ -5,7 +5,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
 import LaptopSVG from "@/components/LaptopSVG";
-import { BRANDS, REVIEWS, formatPrice, fetchLiveProducts, fetchLiveReviews, Product } from "@/lib/data";
+import { BRANDS, REVIEWS, formatPrice, fetchLiveProducts, fetchLiveReviews, fetchSettings, Product } from "@/lib/data";
 import HomeClient from "./HomeClient";
 import HomeHeroSlider from "@/components/HomeHeroSlider";
 import { ClientStatsGrid } from "@/components/ClientStats";
@@ -531,10 +531,55 @@ export default function HomePage() {
             </div>
           </div>
         </section>
+
+        {/* ============ DYNAMIC SEO TEXT SECTION ============ */}
+        <HomeSeoBlock />
       </main>
 
       <Footer />
     </>
+  );
+}
+
+function HomeSeoBlock() {
+  const [seoText, setSeoText] = useState("");
+
+  useEffect(() => {
+    fetchSettings().then(s => {
+      if (s.seo_home_text) {
+        setSeoText(s.seo_home_text);
+      }
+    }).catch(() => {});
+  }, []);
+
+  if (!seoText) {
+    return (
+      <section style={{ padding: "48px 0", background: "var(--bg)" }}>
+        <div className="wrap">
+          <div className="seo-text-wrap" style={{ background: "var(--surface)", borderRadius: 24, padding: "36px 40px", border: "1px solid var(--border)", lineHeight: 1.7, fontSize: 14.5, color: "var(--text-muted)" }}>
+            <h2 style={{ fontSize: 24, fontWeight: 800, color: "var(--text)", marginBottom: 16 }}>Интернет-магазин ноутбуков №1 в Алматы — OnePoint.kz</h2>
+            <p style={{ marginBottom: 12 }}>
+              OnePoint — специализированный интернет-магазин оригинальных ноутбуков и компьютерной техники в Алматы с доставкой по всему Казахстану. У нас вы можете купить ноутбуки от мировых лидеров отрасли: ASUS, Lenovo, HP, Acer, Apple, Dell, MSI по выгодным ценам.
+            </p>
+            <p>
+              Все ноутбуки поставляются с официальной гарантией 1 год. Наша команда помогает подобрать идеальную модель для учебы, работы, киберспорта, 3D-моделирования или видеомонтажа.
+            </p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section style={{ padding: "48px 0", background: "var(--bg)" }}>
+      <div className="wrap">
+        <div 
+          className="seo-text-wrap" 
+          style={{ background: "var(--surface)", borderRadius: 24, padding: "36px 40px", border: "1px solid var(--border)", lineHeight: 1.7, fontSize: 14.5, color: "var(--text-muted)" }}
+          dangerouslySetInnerHTML={{ __html: seoText }}
+        />
+      </div>
+    </section>
   );
 }
 

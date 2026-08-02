@@ -4,7 +4,7 @@ import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
-import { PRODUCTS, BRANDS, formatPrice, fetchLiveProducts } from "@/lib/data";
+import { PRODUCTS, BRANDS, formatPrice, fetchLiveProducts, fetchSettings } from "@/lib/data";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 
@@ -434,7 +434,35 @@ export default function CatalogPage() {
         </div>
       </section>
 
+      <CatalogSeoBlock />
+
       <Footer />
     </>
+  );
+}
+
+function CatalogSeoBlock() {
+  const [seoText, setSeoText] = useState("");
+
+  useEffect(() => {
+    fetchSettings().then(s => {
+      if (s.seo_catalog_text) {
+        setSeoText(s.seo_catalog_text);
+      }
+    }).catch(() => {});
+  }, []);
+
+  if (!seoText) return null;
+
+  return (
+    <section style={{ padding: "0 0 64px 0", background: "var(--bg)" }}>
+      <div className="wrap">
+        <div 
+          className="seo-text-wrap" 
+          style={{ background: "var(--surface)", borderRadius: 24, padding: "32px 36px", border: "1px solid var(--border)", lineHeight: 1.7, fontSize: 14.5, color: "var(--text-muted)" }}
+          dangerouslySetInnerHTML={{ __html: seoText }}
+        />
+      </div>
+    </section>
   );
 }

@@ -127,11 +127,20 @@ section { padding: 88px 0; }
   width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
   border: 2px solid #fff;
 }
+.phone-header-btn {
+  display: flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 100px;
+  background: var(--surface); color: var(--text); font-weight: 700; font-size: 14px;
+  border: 1.5px solid var(--border); transition: border-color .2s, transform .2s, background .2s;
+  white-space: nowrap;
+}
+.phone-header-btn:hover { border-color: var(--text); transform: translateY(-2px); background: #fff; }
+.phone-header-btn svg { width: 16px; height: 16px; color: var(--accent); }
 .whatsapp-header-btn {
   display: flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 100px;
   background: #25D366; color: #fff; font-weight: 700; font-size: 14px;
   transition: background .2s, transform .2s, box-shadow .2s;
   box-shadow: 0 8px 20px -6px rgba(37,211,102,.4);
+  white-space: nowrap;
 }
 .whatsapp-header-btn:hover { background: #1ebe5a; transform: translateY(-2px); }
 .whatsapp-header-btn svg { width: 18px; height: 18px; }

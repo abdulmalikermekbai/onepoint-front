@@ -628,35 +628,27 @@ html, body {
 
   /* ── Main Hero Gallery enlargement for mobile ── */
   .hero-section {
-    padding: 0 0 20px 0 !important;
+    padding: 8px 0 20px 0 !important;
   }
   .hero-section > .wrap {
-    padding: 0 !important;
+    padding: 0 16px !important;
   }
   .hero-slider-container {
-    border-radius: 20px !important;
+    border-radius: 18px !important;
     background: transparent !important;
     overflow: hidden !important;
     width: 100% !important;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1) !important;
   }
-  .hero-slider-container > div {
-    width: 100% !important;
-    overflow: hidden !important;
-    border-radius: 20px !important;
-  }
-  .hero-slider-container picture {
-    width: 100% !important;
-    display: block !important;
-    border-radius: 20px !important;
-    overflow: hidden !important;
-  }
+  .hero-slide-item,
+  .hero-slide-picture,
   .hero-slider-img {
     width: 100% !important;
     max-height: none !important;
     height: auto !important;
     display: block !important;
     object-fit: cover !important;
-    border-radius: 20px !important;
+    border-radius: 18px !important;
     filter: none !important;
   }
   .gallery-main-stage {

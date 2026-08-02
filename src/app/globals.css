@@ -664,7 +664,7 @@ html, body {
   }
   .hero-slide-item {
     width: 100% !important;
-    display: block !important;
+    /* no display override — inline style controls show/hide */
     border-radius: 0 !important;
     overflow: hidden !important;
   }

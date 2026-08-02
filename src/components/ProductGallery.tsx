@@ -85,7 +85,6 @@ export default function ProductGallery({
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
-        onClick={() => setLightboxOpen(true)}
         style={{
           position: "relative",
           width: "100%",
@@ -96,7 +95,7 @@ export default function ProductGallery({
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          cursor: "zoom-in",
+          cursor: "default",
           border: "1px solid var(--border)",
           transition: "transform .25s ease, box-shadow .25s ease",
         }}

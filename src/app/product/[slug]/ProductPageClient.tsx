@@ -136,11 +136,10 @@ export function ProductGallery({ images, mainImage, productName }: {
       {/* Main image */}
         <div
           className="product-gallery__main"
-          onClick={() => showImage && setLightbox(true)}
           onTouchStart={onTouchStart}
           onTouchMove={onTouchMove}
           onTouchEnd={onTouchEnd}
-          style={{ cursor: showImage ? "zoom-in" : "default", position: "relative", overflow: "hidden", borderRadius: 18, background: "#ffffff", border: "1px solid var(--border)" }}
+          style={{ cursor: "default", position: "relative", overflow: "hidden", borderRadius: 18, background: "#ffffff", border: "1px solid var(--border)" }}
         >
           {showImage ? (
             <>
@@ -153,15 +152,6 @@ export function ProductGallery({ images, mainImage, productName }: {
                 }}
                 onError={() => setImageError(true)}
               />
-              <div style={{
-                position: "absolute", top: 14, left: 14,
-                background: "rgba(0,0,0,0.6)", backdropFilter: "blur(6px)", color: "#fff",
-                padding: "6px 12px", borderRadius: 100, fontSize: 12, fontWeight: 700,
-                display: "inline-flex", alignItems: "center", gap: 6, opacity: 0.85
-              }}>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" width="14" height="14"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
-                Нажмите для увеличения
-              </div>
             </>
           ) : (
             <div className="product-gallery__placeholder" aria-label={`Изображение ${productName} пока не добавлено`}>

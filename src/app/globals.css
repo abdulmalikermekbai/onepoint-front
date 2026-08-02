@@ -627,8 +627,14 @@ html, body {
   }
 
   /* ── Main Hero Gallery enlargement for mobile ── */
+  .hero-section {
+    padding: 0 0 24px 0 !important;
+  }
+  .hero-section > .wrap {
+    padding: 0 !important;
+  }
   .hero-slider-container {
-    border-radius: 16px !important;
+    border-radius: 0 !important;
     background: transparent !important;
   }
   .hero-slider-img {
@@ -636,7 +642,7 @@ html, body {
     max-height: none !important;
     height: auto !important;
     object-fit: cover !important;
-    border-radius: 16px !important;
+    border-radius: 0 !important;
     filter: none !important;
   }
   .gallery-main-stage {

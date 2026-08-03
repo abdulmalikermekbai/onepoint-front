@@ -207,7 +207,7 @@ export default async function ProductPage({ params }: Props) {
                 </div>
                 <div className="trust-item">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16"><path d="M1 3h15v13H1z"/><path d="M16 8h4l3 3v5h-7V8z"/></svg>
-                  Бесплатная доставка по Алматы. По Казахстану отправим платно (СДЭК / inDrive)
+                  Бесплатная доставка по Алматы. По Казахстану отправим (СДЭК / inDrive)
                 </div>
                 <div className="trust-item">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>

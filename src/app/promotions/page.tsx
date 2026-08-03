@@ -42,7 +42,7 @@ export default async function PromotionsPage() {
             {[
               { Icon: IcoGift,     tag: "Подарок",  title: "Полезный аксессуар к выбранным ноутбукам", desc: "Уточняйте комплект у консультанта",                    bg: "linear-gradient(135deg,#FF7A3D,#FF5A1F,#E64A12)", href: "https://wa.me/77075511979?text=Хочу%20узнать%20про%20подарок%20к%20ноутбуку" },
               { Icon: IcoSale,     tag: "Спеццена", title: "Скидки на популярные ноутбуки из наличия",   desc: "Количество товаров по акции ограничено",           bg: "linear-gradient(135deg,#1B1B21,#0D0D11)",         href: "/catalog?sale=1" },
-              { Icon: IcoDelivery, tag: "Доставка", title: "Бесплатная доставка по Алматы",              desc: "По Алматы бесплатно курьером · По Казахстану СДЭК / inDrive (платно)",bg: "linear-gradient(135deg,#1a2e6e,#0d0d11)",         href: "/delivery" },
+              { Icon: IcoDelivery, tag: "Доставка", title: "Бесплатная доставка по Алматы",              desc: "По Алматы бесплатно курьером · По Казахстану СДЭК / inDrive",bg: "linear-gradient(135deg,#1a2e6e,#0d0d11)",         href: "/delivery" },
             ].map((promo) => (
               <a
                 key={promo.tag}

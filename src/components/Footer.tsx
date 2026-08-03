@@ -1,4 +1,37 @@
+"use client";
 import Link from "next/link";
+import { useState, useEffect } from "react";
+import { fetchLiveProducts, BRANDS } from "@/lib/data";
+
+function DynamicFooterBrands() {
+  const [brands, setBrands] = useState<{name: string, slug: string}[]>(BRANDS.slice(0, 8));
+
+  useEffect(() => {
+    fetchLiveProducts().then(list => {
+      if (list && list.length > 0) {
+        const unique = new Map();
+        for (const p of list) {
+          if (p.brand && p.brand !== "Ноутбуки") {
+            unique.set(p.brand.toLowerCase(), { name: p.brand, slug: p.brand.toLowerCase() });
+          }
+        }
+        if (unique.size > 0) {
+          setBrands(Array.from(unique.values()).slice(0, 8));
+        }
+      }
+    }).catch(() => {});
+  }, []);
+
+  return (
+    <>
+      {brands.map((b) => (
+        <li key={b.slug}>
+          <Link href={`/catalog?brand=${b.slug}`}>{b.name}</Link>
+        </li>
+      ))}
+    </>
+  );
+}
 
 export default function Footer() {
   return (
@@ -75,13 +108,7 @@ export default function Footer() {
           <div className="footer-col">
             <h4>Популярные бренды</h4>
             <ul>
-              <li><Link href="/catalog?brand=asus">ASUS</Link></li>
-              <li><Link href="/catalog?brand=lenovo">Lenovo</Link></li>
-              <li><Link href="/catalog?brand=hp">HP</Link></li>
-              <li><Link href="/catalog?brand=acer">Acer</Link></li>
-              <li><Link href="/catalog?brand=dell">Dell</Link></li>
-              <li><Link href="/catalog?brand=msi">MSI</Link></li>
-              <li><Link href="/catalog?brand=apple">Apple</Link></li>
+              <DynamicFooterBrands />
             </ul>
           </div>
 

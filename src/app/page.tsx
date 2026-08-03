@@ -77,6 +77,36 @@ function DynamicCategoryGrid() {
   );
 }
 
+function DynamicBrandStrip() {
+  const [brands, setBrands] = useState<{name: string, slug: string}[]>(BRANDS);
+
+  useEffect(() => {
+    fetchLiveProducts().then(list => {
+      if (list && list.length > 0) {
+        const unique = new Map();
+        for (const p of list) {
+          if (p.brand && p.brand !== "Ноутбуки") {
+            unique.set(p.brand.toLowerCase(), { name: p.brand, slug: p.brand.toLowerCase() });
+          }
+        }
+        if (unique.size > 0) {
+          setBrands(Array.from(unique.values()));
+        }
+      }
+    }).catch(() => {});
+  }, []);
+
+  return (
+    <div className="brand-strip reveal">
+      {brands.map((b) => (
+        <Link key={b.slug} href={`/catalog?brand=${b.slug}`} className="brand-item">
+          <span className="brand-word">{b.name}</span>
+        </Link>
+      ))}
+    </div>
+  );
+}
+
 function DynamicReviewsGrid() {
   const [reviewsList, setReviewsList] = useState<any[]>(REVIEWS);
 
@@ -248,13 +278,7 @@ export default function HomePage() {
                 <h2 className="section-title">Популярные бренды</h2>
               </div>
             </div>
-            <div className="brand-strip reveal">
-              {BRANDS.map((b) => (
-                <Link key={b.slug} href={`/catalog?brand=${b.slug}`} className="brand-item">
-                  <span className="brand-word">{b.name}</span>
-                </Link>
-              ))}
-            </div>
+            <DynamicBrandStrip />
           </div>
         </section>
 

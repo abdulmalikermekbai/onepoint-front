@@ -19,7 +19,7 @@ export default async function NewArrivalsPage() {
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="14" height="14"><path d="M9 18l6-6-6-6"/></svg>
             <span>Новинки</span>
           </div>
-          <h1>Новинки 2025</h1>
+          <h1>Новинки 2026</h1>
           <p>Новейшие модели ноутбуков с RTX 50xx, Intel Core Ultra и Snapdragon X. Уже доступны в OnePoint.</p>
         </div>
       </div>
@@ -50,8 +50,8 @@ export default async function NewArrivalsPage() {
 
           {/* What's new section */}
           <div style={{ marginTop: 72, background: "linear-gradient(135deg,#0D0D11,#1B1710)", borderRadius: 28, padding: "48px 40px", color: "#fff", overflow: "hidden" }} className="new-tech-section">
-            <div className="eyebrow" style={{ color: "var(--accent)" }}>Технологии 2025</div>
-            <h2 style={{ fontSize: 32, fontWeight: 800, marginBottom: 32, letterSpacing: "-.02em" }}>Что нового в ноутбуках 2025 года</h2>
+            <div className="eyebrow" style={{ color: "var(--accent)" }}>Технологии 2026</div>
+            <h2 style={{ fontSize: 32, fontWeight: 800, marginBottom: 32, letterSpacing: "-.02em" }}>Что нового в ноутбуках 2026 года</h2>
             <div className="new-tech-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 24 }}>
               {[
                 { icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="24" height="24"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 12h4m-2-2v4m10-2h.01m-3 0h.01"/></svg>, title: "RTX 50xx Series", desc: "Новое поколение NVIDIA GeForce RTX 5060/5070/5080 — до 70% прироста в играх по сравнению с RTX 40xx" },

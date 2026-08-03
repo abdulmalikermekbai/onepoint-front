@@ -1,15 +1,19 @@
 "use client";
 import { useEffect, useState } from "react";
 import ProductCard from "@/components/ProductCard";
-import { fetchLiveProducts, Product } from "@/lib/data";
+import { fetchLiveProducts, fetchLiveProductsByFlag, Product } from "@/lib/data";
 
 export function HitProductsGrid() {
   const [hits, setHits] = useState<Product[]>([]);
 
   useEffect(() => {
-    fetchLiveProducts().then(list => {
-      const featured = list.filter(product => product.isHit);
-      setHits((featured.length ? featured : list).slice(0, 8));
+    fetchLiveProductsByFlag("is_hit").then(featured => {
+      if (featured.length > 0) {
+        setHits(featured.slice(0, 8));
+      } else {
+        // Fallback
+        fetchLiveProducts().then(list => setHits(list.slice(0, 8)));
+      }
     });
   }, []);
 
@@ -28,9 +32,13 @@ export function NewProductsGrid() {
   const [news, setNews] = useState<Product[]>([]);
 
   useEffect(() => {
-    fetchLiveProducts().then(list => {
-      const featured = list.filter(product => product.isNew);
-      setNews((featured.length ? featured : list).slice(0, 4));
+    fetchLiveProductsByFlag("is_new").then(featured => {
+      if (featured.length > 0) {
+        setNews(featured.slice(0, 4));
+      } else {
+        // Fallback
+        fetchLiveProducts().then(list => setNews(list.slice(0, 4)));
+      }
     });
   }, []);
 

@@ -44,9 +44,7 @@ function IconBank() {
 
 const PAYMENT_METHODS = [
   { Icon: IconCash, title: "Наличные",          desc: "При получении курьером или в магазине" },
-  { Icon: IconCard, title: "Банковская карта",  desc: "Visa, Mastercard. Оплата на сайте или через терминал" },
-  { Icon: IconQR,   title: "Kaspi Pay",          desc: "Быстрая оплата через QR в приложении Kaspi" },
-  { Icon: IconBank, title: "Банковский перевод", desc: "Счёт на оплату для Halyk, Kaspi, Forte и др." },
+  { Icon: IconBank, title: "Переводы",          desc: "Переводы на карту или банковский счет" },
 ];
 
 export default function PaymentPage() {

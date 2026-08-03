@@ -230,6 +230,23 @@ export async function fetchLiveProducts(): Promise<Product[]> {
   return [];
 }
 
+export async function fetchLiveBrands(): Promise<{name: string, slug: string}[]> {
+  try {
+    const res = await fetch(productsApiUrl("brands=1"), { cache: "no-store" });
+    if (!res.ok) return [];
+    const data = await res.json();
+    if (Array.isArray(data.brands)) {
+      return data.brands.map((b: any) => ({
+        name: b.name,
+        slug: b.slug || b.name.toLowerCase()
+      }));
+    }
+  } catch (e) {
+    console.error("Failed to fetch live brands:", e);
+  }
+  return [];
+}
+
 export async function fetchLiveProductsByFlag(flag: "is_hit" | "is_new" | "is_sale"): Promise<Product[]> {
   try {
     const apiFlag = flag.replace(/^is_/, "");

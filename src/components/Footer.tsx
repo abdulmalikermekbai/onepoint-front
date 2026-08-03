@@ -1,23 +1,15 @@
 "use client";
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { fetchLiveProducts, BRANDS } from "@/lib/data";
+import { fetchLiveBrands, BRANDS } from "@/lib/data";
 
 function DynamicFooterBrands() {
   const [brands, setBrands] = useState<{name: string, slug: string}[]>(BRANDS.slice(0, 8));
 
   useEffect(() => {
-    fetchLiveProducts().then(list => {
+    fetchLiveBrands().then(list => {
       if (list && list.length > 0) {
-        const unique = new Map();
-        for (const p of list) {
-          if (p.brand && p.brand !== "Ноутбуки") {
-            unique.set(p.brand.toLowerCase(), { name: p.brand, slug: p.brand.toLowerCase() });
-          }
-        }
-        if (unique.size > 0) {
-          setBrands(Array.from(unique.values()).slice(0, 8));
-        }
+        setBrands(list.slice(0, 8));
       }
     }).catch(() => {});
   }, []);

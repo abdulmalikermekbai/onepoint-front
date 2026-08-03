@@ -81,19 +81,13 @@ function DynamicBrandStrip() {
   const [brands, setBrands] = useState<{name: string, slug: string}[]>(BRANDS);
 
   useEffect(() => {
-    fetchLiveProducts().then(list => {
-      if (list && list.length > 0) {
-        const unique = new Map();
-        for (const p of list) {
-          if (p.brand && p.brand !== "Ноутбуки") {
-            unique.set(p.brand.toLowerCase(), { name: p.brand, slug: p.brand.toLowerCase() });
-          }
+    import("@/lib/data").then(({ fetchLiveBrands }) => {
+      fetchLiveBrands().then(list => {
+        if (list && list.length > 0) {
+          setBrands(list);
         }
-        if (unique.size > 0) {
-          setBrands(Array.from(unique.values()));
-        }
-      }
-    }).catch(() => {});
+      }).catch(() => {});
+    });
   }, []);
 
   return (

@@ -190,7 +190,7 @@ export default async function ProductPage({ params }: Props) {
               <div style={{ display: "flex", gap: 20, marginBottom: 24, flexWrap: "wrap" }}>
                 <div className={`stock-row ${product.inStock ? "stock-in" : "stock-order"}`} style={{ fontSize: 14 }}>
                   <span className="stock-dot" />
-                  {product.inStock ? "В наличии — готов к отгрузке" : "Под заказ — 3–7 дней"}
+                  {product.inStock ? "В наличии — готов к отгрузке" : "Нет в наличии"}
                 </div>
               </div>
 

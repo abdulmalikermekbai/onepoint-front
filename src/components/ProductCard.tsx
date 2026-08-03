@@ -175,7 +175,7 @@ export default function ProductCard({ product, onToast }: ProductCardProps) {
 
           <div className={`stock-row ${product.inStock ? "stock-in" : "stock-order"}`}>
             <span className="stock-dot" />
-            {product.inStock ? "В наличии" : "Под заказ"}
+            {product.inStock ? "В наличии" : "Нет в наличии"}
           </div>
 
           <div style={{ marginTop: "auto" }}>

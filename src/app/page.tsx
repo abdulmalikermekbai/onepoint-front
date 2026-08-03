@@ -265,7 +265,7 @@ export default function HomePage() {
               <div>
                 <div className="eyebrow">Акции</div>
                 <h2 className="section-title">Лучшие предложения недели</h2>
-                <p className="section-sub">Подберите ноутбук со скидкой до 200 000 ₸</p>
+                <p className="section-sub">Подберите ноутбук с максимальной выгодой</p>
               </div>
               <Link href="/promotions" className="link-arrow">
                 Все акции
@@ -316,8 +316,8 @@ export default function HomePage() {
             <div className="section-head reveal">
               <div>
                 <div className="eyebrow">Новинки</div>
-                <h2 className="section-title">Новейшие модели 2025</h2>
-                <p className="section-sub">Свежие поступления с RTX 50xx и Intel Core Ultra</p>
+                <h2 className="section-title">Новейшие модели 2026</h2>
+                <p className="section-sub">Свежие поступления актуальных ноутбуков для любых задач</p>
               </div>
               <Link href="/new-arrivals" className="link-arrow">
                 Все новинки
@@ -500,7 +500,7 @@ export default function HomePage() {
                 <div>
                   <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 4 }}>Позвонить</div>
                   <div style={{ fontSize: 18, fontWeight: 800 }}>+7 (707) 551-19-79</div>
-                  <div style={{ fontSize: 13, color: "var(--text-muted)", marginTop: 4 }}>Ежедневно 10:00–19:00</div>
+                  <div style={{ fontSize: 13, color: "var(--text-muted)", marginTop: 4 }}>Ежедневно 10:00–20:00</div>
                 </div>
               </a>
               <a href="https://wa.me/77075511979" target="_blank" rel="noopener noreferrer" className="contact-card">

@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import LaptopSVG from "./LaptopSVG";
 
 import type { Product } from "@/lib/data";
@@ -13,13 +13,42 @@ interface ProductCardProps {
 
 export default function ProductCard({ product, onToast }: ProductCardProps) {
   const [fav, setFav] = useState(false);
-
   const [imageLoadError, setImageLoadError] = useState(false);
   const [activeImg, setActiveImg] = useState(0);
 
   const gallery = product.images && product.images.length > 0 ? product.images : (product.image ? [product.image] : []);
-
   const waLink = `https://wa.me/77075511979?text=Здравствуйте!%20Хочу%20заказать:%20${encodeURIComponent(product.name)}%20за%20${encodeURIComponent(formatPrice(product.price))}`;
+
+  
+  useEffect(() => {
+    try {
+      const favs = JSON.parse(localStorage.getItem("onepoint-favorites") || "[]");
+      if (favs.includes(product.id)) {
+        setFav(true);
+      }
+    } catch (e) {}
+  }, [product.id]);
+
+  const handleFavToggle = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    try {
+      let favs = JSON.parse(localStorage.getItem("onepoint-favorites") || "[]");
+      if (fav) {
+        favs = favs.filter((id: number) => id !== product.id);
+        setFav(false);
+        onToast?.("Убрано из избранного");
+      } else {
+        if (!favs.includes(product.id)) {
+          favs.push(product.id);
+        }
+        setFav(true);
+        onToast?.("Добавлено в избранное");
+      }
+      localStorage.setItem("onepoint-favorites", JSON.stringify(favs));
+      window.dispatchEvent(new Event("favorites-updated"));
+    } catch (e) {}
+  };
 
   return (
     <>
@@ -37,10 +66,7 @@ export default function ProductCard({ product, onToast }: ProductCardProps) {
             </div>
             <button
               className={`fav-btn${fav ? " active" : ""}`}
-              onClick={() => {
-                setFav(!fav);
-                onToast?.(fav ? "Убрано из избранного" : "Добавлено в избранное");
-              }}
+              onClick={handleFavToggle}
               aria-label="В избранное"
             >
               <svg viewBox="0 0 24 24" fill={fav ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2">

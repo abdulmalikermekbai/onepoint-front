@@ -63,10 +63,16 @@ function CatalogFilters({ initialCat, initialBrand, initialSearch }: { initialCa
   const [sortBy, setSortBy] = useState("popular");
   const [filterOpen, setFilterOpen] = useState(false);
 
+  const [liveBrands, setLiveBrands] = useState<{name: string, slug: string}[]>(BRANDS);
+
   useEffect(() => {
     setIsLoading(true);
-    fetchLiveProducts().then(list => {
+    Promise.all([
+      fetchLiveProducts(),
+      fetchLiveBrands()
+    ]).then(([list, brands]) => {
       if (list && list.length > 0) setProductsList(list);
+      if (brands && brands.length > 0) setLiveBrands(brands);
       setIsLoading(false);
     }).catch(() => {
       setIsLoading(false);
@@ -226,7 +232,7 @@ function CatalogFilters({ initialCat, initialBrand, initialSearch }: { initialCa
           {/* Brand */}
           <div className="filter-card">
             <div className="filter-title">Бренд</div>
-            {["", ...BRANDS.map(b => b.name)].map((b) => (
+            {["", ...liveBrands.map(b => b.name)].map((b) => (
               <label key={b} className="filter-option" style={{ color: brand === b ? "var(--accent)" : undefined, fontWeight: brand === b ? 700 : undefined }}>
                 <input type="radio" name="brand" checked={brand === b} onChange={() => setBrand(b)} style={{ accentColor: "var(--accent)" }} />
                 <span>{b || "Все бренды"}</span>

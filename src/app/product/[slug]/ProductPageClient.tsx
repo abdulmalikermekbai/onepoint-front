@@ -335,7 +335,6 @@ export function ProductTabsInteractive({ product, specs }: {
           <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginTop: 20 }}>
             <span style={{ background: "#fff", border: "1px solid var(--border)", padding: "8px 16px", borderRadius: 100, fontSize: 13, fontWeight: 600 }}>100% Оригинал</span>
             <span style={{ background: "#fff", border: "1px solid var(--border)", padding: "8px 16px", borderRadius: 100, fontSize: 13, fontWeight: 600 }}>Заводская пломба</span>
-            <span style={{ background: "#fff", border: "1px solid var(--border)", padding: "8px 16px", borderRadius: 100, fontSize: 13, fontWeight: 600 }}>Официальная сублицензия</span>
           </div>
         </div>
       )}

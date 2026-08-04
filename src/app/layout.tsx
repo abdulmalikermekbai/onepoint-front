@@ -10,7 +10,10 @@ export const metadata: Metadata = {
   keywords:
     "ноутбуки Казахстан, купить ноутбук Алматы, игровые ноутбуки, MacBook, Lenovo, ASUS, HP",
   icons: {
-    icon: "/icon.svg",
+    icon: [
+      { url: '/icon.svg?v=2', type: 'image/svg+xml' },
+    ],
+    shortcut: '/icon.svg?v=2',
   },
   openGraph: {
     type: "website",

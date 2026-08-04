@@ -57,6 +57,8 @@ export interface Product {
   related?: any[];
   sortOrder?: number;
   isUpcoming?: boolean;
+  condition?: string;
+  dynamicCharacteristics?: {name: string, value: string}[];
   cardProcessor?: string;
   cardGpu?: string;
   cardRam?: string;
@@ -193,6 +195,8 @@ export function normalizeDbProduct(p: any): Product {
     reviews: p.reviews || [],
     related: p.related ? p.related.map((r: any) => normalizeDbProduct(r)) : [],
     sortOrder: Number(p.sort_order) || 0,
+    condition: p.product_condition || (Number(p.is_new) === 1 ? "Новый" : "Б/У"),
+    dynamicCharacteristics: p.dynamic_characteristics || [],
     cardProcessor: p.card_processor || undefined,
     cardGpu: p.card_gpu || undefined,
     cardRam: p.card_ram || undefined,

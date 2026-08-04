@@ -56,27 +56,17 @@ export default async function ProductPage({ params }: Props) {
   const specs: [string, string][] = [
     ["Бренд", product.brand],
     ["Серия", product.series || "—"],
-    ["Артикул", product.sku || "—"],
-    ["Процессор", product.processor || "—"],
-    ["Видеокарта", formatGpu(product.gpu)],
-    ["Оперативная память", product.ram || "—"],
-    ["Накопитель", product.storage || "—"],
-    ["Диагональ экрана", product.display || "—"],
-    ["Разрешение", product.resolution || "—"],
-    ["Частота обновления", product.refreshRate || "—"],
-    ["Тип матрицы", product.matrixType || "—"],
-    ["Операционная система", product.os || "—"],
-    ["Цвет", product.color || "—"],
-    ["Вес", product.weight || "—"],
-    ["Аккумулятор", product.battery || "—"],
-    ["Wi-Fi", product.wifi || "—"],
-    ["Bluetooth", product.bluetooth || "—"],
-    ["Веб-камера", product.camera || "—"],
-    ["Разъёмы", product.ports || "—"],
-    ["Размеры", product.dimensions || "—"],
-    ["Клавиатура", product.keyboard || "—"],
+    ["Модель", product.name],
+    ["Партномер", product.sku || "—"],
+    ["Состояние", product.condition || "—"],
     ["Гарантия", product.warranty || "—"],
   ];
+
+  if (product.dynamicCharacteristics && product.dynamicCharacteristics.length > 0) {
+    product.dynamicCharacteristics.forEach(char => {
+      specs.push([char.name, char.value]);
+    });
+  }
 
   const schemaOrg = {
     "@context": "https://schema.org/",
@@ -228,18 +218,18 @@ export default async function ProductPage({ params }: Props) {
 
           {/* ====== ADVANTAGES OR WHY_BUY ====== */}
           {product.whyBuyText ? (
-            <div
-              style={{
-                marginTop: 32,
-                background: "var(--surface)",
-                borderRadius: 24,
-                padding: "32px 40px",
-                lineHeight: 1.6,
-                color: "var(--text)",
-                fontSize: 15
-              }}
-              dangerouslySetInnerHTML={{ __html: product.whyBuyText }}
-            />
+            <div style={{ marginTop: 32, background: "var(--surface)", borderRadius: 24, padding: "32px 40px" }}>
+              <h3 style={{ margin: "0 0 20px", fontSize: 20, fontWeight: 800 }}>Почему стоит купить:</h3>
+              <div
+                style={{
+                  lineHeight: 1.6,
+                  color: "var(--text)",
+                  fontSize: 15,
+                  whiteSpace: "pre-wrap"
+                }}
+                dangerouslySetInnerHTML={{ __html: product.whyBuyText }}
+              />
+            </div>
           ) : product.advantages && product.advantages.length > 0 ? (
             <div style={{ marginTop: 32, background: "var(--surface)", borderRadius: 24, padding: "32px 40px" }}>
               <h3 style={{ margin: "0 0 20px", fontSize: 20, fontWeight: 800 }}>Почему стоит купить:</h3>

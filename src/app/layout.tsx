@@ -11,9 +11,9 @@ export const metadata: Metadata = {
     "ноутбуки Казахстан, купить ноутбук Алматы, игровые ноутбуки, MacBook, Lenovo, ASUS, HP",
   icons: {
     icon: [
-      { url: '/icon.svg?v=2', type: 'image/svg+xml' },
+      { url: '/icon.svg?v=3', type: 'image/svg+xml' },
     ],
-    shortcut: '/icon.svg?v=2',
+    shortcut: '/icon.svg?v=3',
   },
   openGraph: {
     type: "website",

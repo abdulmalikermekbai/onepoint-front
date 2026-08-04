@@ -146,12 +146,7 @@ export default function Footer() {
               Политика конфиденциальности
             </Link>
           </div>
-          <div className="pay-icons">
-            <span>Visa</span>
-            <span>Mastercard</span>
-            <span>Kaspi Pay</span>
-            <span>Halyk</span>
-          </div>
+
         </div>
       </div>
     </footer>

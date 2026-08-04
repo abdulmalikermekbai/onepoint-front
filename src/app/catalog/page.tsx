@@ -4,7 +4,7 @@ import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
-import { PRODUCTS, BRANDS, formatPrice, fetchLiveProducts, fetchSettings } from "@/lib/data";
+import { PRODUCTS, BRANDS, formatPrice, fetchLiveProducts, fetchSettings, fetchLiveBrands } from "@/lib/data";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 

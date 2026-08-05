@@ -321,7 +321,7 @@ export function ProductTabsInteractive({ product, specs }: {
 
       {activeTab === "desc" && (
         <div style={{ background: "var(--surface)", borderRadius: 20, padding: 32 }}>
-          <h3 style={{ fontSize: 20, fontWeight: 800, marginBottom: 16, margin: 0 }}>О товаре</h3>
+          <h3 style={{ fontSize: 20, fontWeight: 800, marginBottom: 16, margin: 0 }}>Полное описание</h3>
           {product.description ? (
             <div 
               style={{ color: "var(--text)", lineHeight: 1.6 }} 

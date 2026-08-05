@@ -3,6 +3,7 @@
 export interface Product {
   id: number;
   name: string;
+  model?: string;
   slug: string;
   brand: string;
   series?: string;
@@ -135,6 +136,7 @@ export function normalizeDbProduct(p: any): Product {
   return {
     id: Number(p.id),
     name: p.name || "",
+    model: p.model || undefined,
     slug: p.slug || `product-${p.id}`,
     brand: p.brand || "Ноутбуки",
     series: p.series || "",

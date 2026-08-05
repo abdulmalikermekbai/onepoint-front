@@ -56,7 +56,7 @@ export default async function ProductPage({ params }: Props) {
   const specs: [string, string][] = [
     ["Бренд", product.brand],
     ["Серия", product.series || "—"],
-    ["Модель", product.name],
+    ["Модель", product.model || product.name],
     ["Партномер", product.sku || "—"],
     ["Состояние", product.condition || "—"],
     ["Гарантия", product.warranty || "—"],
@@ -236,21 +236,16 @@ export default async function ProductPage({ params }: Props) {
 
           {/* ====== ADVANTAGES OR WHY_BUY ====== */}
           {product.whyBuyText ? (
-            <div style={{ marginTop: 32, background: "var(--surface)", borderRadius: 24, padding: "32px 40px" }}>
-              <h3 style={{ margin: "0 0 20px", fontSize: 20, fontWeight: 800 }}>Почему стоит купить этот ноутбук:</h3>
+            <div style={{ marginTop: 32, background: "var(--surface)", borderRadius: 20, padding: 32 }}>
+              <h3 style={{ fontSize: 20, fontWeight: 800, marginBottom: 16, margin: 0 }}>Почему стоит купить этот ноутбук:</h3>
               <div
-                style={{
-                  lineHeight: 1.6,
-                  color: "var(--text)",
-                  fontSize: 15,
-                  whiteSpace: "pre-wrap"
-                }}
+                style={{ color: "var(--text)", lineHeight: 1.6 }}
                 dangerouslySetInnerHTML={{ __html: product.whyBuyText }}
               />
             </div>
           ) : product.advantages && product.advantages.length > 0 ? (
-            <div style={{ marginTop: 32, background: "var(--surface)", borderRadius: 24, padding: "32px 40px" }}>
-              <h3 style={{ margin: "0 0 20px", fontSize: 20, fontWeight: 800 }}>Почему стоит купить этот ноутбук:</h3>
+            <div style={{ marginTop: 32, background: "var(--surface)", borderRadius: 20, padding: 32 }}>
+              <h3 style={{ fontSize: 20, fontWeight: 800, marginBottom: 16, margin: 0 }}>Почему стоит купить этот ноутбук:</h3>
               <ul style={{ margin: 0, paddingLeft: 20, display: "flex", flexDirection: "column", gap: 12 }}>
                 {product.advantages.map((adv, i) => (
                   <li key={i} style={{ color: "var(--text-muted)", fontSize: 15 }}>

@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { trackEvent } from "@/lib/analytics";
 
 const NAV = [
@@ -25,6 +26,7 @@ const CAT_CHIPS = [
 ];
 
 export default function Header() {
+  const router = useRouter();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -67,14 +69,14 @@ export default function Header() {
             </svg>
           </button>
 
-          <Link href="/" className="logo">
+          <Link href="/" prefetch={false} className="logo">
             <span className="dot" />
             OnePoint
           </Link>
 
           <nav className="nav-main">
             {NAV.map((n) => (
-              <Link key={n.href} href={n.href}>{n.label}</Link>
+              <Link key={n.href} href={n.href} prefetch={false}>{n.label}</Link>
             ))}
           </nav>
 
@@ -83,7 +85,8 @@ export default function Header() {
             onSubmit={(e) => {
               e.preventDefault();
               if (search.trim()) {
-                window.location.href = `/catalog?q=${encodeURIComponent(search.trim())}`;
+                const targetUrl = `/catalog?q=${encodeURIComponent(search.trim())}`;
+                router.push(targetUrl);
               }
             }}
           >
@@ -100,7 +103,7 @@ export default function Header() {
           </form>
 
           <div className="header-actions">
-            <Link href="/favorites" className="phone-header-btn" title="Избранное" style={{ padding: "10px", width: "40px", height: "40px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <Link href="/favorites" prefetch={false} className="phone-header-btn" title="Избранное" style={{ padding: "10px", width: "40px", height: "40px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" width="18" height="18">
                 <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 1 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z" />
               </svg>
@@ -135,7 +138,7 @@ export default function Header() {
         <div className="cat-strip">
           <div className="wrap" style={{ padding: "12px 40px" }}>
             {CAT_CHIPS.map((c) => (
-              <Link key={c.href} href={c.href} className="cat-chip">
+              <Link key={c.href} href={c.href} prefetch={false} className="cat-chip">
                 {c.label}
               </Link>
             ))}
@@ -147,7 +150,7 @@ export default function Header() {
       <div className={`mobile-nav-overlay${mobileOpen ? " open" : ""}`} onClick={() => setMobileOpen(false)} />
       <div className={`mobile-nav-panel${mobileOpen ? " open" : ""}`}>
         <div className="mobile-nav-header">
-          <Link href="/" className="logo" onClick={() => setMobileOpen(false)}>
+          <Link href="/" prefetch={false} className="logo" onClick={() => setMobileOpen(false)}>
             <span className="dot" />
             OnePoint
           </Link>
@@ -159,14 +162,14 @@ export default function Header() {
         </div>
         <div className="mobile-nav-links">
           {NAV.map((n) => (
-            <Link key={n.href} href={n.href} onClick={() => setMobileOpen(false)}>
+            <Link key={n.href} href={n.href} prefetch={false} onClick={() => setMobileOpen(false)}>
               {n.label}
             </Link>
           ))}
-          <Link href="/delivery" onClick={() => setMobileOpen(false)}>Доставка</Link>
-          <Link href="/guarantee" onClick={() => setMobileOpen(false)}>Гарантия</Link>
-          <Link href="/about" onClick={() => setMobileOpen(false)}>О компании</Link>
-          <Link href="/faq" onClick={() => setMobileOpen(false)}>FAQ</Link>
+          <Link href="/delivery" prefetch={false} onClick={() => setMobileOpen(false)}>Доставка</Link>
+          <Link href="/guarantee" prefetch={false} onClick={() => setMobileOpen(false)}>Гарантия</Link>
+          <Link href="/about" prefetch={false} onClick={() => setMobileOpen(false)}>О компании</Link>
+          <Link href="/faq" prefetch={false} onClick={() => setMobileOpen(false)}>FAQ</Link>
           <div style={{ marginTop: 16, padding: "0 12px" }}>
             <a
               href="https://wa.me/77075511979"

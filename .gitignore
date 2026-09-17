@@ -41,6 +41,8 @@ Thumbs.db
 # Archives
 backend.zip
 *.zip
+*.tar.gz
+*.tar
 
 # Coverage
 coverage/

@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { productImageUrl } from "@/lib/data";
 
 interface Slide {
   id: number;
@@ -96,12 +97,15 @@ export default function HomeHeroSlider() {
       {slides.map((s, idx) => {
         const isCurrent = idx === current;
         const renderImage = () => {
-          if (s.mobile_image_url) {
+          const mainImg = productImageUrl(s.image_url);
+          const mobImg = s.mobile_image_url ? productImageUrl(s.mobile_image_url) : undefined;
+
+          if (mobImg) {
             return (
               <picture className="hero-slide-picture">
-                <source media="(max-width: 680px)" srcSet={s.mobile_image_url} />
+                <source media="(max-width: 680px)" srcSet={mobImg} />
                 <img
-                  src={s.image_url}
+                  src={mainImg}
                   alt={s.title || "Слайд"}
                   className="hero-slider-img"
                 />
@@ -111,7 +115,7 @@ export default function HomeHeroSlider() {
 
           return (
             <img
-              src={s.image_url}
+              src={mainImg}
               alt={s.title || "Слайд"}
               className="hero-slider-img"
             />
@@ -121,7 +125,7 @@ export default function HomeHeroSlider() {
         return (
           <div key={s.id} className="hero-slide-item" style={{ display: isCurrent ? "block" : "none" }}>
             {s.link_url ? (
-              <Link href={s.link_url} className="hero-slide-link">
+              <Link href={s.link_url} prefetch={false} className="hero-slide-link">
                 {renderImage()}
               </Link>
             ) : (

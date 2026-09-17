@@ -5,16 +5,28 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { fetchSettings } from "@/lib/data";
 import { formatPhoneKZ } from "@/lib/phone";
+import { submitLead } from "@/lib/lead";
 
 function TwoGisWidget() {
   const iframeHtml = `<!DOCTYPE html><html><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests"><style>html,body{margin:0;padding:0;overflow:hidden;width:100%;height:100%;}</style></head><body><a class="dg-widget-link" href="https://2gis.kz/almaty/firm/70000001033724894/center/76.93839311599733,43.273471510698656/zoom/17?utm_medium=widget-source&utm_campaign=firmsonmap&utm_source=bigMap">Посмотреть на карте Алматы</a><div class="dg-widget-link"><a href="https://2gis.kz/almaty/firm/70000001033724894/photos/70000001033724894/center/76.93839311599733,43.273471510698656/zoom/17?utm_medium=widget-source&utm_campaign=firmsonmap&utm_source=photos">Фотографии компании</a></div><div class="dg-widget-link"><a href="https://2gis.kz/almaty/center/76.938398,43.272874/zoom/17/routeTab/rsType/bus/to/76.938398,43.272874╎Onepoint, магазин?utm_medium=widget-source&utm_campaign=firmsonmap&utm_source=route">Найти проезд до Onepoint, магазин</a></div><script charset="utf-8" src="https://widgets.2gis.com/js/DGWidgetLoader.js"></script><script charset="utf-8">new DGWidgetLoader({"width":"100%","height":"400px","borderColor":"#a3a3a3","pos":{"lat":43.273471510698656,"lon":76.93839311599733,"zoom":17},"opt":{"city":"almaty"},"org":[{"id":"70000001033724894"}]});</script></body></html>`;
-
   return (
-    <div style={{ width: "100%", height: 400, overflow: "hidden", position: "relative", background: "#f8f9fa" }}>
+    <div
+      style={{
+        position: "relative",
+        width: "100%",
+        height: 400,
+        borderRadius: 16,
+        overflow: "hidden",
+        border: "1px solid var(--border)",
+      }}
+    >
       <iframe
         srcDoc={iframeHtml}
-        style={{ width: "100%", height: "400px", border: "none", display: "block" }}
-        title="2GIS Map Widget"
+        title="2GIS Map"
+        width="100%"
+        height="100%"
+        style={{ border: 0 }}
+        loading="lazy"
       />
     </div>
   );
@@ -40,11 +52,7 @@ export default function ContactsPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    await fetch("/api/lead", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ type: "contact", name, phone, message }),
-    }).catch(() => {});
+    await submitLead({ type: "contact", name, phone, message }).catch(() => {});
     setLoading(false);
     setSent(true);
   };
@@ -55,7 +63,7 @@ export default function ContactsPage() {
       <div className="page-hero">
         <div className="wrap">
           <div className="breadcrumbs">
-            <Link href="/">Главная</Link>
+            <Link href="/" prefetch={false}>Главная</Link>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="14" height="14"><path d="M9 18l6-6-6-6"/></svg>
             <span>Контакты</span>
           </div>

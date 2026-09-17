@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import BuyModal from "@/components/BuyModal";
 import { trackEvent } from "@/lib/analytics";
 import LaptopSVG from "@/components/LaptopSVG";
+import { fetchLiveProductBySlug, getCachedProduct, formatPrice } from "@/lib/data";
 
 interface GalleryImage {
   image_url: string;
@@ -76,6 +77,159 @@ export default function ProductPageClient({ product, waLink }: Props) {
   );
 }
 
+export function ProductHeroSection({ initialProduct, initialWaLink }: { initialProduct: any; initialWaLink: string }) {
+  const [product, setProduct] = useState<any>(() => {
+    const cached = getCachedProduct(initialProduct?.slug);
+    return cached || initialProduct;
+  });
+
+  useEffect(() => {
+    if (initialProduct?.slug) {
+      fetchLiveProductBySlug(initialProduct.slug).then((live) => {
+        if (live) {
+          setProduct(live);
+        }
+      }).catch(() => {});
+    }
+  }, [initialProduct?.slug]);
+
+  const liveWaLink = `https://wa.me/77075511979?text=Здравствуйте!%20Хочу%20заказать:%20${encodeURIComponent(product.name)}%20за%20${encodeURIComponent(product.price ? product.price.toLocaleString("ru-KZ") + " ₸" : "")}`;
+
+  const galleryImages = (product.images || []).map((img: any) => ({
+    image_url: typeof img === "string" ? img : (img.url || img.image_url),
+    alt_text: product.name,
+    is_main: false
+  }));
+
+  return (
+    <div className="product-detail-grid">
+      {/* ====== GALLERY ====== */}
+      <div style={{ position: "relative" }}>
+        <ProductGallery
+          images={galleryImages}
+          mainImage={product.image}
+          productName={product.name}
+        />
+      </div>
+
+      {/* ====== LIVE INFO BLOCK ====== */}
+      <ProductLiveMainInfo initialProduct={product} initialWaLink={liveWaLink} />
+    </div>
+  );
+}
+
+export function ProductLiveMainInfo({ initialProduct, initialWaLink }: { initialProduct: any; initialWaLink: string }) {
+  const [product, setProduct] = useState<any>(() => {
+    const cached = getCachedProduct(initialProduct?.slug);
+    return cached || initialProduct;
+  });
+  const [isRemoved, setIsRemoved] = useState(false);
+
+  useEffect(() => {
+    if (initialProduct?.slug) {
+      fetchLiveProductBySlug(initialProduct.slug).then((live) => {
+        if (live) {
+          setProduct(live);
+          setIsRemoved(false);
+        } else {
+          setIsRemoved(true);
+        }
+      }).catch(() => {});
+    }
+  }, [initialProduct?.slug]);
+
+  if (isRemoved) {
+    return (
+      <div style={{ background: "var(--surface)", padding: 32, borderRadius: 20, textAlign: "center", border: "1px solid var(--border)" }}>
+        <h2 style={{ fontSize: 22, fontWeight: 800, marginBottom: 12 }}>Товар снят с продажи</h2>
+        <p style={{ color: "var(--text-muted)", marginBottom: 20 }}>Этот товар больше не представлен в наличии или был удален из каталога.</p>
+        <a href="/catalog" className="btn btn-primary" style={{ padding: "12px 24px", borderRadius: 12, textDecoration: "none", fontWeight: 700, display: "inline-block" }}>
+          Перейти в каталог
+        </a>
+      </div>
+    );
+  }
+
+  const liveWaLink = `https://wa.me/77075511979?text=Здравствуйте!%20Хочу%20заказать:%20${encodeURIComponent(product.name)}%20за%20${encodeURIComponent(product.price ? product.price.toLocaleString("ru-KZ") + " ₸" : "")}`;
+
+  return (
+    <div>
+      <div style={{ display: "flex", gap: 8, marginBottom: 12, flexWrap: "wrap" }}>
+        {product.isNew && <span className="new-badge">Новинка</span>}
+        {product.isHit && <span className="hit-badge">Хит продаж</span>}
+        {product.isSale && <span className="discount-badge">🔥 Скидка · Успейте заказать!</span>}
+        {product.isUpcoming && <span className="upcoming-badge">Скоро в продаже</span>}
+      </div>
+
+      <div className="product-brand" style={{ fontSize: 13, marginBottom: 8 }}>{product.brand} · {product.series}</div>
+      <h1 style={{ fontSize: 28, fontWeight: 800, letterSpacing: "-.02em", lineHeight: 1.2, marginBottom: 16 }}>
+        {product.name}
+      </h1>
+
+      {/* Price block */}
+      <div style={{ background: "var(--surface)", borderRadius: 20, padding: 24, marginBottom: 24 }}>
+        <div style={{ display: "flex", alignItems: "flex-start", gap: 16, marginBottom: 16 }}>
+          <div>
+            {product.oldPrice && (
+              <div className="price-old" style={{ fontSize: 15 }}>{product.oldPrice.toLocaleString("ru-KZ")} ₸</div>
+            )}
+            <div className="price-new" style={{ fontSize: 34 }}>{product.price ? product.price.toLocaleString("ru-KZ") + " ₸" : "—"}</div>
+            {product.saving && (
+              <div className="price-saving" style={{ fontSize: 13, marginTop: 4 }}>
+                Экономия {product.saving.toLocaleString("ru-KZ")} ₸
+              </div>
+            )}
+          </div>
+          {Boolean(product.discountPercent) && (
+            <span className="product-page-badge badge-sale" style={{ fontSize: 15, padding: "8px 16px", marginTop: 4 }}>
+              🔥 -{product.discountPercent}% Скидка
+            </span>
+          )}
+        </div>
+
+        {Boolean(product.discountPercent || product.oldPrice) && (
+          <div style={{ marginTop: 12, background: "rgba(255,90,31,0.08)", border: "1px solid rgba(255,90,31,0.25)", color: "var(--accent)", padding: "10px 14px", borderRadius: 12, fontSize: 13.5, fontWeight: 700, display: "flex", alignItems: "center", gap: 8 }}>
+            <span>🔥 Спеццена! Акция скоро закончится — успейте заказать по выгодной цене!</span>
+          </div>
+        )}
+      </div>
+
+      {/* Availability */}
+      <div style={{ display: "flex", gap: 20, marginBottom: 24, flexWrap: "wrap" }}>
+        <div className={`stock-row ${product.inStock ? "stock-in" : "stock-order"}`} style={{ fontSize: 14 }}>
+          <span className="stock-dot" />
+          {product.inStock ? "В наличии — готов к отгрузке" : "Нет в наличии"}
+        </div>
+      </div>
+
+      {/* CTA Buttons */}
+      <div className="product-actions">
+        <ProductPageClient product={{ id: product.id, name: product.name, price: product.price, slug: product.slug, sku: product.sku }} waLink={liveWaLink} />
+      </div>
+
+      {/* Trust row */}
+      <div className="trust-row" style={{ marginTop: 20 }}>
+        <div className="trust-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16"><path d="M12 2 4 6v6c0 5 3.4 8.7 8 10 4.6-1.3 8-5 8-10V6l-8-4Z"/><path d="m9 12 2 2 4-4"/></svg>
+          Гарантия 1 год
+        </div>
+        <div className="trust-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16"><path d="M1 3h15v13H1z"/><path d="M16 8h4l3 3v5h-7V8z"/></svg>
+          Бесплатная доставка по Алматы. По Казахстану отправим (СДЭК / inDrive)
+        </div>
+        <div className="trust-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+          Проверка перед отправкой
+        </div>
+        <div className="trust-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.7a2 2 0 0 1-.5 2.1L8 9.7a16 16 0 0 0 6 6Z"/></svg>
+          Экспертная консультация
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ─── Product Gallery ─── */
 export function ProductGallery({ images, mainImage, productName }: {
   images: GalleryImage[];
@@ -83,7 +237,15 @@ export function ProductGallery({ images, mainImage, productName }: {
   productName: string;
 }) {
   const allImages = images.filter((image) => Boolean(image.image_url));
-  if (allImages.length === 0 && mainImage) {
+  if (mainImage) {
+    const mainIdx = allImages.findIndex(img => img.image_url === mainImage);
+    if (mainIdx > 0) {
+      const [mainItem] = allImages.splice(mainIdx, 1);
+      allImages.unshift(mainItem);
+    } else if (mainIdx === -1) {
+      allImages.unshift({ image_url: mainImage, alt_text: productName, is_main: true });
+    }
+  } else if (allImages.length === 0 && mainImage) {
     allImages.push({ image_url: mainImage, alt_text: productName, is_main: true });
   }
   const hasImages = allImages.length > 0;
@@ -147,7 +309,7 @@ export function ProductGallery({ images, mainImage, productName }: {
                 src={allImages[active]?.image_url}
                 alt={allImages[active]?.alt_text || productName}
                 style={{
-                  width: "100%", height: 380, objectFit: "contain", borderRadius: 18,
+                  width: "100%", height: 380, maxHeight: "75vw", objectFit: "contain", borderRadius: 18,
                   background: "#ffffff", display: "block", transition: "transform .25s ease, opacity .2s ease"
                 }}
                 onError={() => setImageError(true)}

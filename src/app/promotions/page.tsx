@@ -1,10 +1,10 @@
+"use client";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
-import { fetchLiveProductsByFlag, formatPrice } from "@/lib/data";
-
-export const revalidate = 0;
+import { fetchLiveProducts, fetchLiveProductsByFlag, formatPrice, Product } from "@/lib/data";
 
 function IcoGift() {
   return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="36" height="36"><path d="M20 12v10H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>;
@@ -17,8 +17,25 @@ function IcoDelivery() {
 }
 
 
-export default async function PromotionsPage() {
-  const saleProducts = await fetchLiveProductsByFlag("is_sale");
+export default function PromotionsPage() {
+  const [saleProducts, setSaleProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchLiveProductsByFlag("is_sale").then(list => {
+      if (list.length > 0) {
+        setSaleProducts(list);
+      } else {
+        fetchLiveProducts().then(all => {
+          const sales = all.filter(p => p.isSale || (p.oldPrice && p.oldPrice > p.price));
+          setSaleProducts(sales.length > 0 ? sales : all.slice(0, 8));
+        });
+      }
+      setLoading(false);
+    }).catch(() => {
+      setLoading(false);
+    });
+  }, []);
 
   return (
     <>
@@ -26,7 +43,7 @@ export default async function PromotionsPage() {
       <div className="page-hero">
         <div className="wrap">
           <div className="breadcrumbs">
-            <Link href="/">Главная</Link>
+            <Link href="/" prefetch={false}>Главная</Link>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="14" height="14"><path d="M9 18l6-6-6-6"/></svg>
             <span>Акции</span>
           </div>
@@ -102,7 +119,7 @@ export default async function PromotionsPage() {
                   {[...saleProducts].sort((a, b) => (b.saving || 0) - (a.saving || 0)).map(p => (
                     <tr key={p.id} style={{ borderBottom: "1px solid var(--border)" }}>
                       <td style={{ padding: "14px 16px", fontWeight: 600, fontSize: 14 }}>
-                        <Link href={`/product/${p.slug}`} style={{ color: "var(--text)", transition: "color .2s" }}>{p.brand} {p.name.split(" ").slice(1, 5).join(" ")}</Link>
+                        <Link href={`/product/${p.slug}`} prefetch={false} style={{ color: "var(--text)", transition: "color .2s" }}>{p.brand} {p.name.split(" ").slice(1, 5).join(" ")}</Link>
                       </td>
                       <td style={{ padding: "14px 16px", textDecoration: "line-through", color: "var(--text-muted)", fontSize: 14 }}>{p.oldPrice ? formatPrice(p.oldPrice) : "—"}</td>
                       <td style={{ padding: "14px 16px", fontWeight: 800, fontSize: 15 }}>{formatPrice(p.price)}</td>
@@ -121,7 +138,7 @@ export default async function PromotionsPage() {
                 {[...saleProducts].sort((a, b) => (b.saving || 0) - (a.saving || 0)).map(p => (
                   <div key={p.id} style={{ borderBottom: "1px solid var(--border)", padding: "16px 0", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <Link href={`/product/${p.slug}`} style={{ fontWeight: 700, fontSize: 13.5, color: "var(--text)", display: "block", marginBottom: 4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                      <Link href={`/product/${p.slug}`} prefetch={false} style={{ fontWeight: 700, fontSize: 13.5, color: "var(--text)", display: "block", marginBottom: 4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                         {p.brand} {p.name.split(" ").slice(1, 4).join(" ")}
                       </Link>
                       <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>

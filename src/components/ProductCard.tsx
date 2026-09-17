@@ -75,7 +75,7 @@ export default function ProductCard({ product, onToast }: ProductCardProps) {
             </button>
           </div>
           {gallery.length > 0 && !imageLoadError ? (
-            <Link href={`/product/${product.slug}`} style={{ display: "flex", width: "100%", height: "100%", justifyContent: "center", alignItems: "center" }} tabIndex={-1}>
+            <Link href={`/product/${product.slug}`} prefetch={false} style={{ display: "flex", width: "100%", height: "100%", justifyContent: "center", alignItems: "center" }} tabIndex={-1}>
               <div 
                 style={{ 
                   position: "relative", 
@@ -137,7 +137,7 @@ export default function ProductCard({ product, onToast }: ProductCardProps) {
               </div>
             </Link>
           ) : (
-            <Link href={`/product/${product.slug}`} style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "100%", height: "100%" }}>
+            <Link href={`/product/${product.slug}`} prefetch={false} style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "100%", height: "100%" }}>
               <LaptopSVG color1={product.svgColor1} color2={product.svgColor2} size={220} />
             </Link>
           )}
@@ -147,7 +147,7 @@ export default function ProductCard({ product, onToast }: ProductCardProps) {
         <div className="product-body">
           <div>
             <div className="product-brand">{product.brand} · {product.categoryName}</div>
-            <Link href={`/product/${product.slug}`}>
+            <Link href={`/product/${product.slug}`} prefetch={false}>
               <h3 className="product-name" style={{ cursor: "pointer", transition: "color .2s" }}
                 onMouseEnter={e => (e.currentTarget.style.color = "var(--accent)")}
                 onMouseLeave={e => (e.currentTarget.style.color = "")}

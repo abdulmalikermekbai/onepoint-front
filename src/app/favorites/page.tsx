@@ -46,7 +46,7 @@ export default function FavoritesPage() {
       <div className="page-hero">
         <div className="wrap">
           <div className="breadcrumbs">
-            <Link href="/">Главная</Link>
+            <Link href="/" prefetch={false}>Главная</Link>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="14" height="14"><path d="M9 18l6-6-6-6"/></svg>
             <span>Избранное</span>
           </div>
@@ -64,7 +64,7 @@ export default function FavoritesPage() {
               <div style={{ fontSize: 48, marginBottom: 16 }}>💔</div>
               <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 12 }}>В избранном пока пусто</h2>
               <p style={{ color: "var(--text-muted)", marginBottom: 24 }}>Добавляйте товары в избранное, чтобы не потерять их.</p>
-              <Link href="/catalog" className="btn btn-primary" style={{ display: "inline-flex" }}>Перейти в каталог</Link>
+              <Link href="/catalog" prefetch={false} className="btn btn-primary" style={{ display: "inline-flex" }}>Перейти в каталог</Link>
             </div>
           ) : (
             <div className="product-grid">

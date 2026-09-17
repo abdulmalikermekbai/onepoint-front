@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { trackEvent } from "@/lib/analytics";
 import { formatPhoneKZ } from "@/lib/phone";
+import { submitLead } from "@/lib/lead";
 
 interface ProductInfo {
   id?: number;
@@ -19,7 +20,7 @@ interface BuyModalProps {
 
 export default function BuyModal({ isOpen, onClose, product }: BuyModalProps) {
   const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
+  const [phone, setPhone] = useState("+7 ");
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
@@ -31,7 +32,7 @@ export default function BuyModal({ isOpen, onClose, product }: BuyModalProps) {
   useEffect(() => {
     if (isOpen) {
       setName("");
-      setPhone("");
+      setPhone("+7 ");
       setSent(false);
       setLoading(false);
       setErrorMsg("");
@@ -70,19 +71,15 @@ export default function BuyModal({ isOpen, onClose, product }: BuyModalProps) {
     });
 
     try {
-      await fetch("/api/lead", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          type: "order",
-          productId: product?.id,
-          productName: product?.name,
-          sku: product?.sku,
-          price: product?.price,
-          name,
-          phone,
-          pageUrl: typeof window !== "undefined" ? window.location.href : "",
-        }),
+      await submitLead({
+        type: "order",
+        productId: product?.id,
+        productName: product?.name,
+        sku: product?.sku,
+        price: product?.price,
+        name,
+        phone,
+        pageUrl: typeof window !== "undefined" ? window.location.href : "",
       });
       setSent(true);
     } catch (_) {

@@ -7,6 +7,7 @@ import ProductCard from "@/components/ProductCard";
 import LaptopSVG from "@/components/LaptopSVG";
 import { BRANDS, REVIEWS, formatPrice, fetchLiveProducts, fetchLiveReviews, fetchSettings, Product } from "@/lib/data";
 import { formatPhoneKZ } from "@/lib/phone";
+import { submitLead } from "@/lib/lead";
 import HomeClient from "./HomeClient";
 import HomeHeroSlider from "@/components/HomeHeroSlider";
 import { ClientStatsGrid } from "@/components/ClientStats";
@@ -64,7 +65,7 @@ function DynamicCategoryGrid() {
         const countText = countNum > 0 ? formatModelCount(countNum) : cat.fallbackCount;
 
         return (
-          <Link key={cat.slug} href={`/catalog?cat=${cat.slug}`} className="cat-card">
+          <Link key={cat.slug} href={`/catalog?cat=${cat.slug}`} prefetch={false} className="cat-card">
             <div className="cat-icon-wrap">{cat.icon}</div>
             <div>
               <div className="cat-name">{cat.name}</div>
@@ -93,7 +94,7 @@ function DynamicBrandStrip() {
   return (
     <div className="brand-strip reveal">
       {brands.map((b) => (
-        <Link key={b.slug} href={`/catalog?brand=${b.slug}`} className="brand-item">
+        <Link key={b.slug} href={`/catalog?brand=${b.slug}`} prefetch={false} className="brand-item">
           <span className="brand-word">{b.name}</span>
         </Link>
       ))}
@@ -235,7 +236,7 @@ export default function HomePage() {
                 <h2 className="section-title">Выберите категорию</h2>
                 <p className="section-sub">Найдите идеальный ноутбук для ваших задач</p>
               </div>
-              <Link href="/catalog" className="link-arrow">
+              <Link href="/catalog" prefetch={false} className="link-arrow">
                 Весь каталог
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" width="16" height="16"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
               </Link>
@@ -254,7 +255,7 @@ export default function HomePage() {
                 <h2 className="section-title">Популярные ноутбуки</h2>
                 <p className="section-sub">Модели, которые чаще всего выбирают наши покупатели.</p>
               </div>
-              <Link href="/bestsellers" className="link-arrow">
+              <Link href="/bestsellers" prefetch={false} className="link-arrow">
                 Все хиты
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" width="16" height="16"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
               </Link>
@@ -285,7 +286,7 @@ export default function HomePage() {
                 <h2 className="section-title">Лучшие предложения недели</h2>
                 <p className="section-sub">Подберите ноутбук с максимальной выгодой</p>
               </div>
-              <Link href="/promotions" className="link-arrow">
+              <Link href="/promotions" prefetch={false} className="link-arrow">
                 Все акции
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" width="16" height="16"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
               </Link>
@@ -320,7 +321,7 @@ export default function HomePage() {
                 </span>
                 <div className="promo-title">Популярные ноутбуки по выгодной цене</div>
                 <p className="promo-desc">Выбирайте модели со скидкой из наличия — количество ограничено.</p>
-                <Link href="/catalog?sale=1" className="btn btn-primary btn-sm">
+                <Link href="/catalog?sale=1" prefetch={false} className="btn btn-primary btn-sm">
                   Смотреть предложения
                 </Link>
               </div>
@@ -337,7 +338,7 @@ export default function HomePage() {
                 <h2 className="section-title">Новейшие модели 2026</h2>
                 <p className="section-sub">Свежие поступления актуальных ноутбуков для любых задач</p>
               </div>
-              <Link href="/new-arrivals" className="link-arrow">
+              <Link href="/new-arrivals" prefetch={false} className="link-arrow">
                 Все новинки
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" width="16" height="16"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
               </Link>
@@ -371,6 +372,7 @@ export default function HomePage() {
                 <Link
                   key={item.label}
                   href={`/catalog?cat=${item.slug}`}
+                  prefetch={false}
                   className="use-case-card"
                 >
                   <span className="use-case-icon">{item.icon}</span>
@@ -454,7 +456,7 @@ export default function HomePage() {
                 <div className="eyebrow">Доставка и самовывоз</div>
                 <h2 className="section-title">Быстро и надёжно</h2>
               </div>
-              <Link href="/delivery" className="link-arrow">
+              <Link href="/delivery" prefetch={false} className="link-arrow">
                 Подробнее о доставке
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" width="16" height="16"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
               </Link>
@@ -503,7 +505,7 @@ export default function HomePage() {
                 <div className="eyebrow">Контакты</div>
                 <h2 className="section-title">Мы на связи</h2>
               </div>
-              <Link href="/contacts" className="link-arrow">
+              <Link href="/contacts" prefetch={false} className="link-arrow">
                 Страница контактов
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" width="16" height="16"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
               </Link>
@@ -612,10 +614,12 @@ function ConsultationForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    await fetch("/api/lead", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ type: "consultation", name, phone, message: "Заявка на консультацию с главной страницы" }),
+    await submitLead({
+      type: "consultation",
+      name,
+      phone,
+      message: "Заявка на консультацию с главной страницы",
+      pageUrl: typeof window !== "undefined" ? window.location.href : "",
     }).catch(() => {});
     setLoading(false);
     setSent(true);

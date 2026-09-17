@@ -1,18 +1,33 @@
+"use client";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
-import { fetchLiveProducts, fetchLiveProductsByFlag } from "@/lib/data";
+import { fetchLiveProducts, fetchLiveProductsByFlag, Product } from "@/lib/data";
 
-export const revalidate = 0;
+export default function BestsellersPage() {
+  const [hitProducts, setHitProducts] = useState<Product[]>([]);
+  const [otherProducts, setOtherProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
 
-export default async function BestsellersPage() {
-  const [hitProducts, allProducts] = await Promise.all([
-    fetchLiveProductsByFlag("is_hit"),
-    fetchLiveProducts(),
-  ]);
-
-  const otherProducts = allProducts.filter(p => !p.isHit).slice(0, 4);
+  useEffect(() => {
+    Promise.all([
+      fetchLiveProductsByFlag("is_hit"),
+      fetchLiveProducts(),
+    ]).then(([hits, all]) => {
+      if (hits.length > 0) {
+        setHitProducts(hits);
+        setOtherProducts(all.filter(p => !p.isHit).slice(0, 4));
+      } else {
+        setHitProducts(all.slice(0, 8));
+        setOtherProducts(all.slice(8, 12));
+      }
+      setLoading(false);
+    }).catch(() => {
+      setLoading(false);
+    });
+  }, []);
 
   return (
     <>
@@ -20,7 +35,7 @@ export default async function BestsellersPage() {
       <div className="page-hero">
         <div className="wrap">
           <div className="breadcrumbs">
-            <Link href="/">Главная</Link>
+            <Link href="/" prefetch={false}>Главная</Link>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="14" height="14"><path d="M9 18l6-6-6-6"/></svg>
             <span>Хиты продаж</span>
           </div>
@@ -48,7 +63,7 @@ export default async function BestsellersPage() {
                     <svg viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" strokeWidth="1" width="13" height="13"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
                     {p.rating} · {p.reviewCount} отзывов
                   </div>
-                  <Link href={`/product/${p.slug}`} className="btn btn-dark btn-xs" style={{ display: "inline-flex" }}>Подробнее</Link>
+                  <Link href={`/product/${p.slug}`} prefetch={false} className="btn btn-dark btn-xs" style={{ display: "inline-flex" }}>Подробнее</Link>
                 </div>
               ))}
             </div>
@@ -61,8 +76,10 @@ export default async function BestsellersPage() {
             </div>
           </div>
 
-          {hitProducts.length === 0 ? (
-            <div style={{ padding: "40px 0", textTransform: "uppercase", color: "var(--text-muted)", fontSize: 14 }}>Товары загружаются...</div>
+          {loading ? (
+            <div style={{ padding: "40px 0", textTransform: "uppercase", color: "var(--text-muted)", fontSize: 14 }}>Загрузка хитов продаж...</div>
+          ) : hitProducts.length === 0 ? (
+            <div style={{ padding: "40px 0", color: "var(--text-muted)", fontSize: 14 }}>Нет товаров в этой категории.</div>
           ) : (
             <div className="product-grid">
               {hitProducts.map(p => <ProductCard key={p.id} product={p} />)}

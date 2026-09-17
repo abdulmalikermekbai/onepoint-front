@@ -73,10 +73,16 @@ export interface Product {
 
 export const PRODUCTS: Product[] = [];
 
-function productImageUrl(value: unknown): string {
+export const BACKEND_BASE = "https://api.onepoint.kz";
+
+export function productImageUrl(value: unknown): string {
   const url = typeof value === "string" ? value.trim() : "";
   if (!url) return "";
-  return url.startsWith("/") ? `https://api.onepoint.kz${url}` : url;
+  if (url.startsWith("http://") || url.startsWith("https://") || url.startsWith("data:") || url.startsWith("blob:")) {
+    return url;
+  }
+  const cleanPath = url.startsWith("/") ? url : `/${url}`;
+  return `${BACKEND_BASE}${cleanPath}`;
 }
 
 /**
@@ -84,11 +90,67 @@ function productImageUrl(value: unknown): string {
  * Это не зависит от TLS-прокси Vercel, который не принимает сертификат API.
  */
 function productsApiUrl(query = ""): string {
-  const base = `${typeof window === "undefined"
+  const isBrowser = typeof window !== "undefined";
+  const base = `${!isBrowser
     ? (process.env.BACKEND_API_URL || "https://api.onepoint.kz")
     : "https://api.onepoint.kz"}/api/products.php`;
 
-  return query ? `${base}?${query}` : base;
+  const params = new URLSearchParams(query);
+  if (isBrowser) {
+    params.set("_t", Date.now().toString());
+  }
+  const qs = params.toString();
+  return qs ? `${base}?${qs}` : base;
+}
+
+// In-memory and sessionStorage cache for zero-delay price loading
+const liveCache: Map<string, Product> = new Map();
+
+function saveToLiveCache(products: Product[], appendOnly = false) {
+  if (typeof window === "undefined") return;
+  if (!appendOnly) {
+    liveCache.clear();
+  }
+  products.forEach(p => {
+    if (p.slug) liveCache.set(p.slug, p);
+    if (p.id) liveCache.set(String(p.id), p);
+  });
+  try {
+    const list = Array.from(new Set(Array.from(liveCache.values())));
+    sessionStorage.setItem("op_live_products", JSON.stringify(list));
+  } catch (_) {}
+}
+
+export function removeProductFromCache(slugOrId: string | number) {
+  if (typeof window === "undefined") return;
+  const key = String(slugOrId);
+  liveCache.delete(key);
+  try {
+    const saved = sessionStorage.getItem("op_live_products");
+    if (saved) {
+      const parsed: Product[] = JSON.parse(saved);
+      const filtered = parsed.filter(p => p.slug !== key && String(p.id) !== key);
+      sessionStorage.setItem("op_live_products", JSON.stringify(filtered));
+    }
+  } catch (_) {}
+}
+
+export function getCachedProduct(slugOrId: string | number): Product | null {
+  if (typeof window === "undefined") return null;
+  const key = String(slugOrId);
+  if (liveCache.has(key)) return liveCache.get(key)!;
+  try {
+    const saved = sessionStorage.getItem("op_live_products");
+    if (saved) {
+      const parsed: Product[] = JSON.parse(saved);
+      parsed.forEach(p => {
+        if (p.slug) liveCache.set(p.slug, p);
+        if (p.id) liveCache.set(String(p.id), p);
+      });
+      if (liveCache.has(key)) return liveCache.get(key)!;
+    }
+  } catch (_) {}
+  return null;
 }
 
 export const CATEGORIES = [
@@ -189,11 +251,21 @@ export function normalizeDbProduct(p: any): Product {
     svgColor1: "#5b2a86",
     svgColor2: "#ff5a1f",
     // gallery = array of objects (single product endpoint), gallery_images = array of strings (list endpoint)
-    images: p.gallery
-      ? p.gallery.map((g: any) => productImageUrl(g.image_url))
-      : p.gallery_images && Array.isArray(p.gallery_images) && p.gallery_images.length > 0
-        ? p.gallery_images.map((url: string) => productImageUrl(url))
-        : (p.image_url ? [productImageUrl(p.image_url)] : []),
+    images: (() => {
+      const mainImg = productImageUrl(p.image_url);
+      let list: string[] = [];
+      if (p.gallery && Array.isArray(p.gallery)) {
+        list = p.gallery.map((g: any) => productImageUrl(g.image_url)).filter(Boolean);
+      } else if (p.gallery_images && Array.isArray(p.gallery_images) && p.gallery_images.length > 0) {
+        list = p.gallery_images.map((url: string) => productImageUrl(url)).filter(Boolean);
+      }
+      if (mainImg) {
+        list = [mainImg, ...list.filter(url => url !== mainImg)];
+      } else if (list.length === 0 && p.image_url) {
+        list = [productImageUrl(p.image_url)];
+      }
+      return list;
+    })(),
     reviews: p.reviews || [],
     related: p.related ? p.related.map((r: any) => normalizeDbProduct(r)) : [],
     sortOrder: Number(p.sort_order) || 0,
@@ -222,13 +294,24 @@ export function formatGpu(gpu?: string): string {
   return cleaned || gpu;
 }
 
+function getFetchOptions(): RequestInit {
+  if (typeof window !== "undefined") {
+    // In browser, the URL already includes anti-cache timestamp (?_t=...).
+    // Do NOT send custom Cache-Control request headers to prevent CORS preflight blocks.
+    return {};
+  }
+  return { next: { revalidate: 60 } };
+}
+
 export async function fetchLiveProducts(): Promise<Product[]> {
   try {
-    const res = await fetch(productsApiUrl(), { cache: "no-store" });
+    const res = await fetch(productsApiUrl(), getFetchOptions());
     if (!res.ok) return [];
     const data = await res.json();
     if (Array.isArray(data.products)) {
-      return data.products.map(normalizeDbProduct);
+      const normalized = data.products.map(normalizeDbProduct);
+      saveToLiveCache(normalized);
+      return normalized;
     }
   } catch (e) {
     console.error("Failed to fetch live products:", e);
@@ -238,7 +321,7 @@ export async function fetchLiveProducts(): Promise<Product[]> {
 
 export async function fetchLiveBrands(): Promise<{name: string, slug: string}[]> {
   try {
-    const res = await fetch(productsApiUrl("brands=1"), { cache: "no-store" });
+    const res = await fetch(productsApiUrl("brands=1"), getFetchOptions());
     if (!res.ok) return [];
     const data = await res.json();
     if (Array.isArray(data.brands)) {
@@ -256,11 +339,13 @@ export async function fetchLiveBrands(): Promise<{name: string, slug: string}[]>
 export async function fetchLiveProductsByFlag(flag: "is_hit" | "is_new" | "is_sale"): Promise<Product[]> {
   try {
     const apiFlag = flag.replace(/^is_/, "");
-    const res = await fetch(productsApiUrl(`${apiFlag}=1`), { cache: "no-store" });
+    const res = await fetch(productsApiUrl(`${apiFlag}=1`), getFetchOptions());
     if (!res.ok) return [];
     const data = await res.json();
     if (Array.isArray(data.products)) {
-      return data.products.map(normalizeDbProduct);
+      const normalized = data.products.map(normalizeDbProduct);
+      saveToLiveCache(normalized);
+      return normalized;
     }
   } catch (e) {
     console.error(`Failed to fetch live products by flag ${flag}:`, e);
@@ -270,11 +355,17 @@ export async function fetchLiveProductsByFlag(flag: "is_hit" | "is_new" | "is_sa
 
 export async function fetchLiveProductBySlug(slug: string): Promise<Product | null> {
   try {
-    const res = await fetch(productsApiUrl(`slug=${encodeURIComponent(slug)}`), { cache: "no-store" });
+    const res = await fetch(productsApiUrl(`slug=${encodeURIComponent(slug)}`), getFetchOptions());
     if (res.ok) {
       const data = await res.json();
-      if (data.product) return normalizeDbProduct(data.product);
+      if (data.product) {
+        const normalized = normalizeDbProduct(data.product);
+        saveToLiveCache([normalized], true);
+        return normalized;
+      }
     }
+    // If response is not ok or product not in DB (e.g. 404)
+    removeProductFromCache(slug);
   } catch (e) {
     console.error(`Failed to fetch product by slug ${slug}:`, e);
   }
@@ -283,10 +374,11 @@ export async function fetchLiveProductBySlug(slug: string): Promise<Product | nu
 
 export async function fetchSettings(): Promise<Record<string, string>> {
   try {
-    const base = `${typeof window === "undefined"
+    const isBrowser = typeof window !== "undefined";
+    const base = `${!isBrowser
       ? (process.env.BACKEND_API_URL || "https://api.onepoint.kz")
-      : "https://api.onepoint.kz"}/api/settings.php`;
-    const res = await fetch(base, { cache: "no-store" });
+      : "https://api.onepoint.kz"}/api/settings.php${isBrowser ? `?_t=${Date.now()}` : ""}`;
+    const res = await fetch(base, getFetchOptions());
     if (res.ok) {
       const data = await res.json();
       return data.settings || {};
@@ -303,10 +395,11 @@ export function formatPrice(price: number): string {
 
 export async function fetchLiveReviews(): Promise<any[]> {
   try {
-    const base = `${typeof window === "undefined"
+    const isBrowser = typeof window !== "undefined";
+    const base = `${!isBrowser
       ? (process.env.BACKEND_API_URL || "https://api.onepoint.kz")
-      : "https://api.onepoint.kz"}/api/products.php?reviews=1`;
-    const res = await fetch(base, { cache: "no-store" });
+      : "https://api.onepoint.kz"}/api/products.php?reviews=1${isBrowser ? `&_t=${Date.now()}` : ""}`;
+    const res = await fetch(base, getFetchOptions());
     if (res.ok) {
       const data = await res.json();
       if (Array.isArray(data.reviews) && data.reviews.length > 0) {
@@ -318,3 +411,4 @@ export async function fetchLiveReviews(): Promise<any[]> {
   }
   return [];
 }
+

@@ -1,13 +1,27 @@
+"use client";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
-import { fetchLiveProductsByFlag } from "@/lib/data";
+import { fetchLiveProducts, fetchLiveProductsByFlag, Product } from "@/lib/data";
 
-export const revalidate = 0;
+export default function NewArrivalsPage() {
+  const [newProducts, setNewProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
 
-export default async function NewArrivalsPage() {
-  const newProducts = await fetchLiveProductsByFlag("is_new");
+  useEffect(() => {
+    fetchLiveProductsByFlag("is_new").then(list => {
+      if (list.length > 0) {
+        setNewProducts(list);
+      } else {
+        fetchLiveProducts().then(all => setNewProducts(all.slice(0, 8)));
+      }
+      setLoading(false);
+    }).catch(() => {
+      setLoading(false);
+    });
+  }, []);
 
   return (
     <>
@@ -15,7 +29,7 @@ export default async function NewArrivalsPage() {
       <div className="page-hero">
         <div className="wrap">
           <div className="breadcrumbs">
-            <Link href="/">Главная</Link>
+            <Link href="/" prefetch={false}>Главная</Link>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="14" height="14"><path d="M9 18l6-6-6-6"/></svg>
             <span>Новинки</span>
           </div>

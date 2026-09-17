@@ -18,7 +18,7 @@ function DynamicFooterBrands() {
     <>
       {brands.map((b) => (
         <li key={b.slug}>
-          <Link href={`/catalog?brand=${b.slug}`}>{b.name}</Link>
+          <Link href={`/catalog?brand=${b.slug}`} prefetch={false}>{b.name}</Link>
         </li>
       ))}
     </>
@@ -71,14 +71,14 @@ export default function Footer() {
           <div className="footer-col">
             <h4>Каталог</h4>
             <ul>
-              <li><Link href="/catalog?cat=gaming">Игровые ноутбуки</Link></li>
-              <li><Link href="/catalog?cat=office">Для работы</Link></li>
-              <li><Link href="/catalog?cat=ultrabook">Ультрабуки</Link></li>
-              <li><Link href="/catalog?cat=macbook">MacBook</Link></li>
-              <li><Link href="/catalog?cat=designer">Для дизайнеров</Link></li>
-              <li><Link href="/catalog?cat=rtx">Ноутбуки с RTX</Link></li>
-              <li><Link href="/promotions">Акции</Link></li>
-              <li><Link href="/new-arrivals">Новинки 2026</Link></li>
+              <li><Link href="/catalog?cat=gaming" prefetch={false}>Игровые ноутбуки</Link></li>
+              <li><Link href="/catalog?cat=office" prefetch={false}>Для работы</Link></li>
+              <li><Link href="/catalog?cat=ultrabook" prefetch={false}>Ультрабуки</Link></li>
+              <li><Link href="/catalog?cat=macbook" prefetch={false}>MacBook</Link></li>
+              <li><Link href="/catalog?cat=designer" prefetch={false}>Для дизайнеров</Link></li>
+              <li><Link href="/catalog?cat=rtx" prefetch={false}>Ноутбуки с RTX</Link></li>
+              <li><Link href="/promotions" prefetch={false}>Акции</Link></li>
+              <li><Link href="/new-arrivals" prefetch={false}>Новинки 2026</Link></li>
             </ul>
           </div>
 
@@ -86,13 +86,13 @@ export default function Footer() {
           <div className="footer-col">
             <h4>Компания</h4>
             <ul>
-              <li><Link href="/about">О нас</Link></li>
-              <li><Link href="/contacts">Контакты</Link></li>
-              <li><Link href="/delivery">Доставка</Link></li>
-              <li><Link href="/payment">Оплата</Link></li>
-              <li><Link href="/guarantee">Гарантия</Link></li>
-              <li><Link href="/faq">FAQ</Link></li>
-              <li><Link href="/privacy">Политика</Link></li>
+              <li><Link href="/about" prefetch={false}>О нас</Link></li>
+              <li><Link href="/contacts" prefetch={false}>Контакты</Link></li>
+              <li><Link href="/delivery" prefetch={false}>Доставка</Link></li>
+              <li><Link href="/payment" prefetch={false}>Оплата</Link></li>
+              <li><Link href="/guarantee" prefetch={false}>Гарантия</Link></li>
+              <li><Link href="/faq" prefetch={false}>FAQ</Link></li>
+              <li><Link href="/privacy" prefetch={false}>Политика</Link></li>
             </ul>
           </div>
 
@@ -142,7 +142,7 @@ export default function Footer() {
         <div className="footer-bottom">
           <span>© 2026 OnePoint. Все права защищены.</span>
           <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-            <Link href="/privacy" style={{ fontSize: 12.5, color: "rgba(255,255,255,.35)", transition: "color .2s" }}>
+            <Link href="/privacy" prefetch={false} style={{ fontSize: 12.5, color: "rgba(255,255,255,.35)", transition: "color .2s" }}>
               Политика конфиденциальности
             </Link>
           </div>

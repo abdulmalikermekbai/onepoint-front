@@ -4,7 +4,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build && node scripts/copy-standalone.js",
-    "start": "node .next/standalone/server.js",
+    "start": "node scripts/start-railway.js",
     "build:export": "node scripts/build-export.js",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit"

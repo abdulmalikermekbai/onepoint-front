@@ -56,9 +56,9 @@ export async function POST(req: NextRequest) {
       // Fallback if PHP backend is temporarily unreachable
     }
 
-    // 2. Fallback: direct Telegram message to group -5319438603
-    const botToken = process.env.TELEGRAM_BOT_TOKEN || "8510182301:AAEVviHThdSvbhwjDg0YDJT4f3K2YF6w5jU";
-    const groupId = process.env.TELEGRAM_GROUP_ID || "-5319438603";
+    // 2. Fallback: direct Telegram message to configured group
+    const botToken = process.env.TELEGRAM_BOT_TOKEN;
+    const groupId = process.env.TELEGRAM_GROUP_ID || process.env.TELEGRAM_CHAT_ID;
 
     if (botToken && groupId) {
       const now = new Date();

@@ -1,8 +1,8 @@
 import { MetadataRoute } from 'next'
 import { fetchLiveProducts, CATEGORIES } from '@/lib/data'
 
-export const dynamic = "force-static";
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://onepoint.kz'

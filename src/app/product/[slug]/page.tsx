@@ -6,15 +6,8 @@ import ProductCard from "@/components/ProductCard";
 import { Product, fetchLiveProductBySlug, fetchLiveProducts, formatPrice, formatGpu } from "@/lib/data";
 import { ProductTabsInteractive, ProductHeroSection } from "./ProductPageClient";
 
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
 export const dynamicParams = true;
-
-export async function generateStaticParams() {
-  const products = await fetchLiveProducts();
-  return products.map((product) => ({
-    slug: product.slug,
-  }));
-}
 
 interface Props {
   params: Promise<{ slug: string }>;

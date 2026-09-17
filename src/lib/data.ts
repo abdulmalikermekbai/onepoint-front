@@ -354,21 +354,52 @@ export async function fetchLiveProductsByFlag(flag: "is_hit" | "is_new" | "is_sa
 }
 
 export async function fetchLiveProductBySlug(slug: string): Promise<Product | null> {
+  if (!slug) return null;
+  const cleanSlug = decodeURIComponent(slug).trim();
+
+  // 1. Direct fetch by slug from PHP backend
   try {
-    const res = await fetch(productsApiUrl(`slug=${encodeURIComponent(slug)}`), getFetchOptions());
+    const res = await fetch(productsApiUrl(`slug=${encodeURIComponent(cleanSlug)}`), {
+      cache: "no-store",
+    });
     if (res.ok) {
       const data = await res.json();
-      if (data.product) {
+      if (data && data.product) {
         const normalized = normalizeDbProduct(data.product);
         saveToLiveCache([normalized], true);
         return normalized;
       }
     }
-    // If response is not ok or product not in DB (e.g. 404)
-    removeProductFromCache(slug);
   } catch (e) {
-    console.error(`Failed to fetch product by slug ${slug}:`, e);
+    console.error(`Direct fetch by slug ${cleanSlug} failed:`, e);
   }
+
+  // 2. Fallback: Search in live products list (handles slug casing, ID mappings, or momentary single-product API glitches)
+  try {
+    const allProducts = await fetchLiveProducts();
+    if (allProducts && allProducts.length > 0) {
+      const found = allProducts.find(
+        (p) =>
+          p.slug === cleanSlug ||
+          p.slug?.toLowerCase() === cleanSlug.toLowerCase() ||
+          String(p.id) === cleanSlug ||
+          `product-${p.id}` === cleanSlug
+      );
+      if (found) {
+        saveToLiveCache([found], true);
+        return found;
+      }
+    }
+  } catch (e) {
+    console.error(`Fallback product lookup failed for ${cleanSlug}:`, e);
+  }
+
+  // 3. Fallback: Cached product in browser memory
+  if (typeof window !== "undefined") {
+    const cached = getCachedProduct(cleanSlug);
+    if (cached) return cached;
+  }
+
   return null;
 }
 

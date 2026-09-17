@@ -191,17 +191,42 @@ function normalizeBrandInput(raw: string, brandList: { name: string; slug: strin
   return raw.trim();
 }
 
+function scrollToProductsTop() {
+  if (typeof window !== "undefined") {
+    const el = document.getElementById("catalog-content");
+    if (el) {
+      const rect = el.getBoundingClientRect();
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      const targetY = rect.top + scrollTop - 80;
+      if (scrollTop > targetY + 60) {
+        window.scrollTo({ top: Math.max(0, targetY), behavior: "smooth" });
+      }
+    }
+  }
+}
+
 function CatalogFilters() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // 1. Live Data
-  const [isLoading, setIsLoading] = useState(true);
-  const [productsList, setProductsList] = useState<Product[]>(PRODUCTS);
+  // 1. Live Data initialized from session cache to eliminate loading flash
+  const [productsList, setProductsList] = useState<Product[]>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const saved = sessionStorage.getItem("op_live_products");
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+      } catch (_) {}
+    }
+    return PRODUCTS;
+  });
+  const [isLoading, setIsLoading] = useState<boolean>(() => productsList.length === 0);
   const [liveBrands, setLiveBrands] = useState<{ name: string; slug: string }[]>(BRANDS);
 
   useEffect(() => {
-    setIsLoading(true);
+    if (productsList.length === 0) setIsLoading(true);
     Promise.all([fetchLiveProducts(), fetchLiveBrands()])
       .then(([list, brands]) => {
         if (list && list.length > 0) setProductsList(list);
@@ -211,7 +236,7 @@ function CatalogFilters() {
       .catch(() => {
         setIsLoading(false);
       });
-  }, []);
+  }, [productsList.length]);
 
   // 2. Active filters derived directly from searchParams (Single Source of Truth)
   const rawCat = searchParams.get("cat") || searchParams.get("category") || "";
@@ -265,7 +290,7 @@ function CatalogFilters() {
     setSearchInput(searchQuery);
   }, [searchQuery]);
 
-  // 4. Update URL params seamlessly
+  // 4. Update URL params seamlessly & scroll to products
   const updateFilters = useCallback((updates: Record<string, string | string[] | boolean | undefined | null>) => {
     const params = new URLSearchParams(searchParams.toString());
 
@@ -304,6 +329,7 @@ function CatalogFilters() {
     const qs = params.toString();
     const newUrl = qs ? `/catalog?${qs}` : `/catalog`;
     router.replace(newUrl, { scroll: false });
+    scrollToProductsTop();
   }, [router, searchParams]);
 
   const toggleCheckbox = (key: string, arr: string[], val: string) => {
@@ -323,6 +349,7 @@ function CatalogFilters() {
     setPriceMaxInput("");
     setSearchInput("");
     router.replace("/catalog", { scroll: false });
+    scrollToProductsTop();
   };
 
   // 5. Category Counts
@@ -519,7 +546,7 @@ function CatalogFilters() {
   );
 
   return (
-    <div>
+    <div id="catalog-content">
       {/* Quick Search on Catalog */}
       <div
         style={{

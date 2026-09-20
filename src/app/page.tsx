@@ -51,13 +51,22 @@ function DynamicCategoryGrid() {
         let countNum = 0;
         if (productsList.length > 0) {
           countNum = productsList.filter(p => {
-            if (cat.slug === "rtx") return p.gpu?.toLowerCase().includes("rtx") || p.cardGpu?.toLowerCase().includes("rtx");
-            if (cat.slug === "oled") return p.matrixType === "OLED" || p.display?.toLowerCase().includes("oled");
-            if (p.categories && p.categories.includes(cat.slug)) return true;
-            if (p.categorySlug === cat.slug) return true;
-            if (cat.slug === "gaming") return p.categorySlug === "gaming" || p.gpu?.toLowerCase().includes("rtx") || p.gpu?.toLowerCase().includes("gtx");
-            if (cat.slug === "office" || cat.slug === "student" || cat.slug === "business") return p.categorySlug === cat.slug || p.categorySlug === "office" || p.categorySlug === "ultrabook" || p.categorySlug === "business";
-            if (cat.slug === "designer" || cat.slug === "video" || cat.slug === "dev") return p.categorySlug === cat.slug || p.gpu?.toLowerCase().includes("rtx") || (parseInt(p.ram || "0") >= 16);
+            const catSlugNorm = (p.categorySlug || "").toLowerCase();
+            const gpuNorm = (p.gpu || "").toLowerCase();
+            const cardGpuNorm = (p.cardGpu || "").toLowerCase();
+            const displayNorm = (p.display || "").toLowerCase();
+            const matrixNorm = (p.matrixType || "").toLowerCase();
+            const pCategories = Array.isArray(p.categories)
+              ? p.categories.map(c => (typeof c === "string" ? c.toLowerCase() : "")).filter(Boolean)
+              : [];
+
+            if (cat.slug === "rtx") return gpuNorm.includes("rtx") || cardGpuNorm.includes("rtx");
+            if (cat.slug === "oled") return matrixNorm === "oled" || displayNorm.includes("oled");
+            if (pCategories.includes(cat.slug)) return true;
+            if (catSlugNorm === cat.slug) return true;
+            if (cat.slug === "gaming") return catSlugNorm === "gaming" || gpuNorm.includes("rtx") || gpuNorm.includes("gtx");
+            if (cat.slug === "office" || cat.slug === "student" || cat.slug === "business") return catSlugNorm === cat.slug || catSlugNorm === "office" || catSlugNorm === "ultrabook" || catSlugNorm === "business";
+            if (cat.slug === "designer" || cat.slug === "video" || cat.slug === "dev") return catSlugNorm === cat.slug || gpuNorm.includes("rtx") || (parseInt(p.ram || "0", 10) >= 16);
             return false;
           }).length;
         }

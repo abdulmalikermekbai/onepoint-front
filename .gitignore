@@ -38,11 +38,12 @@ Thumbs.db
 *.swp
 *.swo
 
-# Archives
+# Archives & CSV reports
 backend.zip
 *.zip
 *.tar.gz
 *.tar
+*.csv
 
 # Coverage
 coverage/

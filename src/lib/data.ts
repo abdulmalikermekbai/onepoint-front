@@ -78,7 +78,10 @@ export const BACKEND_BASE = "https://api.onepoint.kz";
 export function productImageUrl(value: unknown): string {
   const url = typeof value === "string" ? value.trim() : "";
   if (!url) return "";
-  if (url.startsWith("http://") || url.startsWith("https://") || url.startsWith("data:") || url.startsWith("blob:")) {
+  if (url.startsWith("http://")) {
+    return url.replace(/^http:\/\//i, "https://");
+  }
+  if (url.startsWith("https://") || url.startsWith("data:") || url.startsWith("blob:")) {
     return url;
   }
   const cleanPath = url.startsWith("/") ? url : `/${url}`;
@@ -189,18 +192,38 @@ export const REVIEWS = [
   { author: "Болат И.", initials: "БИ", color: "linear-gradient(135deg,#EF4444,#F87171)", product: "HP OmniBook 5", rating: 5, text: "Ноутбук для командировок — OmniBook 5 идеален. Лёгкий, быстрый, заряда хватает на весь день. Оформление и доставка — супер.", source: "2GIS" },
 ];
 
+export function detectBrand(name?: string, brand?: string): string {
+  if (brand && typeof brand === "string" && brand !== "null" && brand !== "Ноутбуки" && brand.trim()) {
+    return brand.trim();
+  }
+  const n = (name || "").toLowerCase();
+  if (n.includes("asus") || n.includes("rog") || n.includes("tuf") || n.includes("zenbook")) return "ASUS";
+  if (n.includes("lenovo") || n.includes("thinkpad") || n.includes("ideapad") || n.includes("legion") || n.includes("yoga") || n.includes("loq")) return "Lenovo";
+  if (n.includes("hp") || n.includes("omnibook") || n.includes("victus") || n.includes("omen") || n.includes("pavilion") || n.includes("probook") || n.includes("elitebook")) return "HP";
+  if (n.includes("acer") || n.includes("swift") || n.includes("nitro") || n.includes("predator") || n.includes("aspire")) return "Acer";
+  if (n.includes("msi") || n.includes("cyborg") || n.includes("vector") || n.includes("stealth") || n.includes("titan") || n.includes("raider") || n.includes("katana")) return "MSI";
+  if (n.includes("apple") || n.includes("macbook")) return "Apple";
+  if (n.includes("samsung") || n.includes("galaxy book")) return "Samsung";
+  if (n.includes("huawei") || n.includes("matebook")) return "Huawei";
+  if (n.includes("honor") || n.includes("magicbook")) return "Honor";
+  if (n.includes("dell") || n.includes("alienware") || n.includes("xps") || n.includes("latitude") || n.includes("vostro") || n.includes("inspiron")) return "Dell";
+  if (n.includes("gigabyte") || n.includes("aorus")) return "Gigabyte";
+  return "OnePoint";
+}
+
 export function normalizeDbProduct(p: any): Product {
   const price = Number(p.price) || 0;
   const oldPrice = p.old_price ? Number(p.old_price) : undefined;
   const discountPercent = (oldPrice && oldPrice > price) ? Math.round(((oldPrice - price) / oldPrice) * 100) : undefined;
   const saving = (oldPrice && oldPrice > price) ? (oldPrice - price) : undefined;
+  const brand = detectBrand(p.name, p.brand);
 
   return {
     id: Number(p.id),
     name: p.name || "",
     model: p.model || undefined,
     slug: p.slug || `product-${p.id}`,
-    brand: p.brand || "Ноутбуки",
+    brand,
     series: p.series || "",
     sku: p.sku || `OP-${p.id}`,
     categorySlug: p.category_slug || "gaming",
@@ -220,33 +243,33 @@ export function normalizeDbProduct(p: any): Product {
     isUpcoming: Number(p.is_upcoming) === 1,
     rating: Number(p.rating) || 5.0,
     reviewCount: Number(p.review_count) || 0,
-    color: p.color || "Grey",
-    weight: p.weight || "2.1 кг",
-    processor: p.processor || "Intel Core",
-    processorBrand: p.processor ? p.processor.split(" ")[0] : "Intel",
-    gpu: p.gpu || "GeForce RTX",
-    gpuBrand: p.gpu ? p.gpu.split(" ")[0] : "NVIDIA",
-    ram: p.ram || "16 ГБ",
-    storage: p.storage || "512 ГБ SSD",
-    display: p.display_size || '15.6"',
-    resolution: p.resolution || "1920×1080",
-    refreshRate: p.refresh_rate || "144 Гц",
-    matrixType: p.matrix_type || "IPS",
-    warranty: p.warranty || "1 год",
-    os: p.os || "Windows 11",
-    battery: p.battery || "60 Вт·ч",
-    wifi: p.wifi || "Wi-Fi 6",
-    bluetooth: p.bluetooth || "5.1",
-    camera: p.camera || "720p",
-    dimensions: p.dimensions || "",
-    ports: p.ports || "",
-    keyboard: p.keyboard || undefined,
-    shortDescription: p.short_description || "",
-    description: p.description || "",
-    advantages: p.advantages ? (Array.isArray(p.advantages) ? p.advantages : String(p.advantages).split("\n")) : [],
-    whyBuyText: p.why_buy_text || undefined,
-    frequentlyBoughtIds: p.frequently_bought_ids || undefined,
-    equipment: p.equipment || undefined,
+    color: p.color ? String(p.color) : "Grey",
+    weight: p.weight ? String(p.weight) : "2.1 кг",
+    processor: p.processor ? String(p.processor) : "Intel Core",
+    processorBrand: p.processor ? String(p.processor).split(" ")[0] : "Intel",
+    gpu: p.gpu ? String(p.gpu) : "GeForce RTX",
+    gpuBrand: p.gpu ? String(p.gpu).split(" ")[0] : "NVIDIA",
+    ram: p.ram ? String(p.ram) : "16 ГБ",
+    storage: p.storage ? String(p.storage) : "512 ГБ SSD",
+    display: p.display_size ? String(p.display_size) : '15.6"',
+    resolution: p.resolution ? String(p.resolution) : "1920×1080",
+    refreshRate: p.refresh_rate ? String(p.refresh_rate) : "144 Гц",
+    matrixType: p.matrix_type ? String(p.matrix_type) : "IPS",
+    warranty: p.warranty ? String(p.warranty) : "1 год",
+    os: p.os ? String(p.os) : "Windows 11",
+    battery: p.battery ? String(p.battery) : "60 Вт·ч",
+    wifi: p.wifi ? String(p.wifi) : "Wi-Fi 6",
+    bluetooth: p.bluetooth ? String(p.bluetooth) : "5.1",
+    camera: p.camera ? String(p.camera) : "720p",
+    dimensions: p.dimensions ? String(p.dimensions) : "",
+    ports: p.ports ? String(p.ports) : "",
+    keyboard: p.keyboard ? String(p.keyboard) : undefined,
+    shortDescription: p.short_description ? String(p.short_description) : "",
+    description: p.description ? String(p.description) : "",
+    advantages: p.advantages ? (Array.isArray(p.advantages) ? p.advantages.filter((a: any) => typeof a === "string") : String(p.advantages).split("\n")) : [],
+    whyBuyText: p.why_buy_text ? String(p.why_buy_text) : undefined,
+    frequentlyBoughtIds: p.frequently_bought_ids ? String(p.frequently_bought_ids) : undefined,
+    equipment: p.equipment ? String(p.equipment) : undefined,
     bgGradient: "linear-gradient(150deg,#F1E9FB,#EAE1F9)",
     svgColor1: "#5b2a86",
     svgColor2: "#ff5a1f",
@@ -266,21 +289,25 @@ export function normalizeDbProduct(p: any): Product {
       }
       return list;
     })(),
-    reviews: p.reviews || [],
-    related: p.related ? p.related.map((r: any) => normalizeDbProduct(r)) : [],
+    reviews: Array.isArray(p.reviews) ? p.reviews : [],
+    related: p.related && Array.isArray(p.related) ? p.related.map((r: any) => normalizeDbProduct(r)) : [],
     sortOrder: Number(p.sort_order) || 0,
     condition: p.product_condition || (Number(p.is_new) === 1 ? "Новый" : "Б/У"),
-    dynamicCharacteristics: p.dynamic_characteristics || [],
-    cardProcessor: p.card_processor || undefined,
-    cardGpu: p.card_gpu || undefined,
-    cardRam: p.card_ram || undefined,
-    cardStorage: p.card_storage || undefined,
-    metaTitle: p.meta_title || undefined,
-    metaDescription: p.meta_description || undefined,
-    h1: p.h1 || undefined,
-    imageAlt: p.image_alt || undefined,
-    createdAt: p.created_at || undefined,
-    categories: p.categories && Array.isArray(p.categories) ? p.categories : (p.category_slug ? [p.category_slug] : []),
+    dynamicCharacteristics: Array.isArray(p.dynamic_characteristics) ? p.dynamic_characteristics : [],
+    cardProcessor: p.card_processor ? String(p.card_processor) : undefined,
+    cardGpu: p.card_gpu ? String(p.card_gpu) : undefined,
+    cardRam: p.card_ram ? String(p.card_ram) : undefined,
+    cardStorage: p.card_storage ? String(p.card_storage) : undefined,
+    metaTitle: p.meta_title ? String(p.meta_title) : undefined,
+    metaDescription: p.meta_description ? String(p.meta_description) : undefined,
+    h1: p.h1 ? String(p.h1) : undefined,
+    imageAlt: p.image_alt ? String(p.image_alt) : undefined,
+    createdAt: p.created_at ? String(p.created_at) : undefined,
+    categories: Array.isArray(p.categories)
+      ? p.categories
+          .map((c: any) => (typeof c === "string" ? c.trim() : c && typeof c === "object" && c.slug ? String(c.slug).trim() : typeof c === "number" ? String(c) : ""))
+          .filter(Boolean)
+      : (p.category_slug ? [String(p.category_slug).trim()] : []),
   };
 }
 

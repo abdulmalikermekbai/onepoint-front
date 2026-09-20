@@ -1,9 +1,10 @@
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
 import { Product, fetchLiveProductBySlug, fetchLiveProducts, formatPrice, formatGpu } from "@/lib/data";
+import { resolveCanonicalProductSlug } from "@/lib/legacy-redirects";
 import { ProductTabsInteractive, ProductHeroSection } from "./ProductPageClient";
 
 export const dynamic = "force-dynamic";
@@ -15,7 +16,14 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<import("next").Metadata> {
   const { slug } = await params;
-  const product = await fetchLiveProductBySlug(slug);
+  let product = await fetchLiveProductBySlug(slug);
+  if (!product) {
+    const allProducts = await fetchLiveProducts();
+    const resolution = resolveCanonicalProductSlug(slug, allProducts);
+    if (resolution.canonicalSlug && resolution.canonicalSlug !== slug) {
+      product = await fetchLiveProductBySlug(resolution.canonicalSlug);
+    }
+  }
   if (!product) return {};
 
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://onepoint.kz";
@@ -60,7 +68,17 @@ export async function generateMetadata({ params }: Props): Promise<import("next"
 
 export default async function ProductPage({ params }: Props) {
   const { slug } = await params;
-  const product = await fetchLiveProductBySlug(slug);
+  let product = await fetchLiveProductBySlug(slug);
+
+  // If not found directly or slug is a legacy alias, check canonical resolver
+  if (!product || product.slug !== slug) {
+    const allProducts = await fetchLiveProducts();
+    const resolution = resolveCanonicalProductSlug(slug, allProducts);
+    if (resolution.canonicalSlug && resolution.canonicalSlug !== slug) {
+      permanentRedirect(`/product/${resolution.canonicalSlug}`);
+    }
+  }
+
   if (!product) notFound();
 
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://onepoint.kz";
@@ -112,6 +130,8 @@ export default async function ProductPage({ params }: Props) {
       `Ноутбук ${product.name} по цене ${formatPrice(product.price)} с гарантией 1 год.`,
     sku: product.sku || `OP-${product.id}`,
     mpn: product.sku || product.model || `OP-${product.id}`,
+    model: product.model || undefined,
+    category: product.categoryName || "Ноутбуки",
     brand: {
       "@type": "Brand",
       name: product.brand || "OnePoint",

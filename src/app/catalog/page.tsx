@@ -57,116 +57,134 @@ const MATRIX_TYPES = ["IPS", "OLED", "Mini-LED", "VA", "TN", "WVA"];
 
 function matchCategory(p: Product, catSlug: string): boolean {
   if (!catSlug) return true;
-  const slug = catSlug.toLowerCase();
+  const slug = String(catSlug).trim().toLowerCase();
+
+  const pCategories: string[] = Array.isArray(p.categories)
+    ? p.categories
+        .map(c => (typeof c === "string" ? c.trim().toLowerCase() : c && typeof c === "object" && (c as any).slug ? String((c as any).slug).trim().toLowerCase() : ""))
+        .filter(Boolean)
+    : [];
+  const catSlugNorm = (p.categorySlug || "").toLowerCase();
+  const catNameNorm = (p.categoryName || "").toLowerCase();
+  const brandNorm = (p.brand || "").toLowerCase();
+  const gpuNorm = (p.gpu || "").toLowerCase();
+  const cardGpuNorm = (p.cardGpu || "").toLowerCase();
+  const displayNorm = (p.display || "").toLowerCase();
+  const matrixNorm = (p.matrixType || "").toLowerCase();
+  const ramNorm = (p.ram || "").toLowerCase();
+  const procNorm = (p.processor || "").toLowerCase();
+  const weightNorm = (p.weight || "").toLowerCase();
 
   if (slug === "accessories") {
     return (
-      p.categorySlug?.toLowerCase() === "accessories" ||
-      Boolean(p.categories && p.categories.some(c => c.toLowerCase() === "accessories")) ||
-      Boolean(p.categoryName?.toLowerCase().includes("аксессуар")) ||
-      Boolean(p.categoryName?.toLowerCase().includes("мышь")) ||
-      Boolean(p.categoryName?.toLowerCase().includes("сумк"))
+      catSlugNorm === "accessories" ||
+      pCategories.includes("accessories") ||
+      catNameNorm.includes("аксессуар") ||
+      catNameNorm.includes("мышь") ||
+      catNameNorm.includes("сумк")
     );
   }
   if (slug === "rtx") {
-    return Boolean(p.gpu?.toUpperCase().includes("RTX") || p.cardGpu?.toUpperCase().includes("RTX"));
+    return gpuNorm.includes("rtx") || cardGpuNorm.includes("rtx");
   }
   if (slug === "oled") {
-    return p.matrixType?.toLowerCase() === "oled" || Boolean(p.display?.toLowerCase().includes("oled"));
+    return matrixNorm === "oled" || displayNorm.includes("oled");
   }
   if (slug === "macbook") {
-    return p.brand?.toLowerCase() === "apple" || p.categorySlug?.toLowerCase() === "macbook" || Boolean(p.categories?.includes("macbook"));
+    return brandNorm === "apple" || catSlugNorm === "macbook" || pCategories.includes("macbook");
   }
   if (slug === "designer") {
     return (
-      p.categorySlug === "designer" ||
-      Boolean(p.categories && p.categories.includes("designer")) ||
-      Boolean(p.matrixType?.toLowerCase() === "oled") ||
-      Boolean(p.gpu?.toUpperCase().includes("RTX")) ||
-      Boolean(p.ram?.includes("16")) ||
-      Boolean(p.ram?.includes("32"))
+      catSlugNorm === "designer" ||
+      pCategories.includes("designer") ||
+      matrixNorm === "oled" ||
+      gpuNorm.includes("rtx") ||
+      ramNorm.includes("16") ||
+      ramNorm.includes("32")
     );
   }
   if (slug === "dev" || slug === "programmer") {
     return (
-      p.categorySlug === "dev" ||
-      p.categorySlug === "programmer" ||
-      Boolean(p.categories && (p.categories.includes("dev") || p.categories.includes("programmer"))) ||
-      Boolean(p.ram?.includes("16")) ||
-      Boolean(p.ram?.includes("32")) ||
-      Boolean(p.ram?.includes("64")) ||
-      Boolean(p.processor?.includes("Core i7")) ||
-      Boolean(p.processor?.includes("Core i9")) ||
-      Boolean(p.processor?.includes("Ryzen 7")) ||
-      Boolean(p.processor?.includes("Ryzen 9")) ||
-      Boolean(p.processor?.includes("Ultra"))
+      catSlugNorm === "dev" ||
+      catSlugNorm === "programmer" ||
+      pCategories.includes("dev") ||
+      pCategories.includes("programmer") ||
+      ramNorm.includes("16") ||
+      ramNorm.includes("32") ||
+      ramNorm.includes("64") ||
+      procNorm.includes("core i7") ||
+      procNorm.includes("core i9") ||
+      procNorm.includes("ryzen 7") ||
+      procNorm.includes("ryzen 9") ||
+      procNorm.includes("ultra")
     );
   }
   if (slug === "student") {
     return (
-      p.categorySlug === "student" ||
-      Boolean(p.categories && p.categories.includes("student")) ||
-      p.categorySlug === "office" ||
-      p.categorySlug === "ultrabook"
+      catSlugNorm === "student" ||
+      pCategories.includes("student") ||
+      catSlugNorm === "office" ||
+      catSlugNorm === "ultrabook"
     );
   }
   if (slug === "office") {
     return (
-      p.categorySlug === "office" ||
-      Boolean(p.categories && p.categories.includes("office")) ||
-      p.categorySlug === "ultrabook" ||
-      p.categorySlug === "business" ||
-      p.categorySlug === "student"
+      catSlugNorm === "office" ||
+      pCategories.includes("office") ||
+      catSlugNorm === "ultrabook" ||
+      catSlugNorm === "business" ||
+      catSlugNorm === "student"
     );
   }
   if (slug === "ultrabook") {
     return (
-      p.categorySlug === "ultrabook" ||
-      Boolean(p.categories && p.categories.includes("ultrabook")) ||
-      Boolean(p.weight && (p.weight.includes("1.") || p.weight.includes("0."))) ||
-      p.categorySlug === "office"
+      catSlugNorm === "ultrabook" ||
+      pCategories.includes("ultrabook") ||
+      weightNorm.includes("1.") ||
+      weightNorm.includes("0.") ||
+      catSlugNorm === "office"
     );
   }
   if (slug === "gaming") {
     return (
-      p.categorySlug === "gaming" ||
-      Boolean(p.categories && p.categories.includes("gaming")) ||
-      Boolean(p.gpu?.toUpperCase().includes("RTX")) ||
-      Boolean(p.gpu?.toUpperCase().includes("GTX")) ||
-      Boolean(p.gpu?.toLowerCase().includes("radeon rx"))
+      catSlugNorm === "gaming" ||
+      pCategories.includes("gaming") ||
+      gpuNorm.includes("rtx") ||
+      gpuNorm.includes("gtx") ||
+      gpuNorm.includes("radeon rx")
     );
   }
   if (slug === "video") {
     return (
-      p.categorySlug === "video" ||
-      Boolean(p.categories && p.categories.includes("video")) ||
-      Boolean(p.gpu?.toUpperCase().includes("RTX")) ||
-      Boolean(p.cardGpu?.toUpperCase().includes("RTX")) ||
-      Boolean(p.gpu?.toLowerCase().includes("radeon rx")) ||
-      Boolean(p.ram?.includes("16")) ||
-      Boolean(p.ram?.includes("32")) ||
-      Boolean(p.ram?.includes("64")) ||
-      Boolean(p.processor?.includes("Core i7")) ||
-      Boolean(p.processor?.includes("Core i9")) ||
-      Boolean(p.processor?.includes("Ryzen 7")) ||
-      Boolean(p.processor?.includes("Ryzen 9")) ||
-      Boolean(p.processor?.includes("Ultra")) ||
-      Boolean(p.processor?.includes("Apple M"))
+      catSlugNorm === "video" ||
+      pCategories.includes("video") ||
+      gpuNorm.includes("rtx") ||
+      cardGpuNorm.includes("rtx") ||
+      gpuNorm.includes("radeon rx") ||
+      ramNorm.includes("16") ||
+      ramNorm.includes("32") ||
+      ramNorm.includes("64") ||
+      procNorm.includes("core i7") ||
+      procNorm.includes("core i9") ||
+      procNorm.includes("ryzen 7") ||
+      procNorm.includes("ryzen 9") ||
+      procNorm.includes("ultra") ||
+      procNorm.includes("apple m")
     );
   }
   if (slug === "business") {
     return (
-      p.categorySlug === "business" ||
-      Boolean(p.categories && p.categories.includes("business")) ||
-      p.categorySlug === "office"
+      catSlugNorm === "business" ||
+      pCategories.includes("business") ||
+      catSlugNorm === "office"
     );
   }
 
   return (
-    p.categorySlug?.toLowerCase() === slug ||
-    Boolean(p.categories && p.categories.some(c => c.toLowerCase() === slug)) ||
-    p.categoryName?.toLowerCase() === slug ||
-    Boolean(p.categoryName?.toLowerCase().includes(slug))
+    catSlugNorm === slug ||
+    pCategories.includes(slug) ||
+    catNameNorm === slug ||
+    catNameNorm.includes(slug)
   );
 }
 
@@ -369,8 +387,9 @@ function CatalogFilters() {
   const brandCounts = useMemo(() => {
     const counts: Record<string, number> = {};
     liveBrands.forEach(b => {
+      const bTarget = (b.name || "").toLowerCase();
       counts[b.name] = productsList.filter(
-        p => p.brand?.toLowerCase() === b.name.toLowerCase()
+        p => (p.brand || "").toLowerCase() === bTarget
       ).length;
     });
     return counts;
@@ -380,20 +399,19 @@ function CatalogFilters() {
   const filtered = useMemo(() => {
     let result = [...productsList];
 
-    const currentSearch = searchInput.trim() || searchQuery.trim();
+    const currentSearch = (searchInput.trim() || searchQuery.trim()).toLowerCase();
     if (currentSearch) {
-      const q = currentSearch.toLowerCase();
       result = result.filter(p =>
-        p.name?.toLowerCase().includes(q) ||
-        p.brand?.toLowerCase().includes(q) ||
-        p.model?.toLowerCase().includes(q) ||
-        p.series?.toLowerCase().includes(q) ||
-        p.sku?.toLowerCase().includes(q) ||
-        p.processor?.toLowerCase().includes(q) ||
-        p.gpu?.toLowerCase().includes(q) ||
-        p.categoryName?.toLowerCase().includes(q) ||
-        p.cardProcessor?.toLowerCase().includes(q) ||
-        p.cardGpu?.toLowerCase().includes(q)
+        (p.name || "").toLowerCase().includes(currentSearch) ||
+        (p.brand || "").toLowerCase().includes(currentSearch) ||
+        (p.model || "").toLowerCase().includes(currentSearch) ||
+        (p.series || "").toLowerCase().includes(currentSearch) ||
+        (p.sku || "").toLowerCase().includes(currentSearch) ||
+        (p.processor || "").toLowerCase().includes(currentSearch) ||
+        (p.gpu || "").toLowerCase().includes(currentSearch) ||
+        (p.categoryName || "").toLowerCase().includes(currentSearch) ||
+        (p.cardProcessor || "").toLowerCase().includes(currentSearch) ||
+        (p.cardGpu || "").toLowerCase().includes(currentSearch)
       );
     }
 
@@ -402,7 +420,8 @@ function CatalogFilters() {
     }
 
     if (brand) {
-      result = result.filter(p => p.brand?.toLowerCase() === brand.toLowerCase());
+      const bTarget = brand.toLowerCase();
+      result = result.filter(p => (p.brand || "").toLowerCase() === bTarget);
     }
 
     if (priceMin) {
@@ -418,9 +437,13 @@ function CatalogFilters() {
     if (selectedProcs.length) {
       result = result.filter(p =>
         selectedProcs.some(
-          proc =>
-            p.processor?.toLowerCase().includes(proc.toLowerCase()) ||
-            p.cardProcessor?.toLowerCase().includes(proc.toLowerCase())
+          proc => {
+            const pTarget = proc.toLowerCase();
+            return (
+              (p.processor || "").toLowerCase().includes(pTarget) ||
+              (p.cardProcessor || "").toLowerCase().includes(pTarget)
+            );
+          }
         )
       );
     }
@@ -428,9 +451,13 @@ function CatalogFilters() {
     if (selectedGPUs.length) {
       result = result.filter(p =>
         selectedGPUs.some(
-          g =>
-            p.gpu?.toLowerCase().includes(g.toLowerCase()) ||
-            p.cardGpu?.toLowerCase().includes(g.toLowerCase())
+          g => {
+            const gTarget = g.toLowerCase();
+            return (
+              (p.gpu || "").toLowerCase().includes(gTarget) ||
+              (p.cardGpu || "").toLowerCase().includes(gTarget)
+            );
+          }
         )
       );
     }
@@ -438,9 +465,13 @@ function CatalogFilters() {
     if (selectedRAMs.length) {
       result = result.filter(p =>
         selectedRAMs.some(
-          r =>
-            p.ram?.toLowerCase().includes(r.toLowerCase()) ||
-            p.cardRam?.toLowerCase().includes(r.toLowerCase())
+          r => {
+            const rTarget = r.toLowerCase();
+            return (
+              (p.ram || "").toLowerCase().includes(rTarget) ||
+              (p.cardRam || "").toLowerCase().includes(rTarget)
+            );
+          }
         )
       );
     }
@@ -449,8 +480,8 @@ function CatalogFilters() {
       result = result.filter(p =>
         selectedDisplays.some(
           d =>
-            p.display?.includes(d.replace("\"", "")) ||
-            p.display?.includes(d)
+            (p.display || "").includes(d.replace("\"", "")) ||
+            (p.display || "").includes(d)
         )
       );
     }
@@ -459,15 +490,15 @@ function CatalogFilters() {
       result = result.filter(p =>
         selectedHz.some(
           hz =>
-            p.refreshRate?.toLowerCase().includes(hz.toLowerCase()) ||
-            p.refreshRate?.includes(hz.replace(" Гц", ""))
+            (p.refreshRate || "").toLowerCase().includes(hz.toLowerCase()) ||
+            (p.refreshRate || "").includes(hz.replace(" Гц", ""))
         )
       );
     }
 
     if (selectedMatrix.length) {
       result = result.filter(p =>
-        selectedMatrix.some(m => p.matrixType?.toLowerCase() === m.toLowerCase())
+        selectedMatrix.some(m => (p.matrixType || "").toLowerCase() === (m || "").toLowerCase())
       );
     }
 

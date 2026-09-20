@@ -20,8 +20,12 @@ export async function generateMetadata({ params }: Props): Promise<import("next"
   if (!product) {
     const allProducts = await fetchLiveProducts();
     const resolution = resolveCanonicalProductSlug(slug, allProducts);
-    if (resolution.canonicalSlug && resolution.canonicalSlug !== slug) {
-      product = await fetchLiveProductBySlug(resolution.canonicalSlug);
+    if (resolution.canonicalSlug) {
+      if (resolution.canonicalSlug !== slug) {
+        product = await fetchLiveProductBySlug(resolution.canonicalSlug);
+      } else {
+        product = allProducts.find(p => p.slug === resolution.canonicalSlug) || null;
+      }
     }
   }
   if (!product) return {};
@@ -70,13 +74,30 @@ export default async function ProductPage({ params }: Props) {
   const { slug } = await params;
   let product = await fetchLiveProductBySlug(slug);
 
-  // If not found directly or slug is a legacy alias, check canonical resolver
+  // If not found directly or slug needs canonical alias resolution
   if (!product || product.slug !== slug) {
     const allProducts = await fetchLiveProducts();
     const resolution = resolveCanonicalProductSlug(slug, allProducts);
     if (resolution.canonicalSlug && resolution.canonicalSlug !== slug) {
       permanentRedirect(`/product/${resolution.canonicalSlug}`);
     }
+    if (!product && resolution.canonicalSlug) {
+      product = allProducts.find(p => p.slug === resolution.canonicalSlug) || (await fetchLiveProductBySlug(resolution.canonicalSlug));
+    }
+  }
+
+  // Final fallback lookup across active products catalog
+  if (!product) {
+    const allProducts = await fetchLiveProducts();
+    const clean = decodeURIComponent(slug).trim().toLowerCase();
+    product = allProducts.find(
+      p =>
+        p.slug?.toLowerCase() === clean ||
+        String(p.id) === clean ||
+        `product-${p.id}` === clean ||
+        (p.sku && p.sku.toLowerCase() === clean) ||
+        (p.model && p.model.toLowerCase() === clean)
+    ) || null;
   }
 
   if (!product) notFound();

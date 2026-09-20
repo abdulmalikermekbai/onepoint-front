@@ -37,7 +37,8 @@ export const KNOWN_SLUG_REDIRECTS: Record<string, string> = {
   "msi-raider-a18-hx-amd-ryzen-9-9955hx3d-32gb-2tb-rtx-5080-18-4k-uhd-mini-led-120hz": "msi-raider-a18-ultra9-285hx-32gb-rtx5080",
   "msi-stealth-a16-ai-amd-ryzen-ai-9-hx-370-32gb-2tb-rtx-5080-160-qhd-25k-oled-240hz": "msi-stealth-18-hx-ai-ultra9-64gb-rtx5080",
   "xiaomi-redmibook-14-enhanced-edition-i7-10510u8gb512gbmx250": "acer-swift-go-16-sfg16-72-5844",
-  "xiaomi-mi-notebook-air-133-core-i5-8250u256gb8gbmx150": "acer-swift-neo-sfn14-54h-ultra5-115u"
+  "xiaomi-mi-notebook-air-133-core-i5-8250u256gb8gbmx150": "acer-swift-neo-sfn14-54h-ultra5-115u",
+  "lenovo-slim-7i-aura-edition-15-wuxga-60hz-core-ultra-7-258v-16gb-512gb-ssd-intel-arc-140v-win-11-home": "lenovo-slim-7i-aura-edition-14-wuxga-60hz-core-ultra-7-256v-16gb-512gb-ssd-intel-arc-140v-win-11-home"
 };
 
 /**
@@ -108,7 +109,7 @@ export function resolveCanonicalProductSlug(
         if (pTokens.includes(token)) overlap++;
       }
       const score = overlap / Math.max(slugTokens.length, 1);
-      if (score >= 0.55 && score > bestScore) {
+      if (score >= 0.45 && score > bestScore) {
         bestScore = score;
         candidate = p;
       }

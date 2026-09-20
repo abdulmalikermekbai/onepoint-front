@@ -401,16 +401,19 @@ export async function fetchLiveProductBySlug(slug: string): Promise<Product | nu
     console.error(`Direct fetch by slug ${cleanSlug} failed:`, e);
   }
 
-  // 2. Fallback: Search in live products list (handles slug casing, ID mappings, or momentary single-product API glitches)
+  // 2. Fallback: Search in live products list (handles slug casing, ID mappings, SKU/model, or momentary single-product API glitches)
   try {
     const allProducts = await fetchLiveProducts();
     if (allProducts && allProducts.length > 0) {
+      const lowerClean = cleanSlug.toLowerCase();
       const found = allProducts.find(
         (p) =>
           p.slug === cleanSlug ||
-          p.slug?.toLowerCase() === cleanSlug.toLowerCase() ||
+          (p.slug && p.slug.toLowerCase() === lowerClean) ||
           String(p.id) === cleanSlug ||
-          `product-${p.id}` === cleanSlug
+          `product-${p.id}` === lowerClean ||
+          (p.sku && p.sku.toLowerCase() === lowerClean) ||
+          (p.model && p.model.toLowerCase().replace(/[^a-z0-9]+/g, "-") === lowerClean)
       );
       if (found) {
         saveToLiveCache([found], true);

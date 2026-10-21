@@ -388,10 +388,10 @@ export async function fetchLiveProducts(forceRefresh = false): Promise<Product[]
         if (!res.ok) return [];
         const data = await res.json();
         if (Array.isArray(data.products)) {
-          const normalized = data.products.map(normalizeDbProduct);
+          const normalized: Product[] = data.products.map(normalizeDbProduct);
           saveToLiveCache(normalized);
           // Pre-populate individual product caches for instant slug/id lookups
-          normalized.forEach((p) => {
+          normalized.forEach((p: Product) => {
             if (p.slug) {
               memoryCache.set(`product:${p.slug.toLowerCase()}`, { data: p, timestamp: Date.now() });
             }

@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { fetchLiveProducts } from "@/lib/data";
 import { resolveCanonicalProductSlug } from "@/lib/legacy-redirects";
 
-export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
   const slug = request.nextUrl.searchParams.get("slug");

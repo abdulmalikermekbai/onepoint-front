@@ -10,8 +10,10 @@ export async function POST(req: NextRequest) {
     if (!email || !email.includes("@")) {
       return NextResponse.json({ error: "Invalid email" }, { status: 400 });
     }
-    // MySQL equivalent of INSERT IGNORE — update nothing on duplicate email
-    await db.insert(newsletter).values({ email }).onDuplicateKeyUpdate({ set: { email } });
+    if (db) {
+      // MySQL equivalent of INSERT IGNORE — update nothing on duplicate email
+      await db.insert(newsletter).values({ email }).onDuplicateKeyUpdate({ set: { email } });
+    }
     return NextResponse.json({ ok: true });
   } catch {
     return NextResponse.json({ ok: true }); // graceful fallback

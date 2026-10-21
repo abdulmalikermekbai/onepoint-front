@@ -26,19 +26,21 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: false, error: "Слишком короткий номер телефона" }, { status: 400 });
     }
 
-    // Save lead to local database if database connection is available
-    try {
-      await db.insert(leads).values({
-        type,
-        productId: productId || null,
-        productName: productName || null,
-        name: name || null,
-        phone: phone || null,
-        email: email || null,
-        message: message || null,
-      });
-    } catch {
-      // Ignore database save errors if database server is offline
+    // Save lead to database only if database connection is configured
+    if (db) {
+      try {
+        await db.insert(leads).values({
+          type,
+          productId: productId || null,
+          productName: productName || null,
+          name: name || null,
+          phone: phone || null,
+          email: email || null,
+          message: message || null,
+        });
+      } catch {
+        // Ignore database save errors if database server is offline
+      }
     }
 
     // 1. Forward lead to main PHP backend API (which creates DB record & sends message to group -5319438603 with inline buttons)

@@ -11,13 +11,21 @@ export async function apiRequest<T>(
 ): Promise<T> {
   const url = `${BACKEND_API_BASE}/${endpoint.replace(/^\//, "")}`;
 
+  const isGet = !options?.method || options.method.toUpperCase() === "GET";
+  const defaultCacheOptions: RequestInit =
+    typeof window === "undefined" && isGet
+      ? { next: { revalidate: 60 } }
+      : isGet
+      ? {}
+      : { cache: "no-store" };
+
   const res = await fetch(url, {
     headers: {
       "Content-Type": "application/json",
       Accept: "application/json",
       ...(options?.headers || {}),
     },
-    cache: "no-store",
+    ...defaultCacheOptions,
     ...options,
   });
 

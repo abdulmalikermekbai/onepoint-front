@@ -1,7 +1,7 @@
 import { permanentRedirect } from "next/navigation";
 import { CATEGORIES } from "@/lib/data";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 86400;
 
 interface Props {
   params: Promise<{ slug: string }>;

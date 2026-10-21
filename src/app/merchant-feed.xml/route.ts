@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
 import { fetchLiveProducts, formatPrice } from "@/lib/data";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 300;
+export const revalidate = 1800; // 30 minutes cache for Google Merchant crawler
 
 function escapeXml(unsafe: string | number | undefined | null): string {
   if (unsafe === undefined || unsafe === null) return "";
@@ -122,7 +121,7 @@ ${itemsXml}
   return new NextResponse(xml, {
     headers: {
       "Content-Type": "application/xml; charset=utf-8",
-      "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600",
+      "Cache-Control": "public, max-age=1800, s-maxage=1800, stale-while-revalidate=86400",
     },
   });
 }

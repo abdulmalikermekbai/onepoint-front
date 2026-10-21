@@ -92,14 +92,14 @@ export function productImageUrl(value: unknown): string {
  * PHP API выдаёт CORS-заголовки, поэтому используем его напрямую и в браузере.
  * Это не зависит от TLS-прокси Vercel, который не принимает сертификат API.
  */
-function productsApiUrl(query = ""): string {
+function productsApiUrl(query = "", forceRefresh = false): string {
   const isBrowser = typeof window !== "undefined";
   const base = `${!isBrowser
     ? (process.env.BACKEND_API_URL || "https://api.onepoint.kz")
     : "https://api.onepoint.kz"}/api/products.php`;
 
   const params = new URLSearchParams(query);
-  if (isBrowser) {
+  if (forceRefresh) {
     params.set("_t", Date.now().toString());
   }
   const qs = params.toString();
@@ -108,6 +108,55 @@ function productsApiUrl(query = ""): string {
 
 // In-memory and sessionStorage cache for zero-delay price loading
 const liveCache: Map<string, Product> = new Map();
+
+// High-performance server & client in-memory cache with TTL and promise coalescing
+interface CacheRecord<T> {
+  data: T;
+  timestamp: number;
+}
+const memoryCache = new Map<string, CacheRecord<any>>();
+const inFlightRequests = new Map<string, Promise<any>>();
+
+export const TTL_PRODUCTS = 2 * 60 * 1000;       // 2 minutes
+export const TTL_PRODUCT_SINGLE = 2 * 60 * 1000; // 2 minutes
+export const TTL_BRANDS = 10 * 60 * 1000;        // 10 minutes
+export const TTL_SETTINGS = 5 * 60 * 1000;       // 5 minutes
+export const TTL_REVIEWS = 5 * 60 * 1000;        // 5 minutes
+
+async function cachedFetch<T>(
+  key: string,
+  ttlMs: number,
+  fetcher: () => Promise<T>,
+  forceRefresh = false
+): Promise<T> {
+  if (!forceRefresh) {
+    const cached = memoryCache.get(key);
+    if (cached && Date.now() - cached.timestamp < ttlMs) {
+      return cached.data as T;
+    }
+  }
+
+  // Request coalescing: reuse active promise to prevent duplicate concurrent network queries
+  const inFlight = inFlightRequests.get(key);
+  if (inFlight) {
+    return inFlight as Promise<T>;
+  }
+
+  const promise = (async () => {
+    try {
+      const data = await fetcher();
+      if (data !== undefined && data !== null) {
+        memoryCache.set(key, { data, timestamp: Date.now() });
+      }
+      return data;
+    } finally {
+      inFlightRequests.delete(key);
+    }
+  })();
+
+  inFlightRequests.set(key, promise);
+  return promise;
+}
 
 function saveToLiveCache(products: Product[], appendOnly = false) {
   if (typeof window === "undefined") return;
@@ -125,8 +174,9 @@ function saveToLiveCache(products: Product[], appendOnly = false) {
 }
 
 export function removeProductFromCache(slugOrId: string | number) {
+  const key = String(slugOrId).toLowerCase();
+  memoryCache.delete(`product:${key}`);
   if (typeof window === "undefined") return;
-  const key = String(slugOrId);
   liveCache.delete(key);
   try {
     const saved = sessionStorage.getItem("op_live_products");
@@ -321,155 +371,203 @@ export function formatGpu(gpu?: string): string {
   return cleaned || gpu;
 }
 
-function getFetchOptions(): RequestInit {
+function getFetchOptions(revalidateSeconds = 60): RequestInit {
   if (typeof window !== "undefined") {
-    // In browser, the URL already includes anti-cache timestamp (?_t=...).
-    // Do NOT send custom Cache-Control request headers to prevent CORS preflight blocks.
     return {};
   }
-  return { next: { revalidate: 60 } };
+  return { next: { revalidate: revalidateSeconds } };
 }
 
-export async function fetchLiveProducts(): Promise<Product[]> {
-  try {
-    const res = await fetch(productsApiUrl(), getFetchOptions());
-    if (!res.ok) return [];
-    const data = await res.json();
-    if (Array.isArray(data.products)) {
-      const normalized = data.products.map(normalizeDbProduct);
-      saveToLiveCache(normalized);
-      return normalized;
-    }
-  } catch (e) {
-    console.error("Failed to fetch live products:", e);
-  }
-  return [];
+export async function fetchLiveProducts(forceRefresh = false): Promise<Product[]> {
+  return cachedFetch(
+    "products:all",
+    TTL_PRODUCTS,
+    async () => {
+      try {
+        const res = await fetch(productsApiUrl("", forceRefresh), getFetchOptions(120));
+        if (!res.ok) return [];
+        const data = await res.json();
+        if (Array.isArray(data.products)) {
+          const normalized = data.products.map(normalizeDbProduct);
+          saveToLiveCache(normalized);
+          // Pre-populate individual product caches for instant slug/id lookups
+          normalized.forEach((p) => {
+            if (p.slug) {
+              memoryCache.set(`product:${p.slug.toLowerCase()}`, { data: p, timestamp: Date.now() });
+            }
+            if (p.id) {
+              memoryCache.set(`product:${p.id}`, { data: p, timestamp: Date.now() });
+            }
+          });
+          return normalized;
+        }
+      } catch (e) {
+        console.error("Failed to fetch live products:", e);
+      }
+      return [];
+    },
+    forceRefresh
+  );
 }
 
-export async function fetchLiveBrands(): Promise<{name: string, slug: string}[]> {
-  try {
-    const res = await fetch(productsApiUrl("brands=1"), getFetchOptions());
-    if (!res.ok) return [];
-    const data = await res.json();
-    if (Array.isArray(data.brands)) {
-      return data.brands.map((b: any) => ({
-        name: b.name,
-        slug: b.slug || b.name.toLowerCase()
-      }));
-    }
-  } catch (e) {
-    console.error("Failed to fetch live brands:", e);
-  }
-  return [];
+export async function fetchLiveBrands(forceRefresh = false): Promise<{name: string, slug: string}[]> {
+  return cachedFetch(
+    "brands:all",
+    TTL_BRANDS,
+    async () => {
+      try {
+        const res = await fetch(productsApiUrl("brands=1", forceRefresh), getFetchOptions(600));
+        if (!res.ok) return [];
+        const data = await res.json();
+        if (Array.isArray(data.brands)) {
+          return data.brands.map((b: any) => ({
+            name: b.name,
+            slug: b.slug || b.name.toLowerCase()
+          }));
+        }
+      } catch (e) {
+        console.error("Failed to fetch live brands:", e);
+      }
+      return [];
+    },
+    forceRefresh
+  );
 }
 
-export async function fetchLiveProductsByFlag(flag: "is_hit" | "is_new" | "is_sale"): Promise<Product[]> {
-  try {
-    const apiFlag = flag.replace(/^is_/, "");
-    const res = await fetch(productsApiUrl(`${apiFlag}=1`), getFetchOptions());
-    if (!res.ok) return [];
-    const data = await res.json();
-    if (Array.isArray(data.products)) {
-      const normalized = data.products.map(normalizeDbProduct);
-      saveToLiveCache(normalized);
-      return normalized;
-    }
-  } catch (e) {
-    console.error(`Failed to fetch live products by flag ${flag}:`, e);
-  }
-  return [];
+export async function fetchLiveProductsByFlag(flag: "is_hit" | "is_new" | "is_sale", forceRefresh = false): Promise<Product[]> {
+  return cachedFetch(
+    `products:flag:${flag}`,
+    TTL_PRODUCTS,
+    async () => {
+      try {
+        const apiFlag = flag.replace(/^is_/, "");
+        const res = await fetch(productsApiUrl(`${apiFlag}=1`, forceRefresh), getFetchOptions(120));
+        if (!res.ok) return [];
+        const data = await res.json();
+        if (Array.isArray(data.products)) {
+          const normalized = data.products.map(normalizeDbProduct);
+          saveToLiveCache(normalized, true);
+          return normalized;
+        }
+      } catch (e) {
+        console.error(`Failed to fetch live products by flag ${flag}:`, e);
+      }
+      return [];
+    },
+    forceRefresh
+  );
 }
 
-export async function fetchLiveProductBySlug(slug: string): Promise<Product | null> {
+export async function fetchLiveProductBySlug(slug: string, forceRefresh = false): Promise<Product | null> {
   if (!slug) return null;
   const cleanSlug = decodeURIComponent(slug).trim();
+  const cacheKey = `product:${cleanSlug.toLowerCase()}`;
 
-  // 1. Direct fetch by slug from PHP backend
-  try {
-    const res = await fetch(productsApiUrl(`slug=${encodeURIComponent(cleanSlug)}`), {
-      cache: "no-store",
-    });
-    if (res.ok) {
-      const data = await res.json();
-      if (data && data.product) {
-        const normalized = normalizeDbProduct(data.product);
-        saveToLiveCache([normalized], true);
-        return normalized;
+  return cachedFetch(
+    cacheKey,
+    TTL_PRODUCT_SINGLE,
+    async () => {
+      // 1. Direct fetch by slug from PHP backend with 2 min ISR revalidation
+      try {
+        const res = await fetch(productsApiUrl(`slug=${encodeURIComponent(cleanSlug)}`, forceRefresh), getFetchOptions(120));
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.product) {
+            const normalized = normalizeDbProduct(data.product);
+            saveToLiveCache([normalized], true);
+            return normalized;
+          }
+        }
+      } catch (e) {
+        console.error(`Direct fetch by slug ${cleanSlug} failed:`, e);
       }
-    }
-  } catch (e) {
-    console.error(`Direct fetch by slug ${cleanSlug} failed:`, e);
-  }
 
-  // 2. Fallback: Search in live products list (handles slug casing, ID mappings, SKU/model, or momentary single-product API glitches)
-  try {
-    const allProducts = await fetchLiveProducts();
-    if (allProducts && allProducts.length > 0) {
-      const lowerClean = cleanSlug.toLowerCase();
-      const found = allProducts.find(
-        (p) =>
-          p.slug === cleanSlug ||
-          (p.slug && p.slug.toLowerCase() === lowerClean) ||
-          String(p.id) === cleanSlug ||
-          `product-${p.id}` === lowerClean ||
-          (p.sku && p.sku.toLowerCase() === lowerClean) ||
-          (p.model && p.model.toLowerCase().replace(/[^a-z0-9]+/g, "-") === lowerClean)
-      );
-      if (found) {
-        saveToLiveCache([found], true);
-        return found;
+      // 2. Fallback: Search in live products list (uses in-memory cached catalog)
+      try {
+        const allProducts = await fetchLiveProducts();
+        if (allProducts && allProducts.length > 0) {
+          const lowerClean = cleanSlug.toLowerCase();
+          const found = allProducts.find(
+            (p) =>
+              p.slug === cleanSlug ||
+              (p.slug && p.slug.toLowerCase() === lowerClean) ||
+              String(p.id) === cleanSlug ||
+              `product-${p.id}` === lowerClean ||
+              (p.sku && p.sku.toLowerCase() === lowerClean) ||
+              (p.model && p.model.toLowerCase().replace(/[^a-z0-9]+/g, "-") === lowerClean)
+          );
+          if (found) {
+            saveToLiveCache([found], true);
+            return found;
+          }
+        }
+      } catch (e) {
+        console.error(`Fallback product lookup failed for ${cleanSlug}:`, e);
       }
-    }
-  } catch (e) {
-    console.error(`Fallback product lookup failed for ${cleanSlug}:`, e);
-  }
 
-  // 3. Fallback: Cached product in browser memory
-  if (typeof window !== "undefined") {
-    const cached = getCachedProduct(cleanSlug);
-    if (cached) return cached;
-  }
+      // 3. Fallback: Cached product in browser memory
+      if (typeof window !== "undefined") {
+        const cached = getCachedProduct(cleanSlug);
+        if (cached) return cached;
+      }
 
-  return null;
+      return null;
+    },
+    forceRefresh
+  );
 }
 
-export async function fetchSettings(): Promise<Record<string, string>> {
-  try {
-    const isBrowser = typeof window !== "undefined";
-    const base = `${!isBrowser
-      ? (process.env.BACKEND_API_URL || "https://api.onepoint.kz")
-      : "https://api.onepoint.kz"}/api/settings.php${isBrowser ? `?_t=${Date.now()}` : ""}`;
-    const res = await fetch(base, getFetchOptions());
-    if (res.ok) {
-      const data = await res.json();
-      return data.settings || {};
-    }
-  } catch (e) {
-    console.error(`Failed to fetch settings:`, e);
-  }
-  return {};
+export async function fetchSettings(forceRefresh = false): Promise<Record<string, string>> {
+  return cachedFetch(
+    "settings:all",
+    TTL_SETTINGS,
+    async () => {
+      try {
+        const isBrowser = typeof window !== "undefined";
+        const base = `${!isBrowser
+          ? (process.env.BACKEND_API_URL || "https://api.onepoint.kz")
+          : "https://api.onepoint.kz"}/api/settings.php${forceRefresh ? `?_t=${Date.now()}` : ""}`;
+        const res = await fetch(base, getFetchOptions(300));
+        if (res.ok) {
+          const data = await res.json();
+          return data.settings || {};
+        }
+      } catch (e) {
+        console.error(`Failed to fetch settings:`, e);
+      }
+      return {};
+    },
+    forceRefresh
+  );
 }
 
 export function formatPrice(price: number): string {
   return price.toLocaleString("ru-KZ") + " ₸";
 }
 
-export async function fetchLiveReviews(): Promise<any[]> {
-  try {
-    const isBrowser = typeof window !== "undefined";
-    const base = `${!isBrowser
-      ? (process.env.BACKEND_API_URL || "https://api.onepoint.kz")
-      : "https://api.onepoint.kz"}/api/products.php?reviews=1${isBrowser ? `&_t=${Date.now()}` : ""}`;
-    const res = await fetch(base, getFetchOptions());
-    if (res.ok) {
-      const data = await res.json();
-      if (Array.isArray(data.reviews) && data.reviews.length > 0) {
-        return data.reviews;
+export async function fetchLiveReviews(forceRefresh = false): Promise<any[]> {
+  return cachedFetch(
+    "reviews:all",
+    TTL_REVIEWS,
+    async () => {
+      try {
+        const isBrowser = typeof window !== "undefined";
+        const base = `${!isBrowser
+          ? (process.env.BACKEND_API_URL || "https://api.onepoint.kz")
+          : "https://api.onepoint.kz"}/api/products.php?reviews=1${forceRefresh ? `&_t=${Date.now()}` : ""}`;
+        const res = await fetch(base, getFetchOptions(300));
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data.reviews) && data.reviews.length > 0) {
+            return data.reviews;
+          }
+        }
+      } catch (e) {
+        console.error(`Failed to fetch live reviews:`, e);
       }
-    }
-  } catch (e) {
-    console.error(`Failed to fetch live reviews:`, e);
-  }
-  return [];
+      return [];
+    },
+    forceRefresh
+  );
 }
 

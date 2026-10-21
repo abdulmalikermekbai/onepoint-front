@@ -3,31 +3,54 @@ import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
+import { cache } from "react";
 import { Product, fetchLiveProductBySlug, fetchLiveProducts, formatPrice, formatGpu } from "@/lib/data";
 import { resolveCanonicalProductSlug } from "@/lib/legacy-redirects";
 import { ProductTabsInteractive, ProductHeroSection } from "./ProductPageClient";
 
-export const dynamic = "force-dynamic";
+// 2-minute Incremental Static Regeneration (ISR)
+// Keeps Railway compute & memory near zero while ensuring product data refreshes automatically
+export const revalidate = 120;
 export const dynamicParams = true;
 
 interface Props {
   params: Promise<{ slug: string }>;
 }
 
-export async function generateMetadata({ params }: Props): Promise<import("next").Metadata> {
-  const { slug } = await params;
+const getProductData = cache(async (slug: string) => {
   let product = await fetchLiveProductBySlug(slug);
-  if (!product) {
+  let canonicalRedirect: string | null = null;
+
+  if (!product || product.slug !== slug) {
     const allProducts = await fetchLiveProducts();
     const resolution = resolveCanonicalProductSlug(slug, allProducts);
-    if (resolution.canonicalSlug) {
-      if (resolution.canonicalSlug !== slug) {
-        product = await fetchLiveProductBySlug(resolution.canonicalSlug);
-      } else {
-        product = allProducts.find(p => p.slug === resolution.canonicalSlug) || null;
-      }
+    if (resolution.canonicalSlug && resolution.canonicalSlug !== slug) {
+      canonicalRedirect = resolution.canonicalSlug;
+    }
+    if (!product && resolution.canonicalSlug) {
+      product = allProducts.find((p) => p.slug === resolution.canonicalSlug) || (await fetchLiveProductBySlug(resolution.canonicalSlug));
     }
   }
+
+  if (!product) {
+    const allProducts = await fetchLiveProducts();
+    const clean = decodeURIComponent(slug).trim().toLowerCase();
+    product = allProducts.find(
+      (p) =>
+        p.slug?.toLowerCase() === clean ||
+        String(p.id) === clean ||
+        `product-${p.id}` === clean ||
+        (p.sku && p.sku.toLowerCase() === clean) ||
+        (p.model && p.model.toLowerCase() === clean)
+    ) || null;
+  }
+
+  return { product, canonicalRedirect };
+});
+
+export async function generateMetadata({ params }: Props): Promise<import("next").Metadata> {
+  const { slug } = await params;
+  const { product } = await getProductData(slug);
   if (!product) return {};
 
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://onepoint.kz";
@@ -72,32 +95,10 @@ export async function generateMetadata({ params }: Props): Promise<import("next"
 
 export default async function ProductPage({ params }: Props) {
   const { slug } = await params;
-  let product = await fetchLiveProductBySlug(slug);
+  const { product, canonicalRedirect } = await getProductData(slug);
 
-  // If not found directly or slug needs canonical alias resolution
-  if (!product || product.slug !== slug) {
-    const allProducts = await fetchLiveProducts();
-    const resolution = resolveCanonicalProductSlug(slug, allProducts);
-    if (resolution.canonicalSlug && resolution.canonicalSlug !== slug) {
-      permanentRedirect(`/product/${resolution.canonicalSlug}`);
-    }
-    if (!product && resolution.canonicalSlug) {
-      product = allProducts.find(p => p.slug === resolution.canonicalSlug) || (await fetchLiveProductBySlug(resolution.canonicalSlug));
-    }
-  }
-
-  // Final fallback lookup across active products catalog
-  if (!product) {
-    const allProducts = await fetchLiveProducts();
-    const clean = decodeURIComponent(slug).trim().toLowerCase();
-    product = allProducts.find(
-      p =>
-        p.slug?.toLowerCase() === clean ||
-        String(p.id) === clean ||
-        `product-${p.id}` === clean ||
-        (p.sku && p.sku.toLowerCase() === clean) ||
-        (p.model && p.model.toLowerCase() === clean)
-    ) || null;
+  if (canonicalRedirect && canonicalRedirect !== slug) {
+    permanentRedirect(`/product/${canonicalRedirect}`);
   }
 
   if (!product) notFound();

@@ -2,7 +2,7 @@ import { notFound, permanentRedirect } from "next/navigation";
 import { fetchLiveProducts } from "@/lib/data";
 import { resolveCanonicalProductSlug } from "@/lib/legacy-redirects";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
 interface Props {
   params: Promise<{ slug: string }>;

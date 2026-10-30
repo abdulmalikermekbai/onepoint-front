@@ -67,8 +67,10 @@ function extractProcessor(p: Product): string | null {
 }
 
 function extractRam(p: Product): string | null {
-  const text = (p.ram || "") + " " + (p.cardRam || "") + " " + (p.name || "");
-  const m = text.match(/\b(8|12|16|24|32|48|64|96|128)\s*(?:GB|ГБ)\b/i);
+  const raw = ((p.ram || "") + " " + (p.cardRam || "") + " " + (p.name || "")).replace(/[™®]/g, "");
+  // Strip slot breakdowns like (2x8GB) or 2 × 8 ГБ so individual stick sizes don't get misidentified as total RAM
+  const clean = raw.replace(/\b\d+\s*[xх×]\s*\d+\s*(?:gb|гб)?/gi, "");
+  const m = clean.match(/\b(8|12|16|24|32|48|64|96|128)\s*(?:GB|ГБ)(?![a-zA-Zа-яА-Я0-9])/i);
   return m ? m[1] + " ГБ" : null;
 }
 
@@ -85,7 +87,7 @@ function extractDisplay(p: Product): string | null {
 
 function extractHz(p: Product): string | null {
   const text = (p.refreshRate || "") + " " + (p.name || "");
-  const m = text.match(/\b(60|75|90|120|144|165|180|240|300|360|480|500)\s*(?:Hz|Гц)\b/i);
+  const m = text.match(/\b(60|75|90|120|144|165|180|240|300|360|480|500)\s*(?:Hz|Гц)(?![a-zA-Zа-яА-Я0-9])/i);
   return m ? m[1] + " Гц" : null;
 }
 
@@ -245,7 +247,9 @@ function matchCategory(p: Product, catSlug: string): boolean {
 
 function matchGPU(p: Product, selectedGPU: string): boolean {
   const extracted = extractGpu(p);
-  if (extracted && extracted.toLowerCase() === selectedGPU.toLowerCase()) return true;
+  if (extracted) {
+    return extracted.toLowerCase() === selectedGPU.toLowerCase();
+  }
 
   const g = ((p.gpu || "") + " " + (p.cardGpu || "") + " " + (p.name || "")).toLowerCase();
   const k = selectedGPU.toLowerCase();
@@ -294,7 +298,9 @@ function matchGPU(p: Product, selectedGPU: string): boolean {
 
 function matchProcessor(p: Product, selectedProc: string): boolean {
   const extracted = extractProcessor(p);
-  if (extracted && extracted.toLowerCase() === selectedProc.toLowerCase()) return true;
+  if (extracted) {
+    return extracted.toLowerCase() === selectedProc.toLowerCase();
+  }
 
   const pr = ((p.processor || "") + " " + (p.cardProcessor || "") + " " + (p.name || "")).toLowerCase();
   const k = selectedProc.toLowerCase();
@@ -322,7 +328,9 @@ function matchProcessor(p: Product, selectedProc: string): boolean {
 
 function matchDisplay(p: Product, d: string): boolean {
   const extracted = extractDisplay(p);
-  if (extracted && extracted === d) return true;
+  if (extracted) {
+    return extracted === d;
+  }
   const text = ((p.display || "") + " " + (p.name || "")).replace(/″|дюйм(а|ов)?/g, '"');
   const dNum = d.replace('"', "").trim();
   if (dNum === "13.6") return text.includes("13.6") || text.includes("13.3") || text.includes("13\"");
@@ -337,23 +345,31 @@ function matchDisplay(p: Product, d: string): boolean {
 
 function matchRAM(p: Product, r: string): boolean {
   const extracted = extractRam(p);
-  if (extracted && extracted === r) return true;
-  const text = ((p.ram || "") + " " + (p.cardRam || "")).toLowerCase();
+  if (extracted) {
+    return extracted === r;
+  }
+  const text = ((p.ram || "") + " " + (p.cardRam || "")).toLowerCase().replace(/\b\d+\s*[xх×]\s*\d+\s*(?:gb|гб)?/gi, "");
   const num = r.split(" ")[0];
-  return text.includes(num + "gb") || text.includes(num + " гб") || text.includes(num + "гб") || text.startsWith(num + " ");
+  const m = text.match(/\b(\d+)\s*(?:gb|гб)(?![a-zA-Zа-яА-Я0-9])/i);
+  return m ? m[1] === num : false;
 }
 
 function matchHz(p: Product, hz: string): boolean {
   const extracted = extractHz(p);
-  if (extracted && extracted === hz) return true;
+  if (extracted) {
+    return extracted === hz;
+  }
   const text = ((p.refreshRate || "") + " " + (p.name || "")).toLowerCase();
   const num = hz.split(" ")[0];
-  return text.includes(num + "hz") || text.includes(num + " hz") || text.includes(num + " гц") || text.includes(num + "гц");
+  const m = text.match(/\b(\d+)\s*(?:hz|гц)(?![a-zA-Zа-яА-Я0-9])/i);
+  return m ? m[1] === num : false;
 }
 
 function matchMatrix(p: Product, m: string): boolean {
   const extracted = extractMatrix(p);
-  if (extracted && extracted === m) return true;
+  if (extracted) {
+    return extracted === m;
+  }
   const text = ((p.matrixType || "") + " " + (p.name || "")).toLowerCase();
   if (m === "OLED") return text.includes("oled") || text.includes("amoled");
   if (m === "Mini-LED") return text.includes("mini led") || text.includes("mini-led");
@@ -974,15 +990,17 @@ function CatalogFilters() {
           className={`filter-sidebar${filterOpen ? " mobile-open" : ""}`}
           style={{
             position: filterOpen ? "fixed" : "sticky",
-            top: filterOpen ? 0 : 90,
+            top: filterOpen ? 0 : 88,
             left: filterOpen ? 0 : undefined,
             bottom: filterOpen ? 0 : undefined,
-            zIndex: filterOpen ? 9999 : undefined,
+            zIndex: filterOpen ? 9999 : 20,
             width: filterOpen ? "320px" : undefined,
             maxWidth: filterOpen ? "85vw" : undefined,
             background: filterOpen ? "#fff" : undefined,
-            overflowY: filterOpen ? "auto" : undefined,
-            paddingBottom: filterOpen ? "90px" : undefined,
+            maxHeight: filterOpen ? "100vh" : "calc(100vh - 104px)",
+            overflowY: "auto",
+            overscrollBehavior: "contain",
+            paddingBottom: filterOpen ? "90px" : "32px",
             padding: filterOpen ? "24px 24px 90px" : undefined,
             boxShadow: filterOpen ? "4px 0 24px rgba(0,0,0,0.15)" : undefined,
           }}

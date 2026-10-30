@@ -381,7 +381,25 @@ footer { background: var(--dark); color: rgba(255,255,255,.55); padding-top: 72p
 .pay-icons span { padding: 6px 12px; border: 1px solid rgba(255,255,255,.14); border-radius: 8px; font-size: 11px; font-weight: 700; color: rgba(255,255,255,.55); }
 
 /* ============ FILTER SIDEBAR ============ */
-.filter-sidebar { width: 280px; flex-shrink: 0; }
+.filter-sidebar {
+  width: 280px;
+  flex-shrink: 0;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.18) transparent;
+}
+.filter-sidebar::-webkit-scrollbar {
+  width: 5px;
+}
+.filter-sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.filter-sidebar::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.18);
+  border-radius: 4px;
+}
+.filter-sidebar::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
+}
 .filter-card { background: #fff; border: 1.5px solid var(--border); border-radius: var(--radius-md); padding: 24px; margin-bottom: 16px; }
 .filter-title { font-size: 14px; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
 .filter-option { display: flex; align-items: center; gap: 10px; padding: 7px 0; cursor: pointer; font-size: 14px; color: var(--text-muted); transition: color .2s; }
@@ -534,7 +552,7 @@ footer { background: var(--dark); color: rgba(255,255,255,.55); padding-top: 72p
 
 /* ============ RESPONSIVE & MOBILE FIXES ============ */
 html, body {
-  overflow-x: hidden;
+  overflow-x: clip;
   width: 100%;
   max-width: 100%;
 }

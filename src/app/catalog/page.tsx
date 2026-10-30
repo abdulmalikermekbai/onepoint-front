@@ -25,42 +25,142 @@ const CATEGORIES_FILTER = [
   { slug: "accessories", label: "Аксессуары" },
 ];
 
-const PROCESSORS = [
-  "Intel Core Ultra 9",
-  "Intel Core Ultra 7",
-  "Intel Core Ultra 5",
-  "Intel Core 7",
-  "Intel Core 5",
-  "Intel Core i7",
-  "Intel Core i5",
-  "Intel Core i3",
-  "AMD Ryzen AI",
-  "AMD Ryzen 9",
-  "AMD Ryzen 7",
-  "AMD Ryzen 5",
-  "Apple M",
-  "Qualcomm Snapdragon",
-];
+function extractGpu(p: Product): string | null {
+  const g = ((p.gpu || "") + " " + (p.cardGpu || "") + " " + (p.name || "")).replace(/[™®]/g, "");
+  const rtxMatch = g.match(/\b(RTX\s*\d{4}(?:\s*Ti)?)\b/i);
+  if (rtxMatch) {
+    let raw = rtxMatch[1].toUpperCase().replace(/\s+/g, " ");
+    if (raw.endsWith(" TI")) raw = raw.replace(" TI", " Ti");
+    return raw;
+  }
+  const gtxMatch = g.match(/\b(GTX\s*\d{4}(?:\s*Ti)?)\b/i);
+  if (gtxMatch) return gtxMatch[1].toUpperCase();
+  if (/\b(?:Apple|M[1-9])\b/i.test(g)) return "Apple GPU";
+  if (/\bArc\b/i.test(g)) return "Intel Arc";
+  if (/\b(?:Iris|UHD Graphics|Intel Graphics)\b/i.test(g)) return "Intel Graphics";
+  if (/\b(?:Radeon|AMD Graphics)\b/i.test(g)) return "AMD Radeon";
+  if (/\bAdreno\b/i.test(g)) return "Qualcomm Adreno";
+  return null;
+}
 
-const GPUS = [
-  "RTX 5080",
-  "RTX 5070 Ti",
-  "RTX 5070",
-  "RTX 5060",
-  "RTX 5050",
-  "RTX 4060",
-  "RTX 4050",
-  "RTX 3050",
-  "Apple GPU",
-  "Intel Arc",
-  "AMD Radeon",
-  "Intel Graphics",
-];
+function extractProcessor(p: Product): string | null {
+  const pr = ((p.processor || "") + " " + (p.cardProcessor || "") + " " + (p.name || "")).replace(/[™®]/g, "");
+  if (/Ultra\s*9/i.test(pr)) return "Intel Core Ultra 9";
+  if (/Ultra\s*7/i.test(pr)) return "Intel Core Ultra 7";
+  if (/Ultra\s*5/i.test(pr)) return "Intel Core Ultra 5";
+  if (/Ultra\s*3/i.test(pr)) return "Intel Core Ultra 3";
+  if (/Core\s*7\b/i.test(pr) && !/i7|Ultra/i.test(pr)) return "Intel Core 7";
+  if (/Core\s*5\b/i.test(pr) && !/i5|Ultra/i.test(pr)) return "Intel Core 5";
+  if (/Core\s*3\b/i.test(pr) && !/i3|Ultra/i.test(pr)) return "Intel Core 3";
+  if (/Core\s*i9|\bi9\b/i.test(pr)) return "Intel Core i9";
+  if (/Core\s*i7|\bi7\b/i.test(pr)) return "Intel Core i7";
+  if (/Core\s*i5|\bi5\b/i.test(pr)) return "Intel Core i5";
+  if (/Core\s*i3|\bi3\b/i.test(pr)) return "Intel Core i3";
+  if (/Ryzen\s*AI/i.test(pr)) return "AMD Ryzen AI";
+  if (/Ryzen\s*9/i.test(pr)) return "AMD Ryzen 9";
+  if (/Ryzen\s*7/i.test(pr)) return "AMD Ryzen 7";
+  if (/Ryzen\s*5/i.test(pr)) return "AMD Ryzen 5";
+  if (/Ryzen\s*3/i.test(pr)) return "AMD Ryzen 3";
+  if (/Apple\s*M|M[1-9]\b/i.test(pr)) return "Apple M";
+  if (/Snapdragon/i.test(pr)) return "Qualcomm Snapdragon";
+  return null;
+}
 
-const RAMS = ["8 ГБ", "16 ГБ", "32 ГБ", "64 ГБ"];
-const DISPLAYS = ["13.6\"", "14\"", "15.3\"", "15.6\"", "16\"", "17.3\"", "18\""];
-const REFRESH_RATES = ["60 Гц", "120 Гц", "144 Гц", "165 Гц", "180 Гц", "240 Гц"];
-const MATRIX_TYPES = ["IPS", "OLED", "Mini-LED"];
+function extractRam(p: Product): string | null {
+  const text = (p.ram || "") + " " + (p.cardRam || "") + " " + (p.name || "");
+  const m = text.match(/\b(8|12|16|24|32|48|64|96|128)\s*(?:GB|ГБ)\b/i);
+  return m ? m[1] + " ГБ" : null;
+}
+
+function extractDisplay(p: Product): string | null {
+  const text = (p.display || "") + " " + (p.name || "");
+  const clean = text.replace(/″|дюйм(а|ов)?/g, '"');
+  const m = clean.match(/\b(1[1-8](?:[\.,]\d)?)\s*"/);
+  if (m) {
+    const val = m[1].replace(",", ".");
+    return val + '"';
+  }
+  return null;
+}
+
+function extractHz(p: Product): string | null {
+  const text = (p.refreshRate || "") + " " + (p.name || "");
+  const m = text.match(/\b(60|75|90|120|144|165|180|240|300|360|480|500)\s*(?:Hz|Гц)\b/i);
+  return m ? m[1] + " Гц" : null;
+}
+
+function extractMatrix(p: Product): string | null {
+  const text = (p.matrixType || "") + " " + (p.name || "");
+  if (/oled|amoled/i.test(text)) return "OLED";
+  if (/mini[- ]?led/i.test(text)) return "Mini-LED";
+  if (/ips|liquid retina|wva/i.test(text)) return "IPS";
+  if (/\bva\b/i.test(text)) return "VA";
+  if (/\btn\b/i.test(text)) return "TN";
+  return null;
+}
+
+function sortGpus(a: string, b: string): number {
+  const numA = parseInt(a.replace(/\D/g, ""), 10) || 0;
+  const numB = parseInt(b.replace(/\D/g, ""), 10) || 0;
+  if (numA && numB && numA !== numB) return numB - numA;
+  if (numA && numB && numA === numB) {
+    if (a.includes("Ti") && !b.includes("Ti")) return -1;
+    if (!a.includes("Ti") && b.includes("Ti")) return 1;
+  }
+  if (numA && !numB) return -1;
+  if (!numA && numB) return 1;
+  return a.localeCompare(b, "ru");
+}
+
+function sortProcessors(a: string, b: string): number {
+  const getRank = (name: string) => {
+    if (name.includes("Ultra 9")) return 1;
+    if (name.includes("Ultra 7")) return 2;
+    if (name.includes("Ultra 5")) return 3;
+    if (name.includes("Ultra 3")) return 4;
+    if (name.includes("Core 7")) return 5;
+    if (name.includes("Core 5")) return 6;
+    if (name.includes("Core 3")) return 7;
+    if (name.includes("Core i9")) return 8;
+    if (name.includes("Core i7")) return 9;
+    if (name.includes("Core i5")) return 10;
+    if (name.includes("Core i3")) return 11;
+    if (name.includes("Ryzen AI")) return 12;
+    if (name.includes("Ryzen 9")) return 13;
+    if (name.includes("Ryzen 7")) return 14;
+    if (name.includes("Ryzen 5")) return 15;
+    if (name.includes("Ryzen 3")) return 16;
+    if (name.includes("Apple")) return 17;
+    if (name.includes("Snapdragon")) return 18;
+    return 99;
+  };
+  const ra = getRank(a);
+  const rb = getRank(b);
+  if (ra !== rb) return ra - rb;
+  return a.localeCompare(b, "ru");
+}
+
+function sortRAMs(a: string, b: string): number {
+  return (parseInt(a, 10) || 0) - (parseInt(b, 10) || 0);
+}
+
+function sortDisplays(a: string, b: string): number {
+  return (parseFloat(a) || 0) - (parseFloat(b) || 0);
+}
+
+function sortHz(a: string, b: string): number {
+  return (parseInt(a, 10) || 0) - (parseInt(b, 10) || 0);
+}
+
+function sortMatrix(a: string, b: string): number {
+  const order = ["IPS", "OLED", "Mini-LED", "VA", "TN"];
+  const ia = order.indexOf(a);
+  const ib = order.indexOf(b);
+  if (ia !== -1 && ib !== -1) return ia - ib;
+  if (ia !== -1) return -1;
+  if (ib !== -1) return 1;
+  return a.localeCompare(b, "ru");
+}
 
 function matchCategory(p: Product, catSlug: string): boolean {
   if (!catSlug) return true;
@@ -144,6 +244,9 @@ function matchCategory(p: Product, catSlug: string): boolean {
 }
 
 function matchGPU(p: Product, selectedGPU: string): boolean {
+  const extracted = extractGpu(p);
+  if (extracted && extracted.toLowerCase() === selectedGPU.toLowerCase()) return true;
+
   const g = ((p.gpu || "") + " " + (p.cardGpu || "") + " " + (p.name || "")).toLowerCase();
   const k = selectedGPU.toLowerCase();
 
@@ -161,6 +264,9 @@ function matchGPU(p: Product, selectedGPU: string): boolean {
   }
   if (k === "rtx 5080") {
     return g.includes("rtx 5080") || g.includes("rtx5080");
+  }
+  if (k === "rtx 5090") {
+    return g.includes("rtx 5090") || g.includes("rtx5090");
   }
   if (k === "rtx 4050") {
     return g.includes("rtx 4050") || g.includes("rtx4050");
@@ -187,14 +293,19 @@ function matchGPU(p: Product, selectedGPU: string): boolean {
 }
 
 function matchProcessor(p: Product, selectedProc: string): boolean {
+  const extracted = extractProcessor(p);
+  if (extracted && extracted.toLowerCase() === selectedProc.toLowerCase()) return true;
+
   const pr = ((p.processor || "") + " " + (p.cardProcessor || "") + " " + (p.name || "")).toLowerCase();
   const k = selectedProc.toLowerCase();
 
   if (k === "intel core ultra 9") return pr.includes("ultra 9");
   if (k === "intel core ultra 7") return pr.includes("ultra 7");
   if (k === "intel core ultra 5") return pr.includes("ultra 5");
+  if (k === "intel core ultra 3") return pr.includes("ultra 3");
   if (k === "intel core 7") return (pr.includes("core 7") || pr.includes("core™ 7")) && !pr.includes("ultra") && !pr.includes("i7");
   if (k === "intel core 5") return (pr.includes("core 5") || pr.includes("core™ 5")) && !pr.includes("ultra") && !pr.includes("i5");
+  if (k === "intel core 3") return (pr.includes("core 3") || pr.includes("core™ 3")) && !pr.includes("ultra") && !pr.includes("i3");
   if (k === "intel core i9") return pr.includes("i9") || pr.includes("core i9");
   if (k === "intel core i7") return pr.includes("i7") || pr.includes("core i7");
   if (k === "intel core i5") return pr.includes("i5") || pr.includes("core i5");
@@ -203,12 +314,15 @@ function matchProcessor(p: Product, selectedProc: string): boolean {
   if (k === "amd ryzen 9") return pr.includes("ryzen 9") || pr.includes("ryzen™ 9");
   if (k === "amd ryzen 7") return (pr.includes("ryzen 7") || pr.includes("ryzen™ 7")) && !pr.includes("ryzen ai");
   if (k === "amd ryzen 5") return (pr.includes("ryzen 5") || pr.includes("ryzen™ 5")) && !pr.includes("ryzen ai");
+  if (k === "amd ryzen 3") return (pr.includes("ryzen 3") || pr.includes("ryzen™ 3")) && !pr.includes("ryzen ai");
   if (k === "apple m") return pr.includes("apple m") || pr.includes("m5") || pr.includes("m4") || pr.includes("m3") || pr.includes("m2") || pr.includes("m1");
   if (k === "qualcomm snapdragon") return pr.includes("snapdragon");
   return pr.includes(k);
 }
 
 function matchDisplay(p: Product, d: string): boolean {
+  const extracted = extractDisplay(p);
+  if (extracted && extracted === d) return true;
   const text = ((p.display || "") + " " + (p.name || "")).replace(/″|дюйм(а|ов)?/g, '"');
   const dNum = d.replace('"', "").trim();
   if (dNum === "13.6") return text.includes("13.6") || text.includes("13.3") || text.includes("13\"");
@@ -222,18 +336,24 @@ function matchDisplay(p: Product, d: string): boolean {
 }
 
 function matchRAM(p: Product, r: string): boolean {
+  const extracted = extractRam(p);
+  if (extracted && extracted === r) return true;
   const text = ((p.ram || "") + " " + (p.cardRam || "")).toLowerCase();
   const num = r.split(" ")[0];
   return text.includes(num + "gb") || text.includes(num + " гб") || text.includes(num + "гб") || text.startsWith(num + " ");
 }
 
 function matchHz(p: Product, hz: string): boolean {
+  const extracted = extractHz(p);
+  if (extracted && extracted === hz) return true;
   const text = ((p.refreshRate || "") + " " + (p.name || "")).toLowerCase();
   const num = hz.split(" ")[0];
   return text.includes(num + "hz") || text.includes(num + " hz") || text.includes(num + " гц") || text.includes(num + "гц");
 }
 
 function matchMatrix(p: Product, m: string): boolean {
+  const extracted = extractMatrix(p);
+  if (extracted && extracted === m) return true;
   const text = ((p.matrixType || "") + " " + (p.name || "")).toLowerCase();
   if (m === "OLED") return text.includes("oled") || text.includes("amoled");
   if (m === "Mini-LED") return text.includes("mini led") || text.includes("mini-led");
@@ -425,10 +545,88 @@ function CatalogFilters() {
     scrollToProductsTop();
   };
 
-  // 5. Category Counts
+  // 5. Dynamic filter options derived automatically and synchronously from live products
+  const availableCategories = useMemo(() => {
+    const list = [...CATEGORIES_FILTER];
+    liveCategories.forEach(lc => {
+      if (lc.slug && !list.some(c => c.slug.toLowerCase() === lc.slug.toLowerCase())) {
+        list.push({ slug: lc.slug, label: lc.name || lc.slug });
+      }
+    });
+    return list;
+  }, [liveCategories]);
+
+  const availableBrands = useMemo(() => {
+    const brandSet = new Set<string>();
+    liveBrands.forEach(b => {
+      if (b.name && b.name.trim()) brandSet.add(b.name.trim());
+    });
+    productsList.forEach(p => {
+      if (p.brand && p.brand.trim() && p.brand !== "OnePoint" && p.brand !== "Ноутбуки") {
+        brandSet.add(p.brand.trim());
+      }
+    });
+    return ["", ...Array.from(brandSet).sort((a, b) => a.localeCompare(b, "ru"))];
+  }, [productsList, liveBrands]);
+
+  const availableGPUs = useMemo(() => {
+    const set = new Set<string>();
+    productsList.forEach(p => {
+      const g = extractGpu(p);
+      if (g) set.add(g);
+    });
+    return Array.from(set).sort(sortGpus);
+  }, [productsList]);
+
+  const availableProcessors = useMemo(() => {
+    const set = new Set<string>();
+    productsList.forEach(p => {
+      const pr = extractProcessor(p);
+      if (pr) set.add(pr);
+    });
+    return Array.from(set).sort(sortProcessors);
+  }, [productsList]);
+
+  const availableRAMs = useMemo(() => {
+    const set = new Set<string>();
+    productsList.forEach(p => {
+      const r = extractRam(p);
+      if (r) set.add(r);
+    });
+    return Array.from(set).sort(sortRAMs);
+  }, [productsList]);
+
+  const availableDisplays = useMemo(() => {
+    const set = new Set<string>();
+    productsList.forEach(p => {
+      const d = extractDisplay(p);
+      if (d) set.add(d);
+    });
+    return Array.from(set).sort(sortDisplays);
+  }, [productsList]);
+
+  const availableHz = useMemo(() => {
+    const set = new Set<string>();
+    productsList.forEach(p => {
+      const h = extractHz(p);
+      if (h) set.add(h);
+    });
+    return Array.from(set).sort(sortHz);
+  }, [productsList]);
+
+  const availableMatrix = useMemo(() => {
+    const set = new Set<string>();
+    productsList.forEach(p => {
+      const m = extractMatrix(p);
+      if (m) set.add(m);
+    });
+    return Array.from(set).sort(sortMatrix);
+  }, [productsList]);
+
+  // Counts calculated dynamically for all options
   const categoryCounts = useMemo(() => {
     const counts: Record<string, number> = {};
-    CATEGORIES_FILTER.forEach(cat => {
+    availableCategories.forEach(cat => {
       if (!cat.slug) {
         counts[""] = productsList.length;
       } else {
@@ -436,73 +634,70 @@ function CatalogFilters() {
       }
     });
     return counts;
-  }, [productsList]);
+  }, [productsList, availableCategories]);
 
-  // 6. Brand Counts
   const brandCounts = useMemo(() => {
     const counts: Record<string, number> = {};
-    liveBrands.forEach(b => {
-      const bTarget = (b.name || "").toLowerCase();
-      counts[b.name] = productsList.filter(
-        p => (p.brand || "").toLowerCase() === bTarget
-      ).length;
+    availableBrands.forEach(b => {
+      if (!b) {
+        counts[""] = productsList.length;
+      } else {
+        const bTarget = b.toLowerCase();
+        counts[b] = productsList.filter(
+          p => (p.brand || "").toLowerCase() === bTarget
+        ).length;
+      }
     });
     return counts;
-  }, [productsList, liveBrands]);
+  }, [productsList, availableBrands]);
 
-  // 7. GPU Counts
   const gpuCounts = useMemo(() => {
     const counts: Record<string, number> = {};
-    GPUS.forEach(g => {
+    availableGPUs.forEach(g => {
       counts[g] = productsList.filter(p => matchGPU(p, g)).length;
     });
     return counts;
-  }, [productsList]);
+  }, [productsList, availableGPUs]);
 
-  // 8. Processor Counts
   const procCounts = useMemo(() => {
     const counts: Record<string, number> = {};
-    PROCESSORS.forEach(pr => {
+    availableProcessors.forEach(pr => {
       counts[pr] = productsList.filter(p => matchProcessor(p, pr)).length;
     });
     return counts;
-  }, [productsList]);
+  }, [productsList, availableProcessors]);
 
-  // 9. RAM Counts
   const ramCounts = useMemo(() => {
     const counts: Record<string, number> = {};
-    RAMS.forEach(r => {
+    availableRAMs.forEach(r => {
       counts[r] = productsList.filter(p => matchRAM(p, r)).length;
     });
     return counts;
-  }, [productsList]);
+  }, [productsList, availableRAMs]);
 
-  // 10. Display Counts
   const displayCounts = useMemo(() => {
     const counts: Record<string, number> = {};
-    DISPLAYS.forEach(d => {
+    availableDisplays.forEach(d => {
       counts[d] = productsList.filter(p => matchDisplay(p, d)).length;
     });
     return counts;
-  }, [productsList]);
+  }, [productsList, availableDisplays]);
 
-  // 11. Hz Counts
   const hzCounts = useMemo(() => {
     const counts: Record<string, number> = {};
-    REFRESH_RATES.forEach(h => {
+    availableHz.forEach(h => {
       counts[h] = productsList.filter(p => matchHz(p, h)).length;
     });
     return counts;
-  }, [productsList]);
+  }, [productsList, availableHz]);
 
-  // 12. Matrix Counts
   const matrixCounts = useMemo(() => {
     const counts: Record<string, number> = {};
-    MATRIX_TYPES.forEach(m => {
+    availableMatrix.forEach(m => {
       counts[m] = productsList.filter(p => matchMatrix(p, m)).length;
     });
     return counts;
-  }, [productsList]);
+  }, [productsList, availableMatrix]);
 
   // 13. Filtered & Sorted Products
   const filtered = useMemo(() => {
@@ -628,11 +823,11 @@ function CatalogFilters() {
 
   const activeCategoryLabel = useMemo(() => {
     if (!category) return "";
-    const found = CATEGORIES_FILTER.find(
+    const found = availableCategories.find(
       c => c.slug.toLowerCase() === category.toLowerCase()
     );
     return found ? found.label : category;
-  }, [category]);
+  }, [category, availableCategories]);
 
   const hasActiveFilters = Boolean(
     category ||
@@ -835,7 +1030,7 @@ function CatalogFilters() {
           {/* Category */}
           <div className="filter-card">
             <div className="filter-title">Категория</div>
-            {CATEGORIES_FILTER.map(c => {
+            {availableCategories.map(c => {
               const isSelected =
                 (!category && !c.slug) ||
                 (Boolean(category) && category.toLowerCase() === c.slug.toLowerCase());
@@ -877,7 +1072,7 @@ function CatalogFilters() {
           {/* Brand */}
           <div className="filter-card">
             <div className="filter-title">Бренд</div>
-            {["", ...liveBrands.map(b => b.name)].map(b => {
+            {availableBrands.map(b => {
               const isSelected = !b ? !brand : brand.toLowerCase() === b.toLowerCase();
               const count = b ? (brandCounts[b] ?? 0) : productsList.length;
 
@@ -980,7 +1175,7 @@ function CatalogFilters() {
           {/* Processor */}
           <div className="filter-card">
             <div className="filter-title">Процессор</div>
-            {PROCESSORS.filter(p => (procCounts[p] ?? 0) > 0 || selectedProcs.includes(p)).map(p => {
+            {availableProcessors.filter(p => (procCounts[p] ?? 0) > 0 || selectedProcs.includes(p)).map(p => {
               const isSelected = selectedProcs.includes(p);
               const count = procCounts[p] ?? 0;
               return (
@@ -1018,7 +1213,7 @@ function CatalogFilters() {
           {/* GPU */}
           <div className="filter-card">
             <div className="filter-title">Видеокарта</div>
-            {GPUS.filter(g => (gpuCounts[g] ?? 0) > 0 || selectedGPUs.includes(g)).map(g => {
+            {availableGPUs.filter(g => (gpuCounts[g] ?? 0) > 0 || selectedGPUs.includes(g)).map(g => {
               const isSelected = selectedGPUs.includes(g);
               const count = gpuCounts[g] ?? 0;
               return (
@@ -1056,7 +1251,7 @@ function CatalogFilters() {
           {/* RAM */}
           <div className="filter-card">
             <div className="filter-title">Оперативная память</div>
-            {RAMS.filter(r => (ramCounts[r] ?? 0) > 0 || selectedRAMs.includes(r)).map(r => {
+            {availableRAMs.filter(r => (ramCounts[r] ?? 0) > 0 || selectedRAMs.includes(r)).map(r => {
               const isSelected = selectedRAMs.includes(r);
               const count = ramCounts[r] ?? 0;
               return (
@@ -1094,7 +1289,7 @@ function CatalogFilters() {
           {/* Display */}
           <div className="filter-card">
             <div className="filter-title">Диагональ</div>
-            {DISPLAYS.filter(d => (displayCounts[d] ?? 0) > 0 || selectedDisplays.includes(d)).map(d => {
+            {availableDisplays.filter(d => (displayCounts[d] ?? 0) > 0 || selectedDisplays.includes(d)).map(d => {
               const isSelected = selectedDisplays.includes(d);
               const count = displayCounts[d] ?? 0;
               return (
@@ -1132,7 +1327,7 @@ function CatalogFilters() {
           {/* Hz */}
           <div className="filter-card">
             <div className="filter-title">Частота экрана</div>
-            {REFRESH_RATES.filter(hz => (hzCounts[hz] ?? 0) > 0 || selectedHz.includes(hz)).map(hz => {
+            {availableHz.filter(hz => (hzCounts[hz] ?? 0) > 0 || selectedHz.includes(hz)).map(hz => {
               const isSelected = selectedHz.includes(hz);
               const count = hzCounts[hz] ?? 0;
               return (
@@ -1170,7 +1365,7 @@ function CatalogFilters() {
           {/* Matrix */}
           <div className="filter-card">
             <div className="filter-title">Тип матрицы</div>
-            {MATRIX_TYPES.filter(m => (matrixCounts[m] ?? 0) > 0 || selectedMatrix.includes(m)).map(m => {
+            {availableMatrix.filter(m => (matrixCounts[m] ?? 0) > 0 || selectedMatrix.includes(m)).map(m => {
               const isSelected = selectedMatrix.includes(m);
               const count = matrixCounts[m] ?? 0;
               return (

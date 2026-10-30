@@ -212,6 +212,7 @@ export const CATEGORIES = [
   { slug: "student", name: "Для учёбы", icon: "book", count: 64, desc: "Доступные ноутбуки для студентов" },
   { slug: "ultrabook", name: "Ультрабуки", icon: "zap", count: 52, desc: "Тонкие и лёгкие, до 1.5 кг" },
   { slug: "macbook", name: "MacBook", icon: "apple", count: 22, desc: "Apple MacBook Air и Pro" },
+  { slug: "pro", name: "Профессиональные", icon: "cpu", count: 40, desc: "Высокая производительность для любых задач" },
   { slug: "designer", name: "Для дизайнеров", icon: "palette", count: 31, desc: "OLED, цветоточные экраны, Quadro" },
   { slug: "dev", name: "Для разработчиков", icon: "code", count: 44, desc: "RAM 32+ ГБ, Linux ready" },
   { slug: "video", name: "Для видеомонтажа", icon: "film", count: 28, desc: "RTX, большой SSD, цветоточный дисплей" },
@@ -228,6 +229,7 @@ export const BRANDS = [
   { name: "Dell", slug: "dell" },
   { name: "MSI", slug: "msi" },
   { name: "Apple", slug: "apple" },
+  { name: "Samsung", slug: "samsung" },
   { name: "Gigabyte", slug: "gigabyte" },
   { name: "Huawei", slug: "huawei" },
   { name: "Honor", slug: "honor" },
@@ -427,6 +429,32 @@ export async function fetchLiveBrands(forceRefresh = false): Promise<{name: stri
         }
       } catch (e) {
         console.error("Failed to fetch live brands:", e);
+      }
+      return [];
+    },
+    forceRefresh
+  );
+}
+
+export async function fetchLiveCategories(forceRefresh = false): Promise<{ id: string; name: string; slug: string; productCount?: number }[]> {
+  return cachedFetch(
+    "categories:all",
+    TTL_BRANDS,
+    async () => {
+      try {
+        const res = await fetch(productsApiUrl("categories=1", forceRefresh), getFetchOptions(600));
+        if (!res.ok) return [];
+        const data = await res.json();
+        if (Array.isArray(data.categories)) {
+          return data.categories.map((c: any) => ({
+            id: String(c.id),
+            name: c.name,
+            slug: c.slug,
+            productCount: Number(c.product_count) || 0
+          }));
+        }
+      } catch (e) {
+        console.error("Failed to fetch live categories:", e);
       }
       return [];
     },

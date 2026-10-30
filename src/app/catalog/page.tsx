@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
-import { PRODUCTS, BRANDS, fetchLiveProducts, fetchSettings, fetchLiveBrands, Product } from "@/lib/data";
+import { PRODUCTS, BRANDS, fetchLiveProducts, fetchSettings, fetchLiveBrands, fetchLiveCategories, Product } from "@/lib/data";
 import { Suspense } from "react";
 
 const CATEGORIES_FILTER = [
@@ -15,6 +15,7 @@ const CATEGORIES_FILTER = [
   { slug: "student", label: "Для учёбы" },
   { slug: "ultrabook", label: "Ультрабуки" },
   { slug: "macbook", label: "MacBook" },
+  { slug: "pro", label: "Профессиональные" },
   { slug: "designer", label: "Для дизайнеров" },
   { slug: "dev", label: "Для разработчиков" },
   { slug: "video", label: "Видеомонтаж" },
@@ -25,35 +26,41 @@ const CATEGORIES_FILTER = [
 ];
 
 const PROCESSORS = [
-  "Intel Core Ultra",
-  "Intel Core i9",
+  "Intel Core Ultra 9",
+  "Intel Core Ultra 7",
+  "Intel Core Ultra 5",
+  "Intel Core 7",
+  "Intel Core 5",
   "Intel Core i7",
   "Intel Core i5",
+  "Intel Core i3",
+  "AMD Ryzen AI",
   "AMD Ryzen 9",
   "AMD Ryzen 7",
   "AMD Ryzen 5",
+  "Apple M",
   "Qualcomm Snapdragon",
-  "Apple M"
 ];
 
 const GPUS = [
   "RTX 5080",
+  "RTX 5070 Ti",
   "RTX 5070",
   "RTX 5060",
+  "RTX 5050",
   "RTX 4060",
   "RTX 4050",
   "RTX 3050",
-  "Radeon RX",
+  "Apple GPU",
   "Intel Arc",
-  "Intel Iris Xe",
   "AMD Radeon",
-  "Apple GPU"
+  "Intel Graphics",
 ];
 
-const RAMS = ["8 ГБ", "12 ГБ", "16 ГБ", "32 ГБ", "64 ГБ"];
-const DISPLAYS = ["13\"", "14\"", "15.6\"", "16\"", "17.3\""];
-const REFRESH_RATES = ["60 Гц", "120 Гц", "144 Гц", "165 Гц", "240 Гц"];
-const MATRIX_TYPES = ["IPS", "OLED", "Mini-LED", "VA", "TN", "WVA"];
+const RAMS = ["8 ГБ", "16 ГБ", "32 ГБ", "64 ГБ"];
+const DISPLAYS = ["13.6\"", "14\"", "15.3\"", "15.6\"", "16\"", "17.3\"", "18\""];
+const REFRESH_RATES = ["60 Гц", "120 Гц", "144 Гц", "165 Гц", "180 Гц", "240 Гц"];
+const MATRIX_TYPES = ["IPS", "OLED", "Mini-LED"];
 
 function matchCategory(p: Product, catSlug: string): boolean {
   if (!catSlug) return true;
@@ -71,112 +78,60 @@ function matchCategory(p: Product, catSlug: string): boolean {
   const cardGpuNorm = (p.cardGpu || "").toLowerCase();
   const displayNorm = (p.display || "").toLowerCase();
   const matrixNorm = (p.matrixType || "").toLowerCase();
-  const ramNorm = (p.ram || "").toLowerCase();
-  const procNorm = (p.processor || "").toLowerCase();
-  const weightNorm = (p.weight || "").toLowerCase();
+  const nameNorm = (p.name || "").toLowerCase();
 
   if (slug === "accessories") {
     return (
       catSlugNorm === "accessories" ||
       pCategories.includes("accessories") ||
       catNameNorm.includes("аксессуар") ||
-      catNameNorm.includes("мышь") ||
-      catNameNorm.includes("сумк")
+      nameNorm.includes("мышь") ||
+      nameNorm.includes("рюкзак") ||
+      nameNorm.includes("чехол")
     );
   }
   if (slug === "rtx") {
-    return gpuNorm.includes("rtx") || cardGpuNorm.includes("rtx");
+    return (
+      catSlugNorm === "rtx" ||
+      pCategories.includes("rtx") ||
+      gpuNorm.includes("rtx") ||
+      cardGpuNorm.includes("rtx") ||
+      nameNorm.includes("rtx")
+    );
   }
   if (slug === "oled") {
-    return matrixNorm === "oled" || displayNorm.includes("oled");
+    return (
+      catSlugNorm === "oled" ||
+      pCategories.includes("oled") ||
+      matrixNorm.includes("oled") ||
+      matrixNorm.includes("amoled") ||
+      displayNorm.includes("oled") ||
+      nameNorm.includes("oled")
+    );
   }
   if (slug === "macbook") {
-    return brandNorm === "apple" || catSlugNorm === "macbook" || pCategories.includes("macbook");
-  }
-  if (slug === "designer") {
     return (
-      catSlugNorm === "designer" ||
-      pCategories.includes("designer") ||
-      matrixNorm === "oled" ||
-      gpuNorm.includes("rtx") ||
-      ramNorm.includes("16") ||
-      ramNorm.includes("32")
-    );
-  }
-  if (slug === "dev" || slug === "programmer") {
-    return (
-      catSlugNorm === "dev" ||
-      catSlugNorm === "programmer" ||
-      pCategories.includes("dev") ||
-      pCategories.includes("programmer") ||
-      ramNorm.includes("16") ||
-      ramNorm.includes("32") ||
-      ramNorm.includes("64") ||
-      procNorm.includes("core i7") ||
-      procNorm.includes("core i9") ||
-      procNorm.includes("ryzen 7") ||
-      procNorm.includes("ryzen 9") ||
-      procNorm.includes("ultra")
-    );
-  }
-  if (slug === "student") {
-    return (
-      catSlugNorm === "student" ||
-      pCategories.includes("student") ||
-      catSlugNorm === "office" ||
-      catSlugNorm === "ultrabook"
-    );
-  }
-  if (slug === "office") {
-    return (
-      catSlugNorm === "office" ||
-      pCategories.includes("office") ||
-      catSlugNorm === "ultrabook" ||
-      catSlugNorm === "business" ||
-      catSlugNorm === "student"
-    );
-  }
-  if (slug === "ultrabook") {
-    return (
-      catSlugNorm === "ultrabook" ||
-      pCategories.includes("ultrabook") ||
-      weightNorm.includes("1.") ||
-      weightNorm.includes("0.") ||
-      catSlugNorm === "office"
+      brandNorm === "apple" ||
+      catSlugNorm === "macbook" ||
+      pCategories.includes("macbook") ||
+      nameNorm.includes("macbook")
     );
   }
   if (slug === "gaming") {
     return (
       catSlugNorm === "gaming" ||
-      pCategories.includes("gaming") ||
-      gpuNorm.includes("rtx") ||
-      gpuNorm.includes("gtx") ||
-      gpuNorm.includes("radeon rx")
+      pCategories.includes("gaming")
     );
   }
-  if (slug === "video") {
+  if (slug === "ultrabook") {
+    // A gaming laptop is not an ultrabook unless explicitly tagged with ultrabook category
+    if (catSlugNorm === "gaming" && !pCategories.includes("ultrabook")) {
+      return false;
+    }
     return (
-      catSlugNorm === "video" ||
-      pCategories.includes("video") ||
-      gpuNorm.includes("rtx") ||
-      cardGpuNorm.includes("rtx") ||
-      gpuNorm.includes("radeon rx") ||
-      ramNorm.includes("16") ||
-      ramNorm.includes("32") ||
-      ramNorm.includes("64") ||
-      procNorm.includes("core i7") ||
-      procNorm.includes("core i9") ||
-      procNorm.includes("ryzen 7") ||
-      procNorm.includes("ryzen 9") ||
-      procNorm.includes("ultra") ||
-      procNorm.includes("apple m")
-    );
-  }
-  if (slug === "business") {
-    return (
-      catSlugNorm === "business" ||
-      pCategories.includes("business") ||
-      catSlugNorm === "office"
+      catSlugNorm === "ultrabook" ||
+      pCategories.includes("ultrabook") ||
+      catNameNorm.includes("ультрабук")
     );
   }
 
@@ -186,6 +141,104 @@ function matchCategory(p: Product, catSlug: string): boolean {
     catNameNorm === slug ||
     catNameNorm.includes(slug)
   );
+}
+
+function matchGPU(p: Product, selectedGPU: string): boolean {
+  const g = ((p.gpu || "") + " " + (p.cardGpu || "") + " " + (p.name || "")).toLowerCase();
+  const k = selectedGPU.toLowerCase();
+
+  if (k === "rtx 5070") {
+    return (g.includes("rtx 5070") || g.includes("rtx5070")) && !g.includes("5070 ti") && !g.includes("5070ti");
+  }
+  if (k === "rtx 5070 ti") {
+    return g.includes("5070 ti") || g.includes("5070ti");
+  }
+  if (k === "rtx 5050") {
+    return g.includes("rtx 5050") || g.includes("rtx5050") || g.includes("5050 8gb") || g.includes("5050");
+  }
+  if (k === "rtx 5060") {
+    return g.includes("rtx 5060") || g.includes("rtx5060");
+  }
+  if (k === "rtx 5080") {
+    return g.includes("rtx 5080") || g.includes("rtx5080");
+  }
+  if (k === "rtx 4050") {
+    return g.includes("rtx 4050") || g.includes("rtx4050");
+  }
+  if (k === "rtx 4060") {
+    return g.includes("rtx 4060") || g.includes("rtx4060");
+  }
+  if (k === "rtx 3050") {
+    return g.includes("rtx 3050") || g.includes("rtx3050");
+  }
+  if (k === "apple gpu") {
+    return g.includes("apple") || g.includes("m5") || g.includes("m4") || g.includes("m3") || g.includes("m2") || g.includes("m1");
+  }
+  if (k === "intel arc") {
+    return g.includes("arc");
+  }
+  if (k === "intel graphics") {
+    return (g.includes("intel graphics") || g.includes("iris xe") || g.includes("intel uhd")) && !g.includes("arc");
+  }
+  if (k === "amd radeon") {
+    return g.includes("radeon");
+  }
+  return g.includes(k);
+}
+
+function matchProcessor(p: Product, selectedProc: string): boolean {
+  const pr = ((p.processor || "") + " " + (p.cardProcessor || "") + " " + (p.name || "")).toLowerCase();
+  const k = selectedProc.toLowerCase();
+
+  if (k === "intel core ultra 9") return pr.includes("ultra 9");
+  if (k === "intel core ultra 7") return pr.includes("ultra 7");
+  if (k === "intel core ultra 5") return pr.includes("ultra 5");
+  if (k === "intel core 7") return (pr.includes("core 7") || pr.includes("core™ 7")) && !pr.includes("ultra") && !pr.includes("i7");
+  if (k === "intel core 5") return (pr.includes("core 5") || pr.includes("core™ 5")) && !pr.includes("ultra") && !pr.includes("i5");
+  if (k === "intel core i9") return pr.includes("i9") || pr.includes("core i9");
+  if (k === "intel core i7") return pr.includes("i7") || pr.includes("core i7");
+  if (k === "intel core i5") return pr.includes("i5") || pr.includes("core i5");
+  if (k === "intel core i3") return pr.includes("i3") || pr.includes("core i3");
+  if (k === "amd ryzen ai") return pr.includes("ryzen ai");
+  if (k === "amd ryzen 9") return pr.includes("ryzen 9") || pr.includes("ryzen™ 9");
+  if (k === "amd ryzen 7") return (pr.includes("ryzen 7") || pr.includes("ryzen™ 7")) && !pr.includes("ryzen ai");
+  if (k === "amd ryzen 5") return (pr.includes("ryzen 5") || pr.includes("ryzen™ 5")) && !pr.includes("ryzen ai");
+  if (k === "apple m") return pr.includes("apple m") || pr.includes("m5") || pr.includes("m4") || pr.includes("m3") || pr.includes("m2") || pr.includes("m1");
+  if (k === "qualcomm snapdragon") return pr.includes("snapdragon");
+  return pr.includes(k);
+}
+
+function matchDisplay(p: Product, d: string): boolean {
+  const text = ((p.display || "") + " " + (p.name || "")).replace(/″|дюйм(а|ов)?/g, '"');
+  const dNum = d.replace('"', "").trim();
+  if (dNum === "13.6") return text.includes("13.6") || text.includes("13.3") || text.includes("13\"");
+  if (dNum === "14") return text.includes("14\"") || text.includes("14 ");
+  if (dNum === "15.3") return text.includes("15.3");
+  if (dNum === "15.6") return text.includes("15.6") || text.includes("15,6");
+  if (dNum === "16") return (text.includes("16\"") || text.includes("16 ")) && !text.includes("160") && !text.includes("165");
+  if (dNum === "17.3") return text.includes("17.3") || text.includes("17,3") || text.includes("17\"");
+  if (dNum === "18") return (text.includes("18\"") || text.includes("18 ")) && !text.includes("180");
+  return false;
+}
+
+function matchRAM(p: Product, r: string): boolean {
+  const text = ((p.ram || "") + " " + (p.cardRam || "")).toLowerCase();
+  const num = r.split(" ")[0];
+  return text.includes(num + "gb") || text.includes(num + " гб") || text.includes(num + "гб") || text.startsWith(num + " ");
+}
+
+function matchHz(p: Product, hz: string): boolean {
+  const text = ((p.refreshRate || "") + " " + (p.name || "")).toLowerCase();
+  const num = hz.split(" ")[0];
+  return text.includes(num + "hz") || text.includes(num + " hz") || text.includes(num + " гц") || text.includes(num + "гц");
+}
+
+function matchMatrix(p: Product, m: string): boolean {
+  const text = ((p.matrixType || "") + " " + (p.name || "")).toLowerCase();
+  if (m === "OLED") return text.includes("oled") || text.includes("amoled");
+  if (m === "Mini-LED") return text.includes("mini led") || text.includes("mini-led");
+  if (m === "IPS") return text.includes("ips") || text.includes("wva");
+  return false;
 }
 
 function normalizeCategoryInput(raw: string): string {
@@ -242,13 +295,15 @@ function CatalogFilters() {
   });
   const [isLoading, setIsLoading] = useState<boolean>(() => productsList.length === 0);
   const [liveBrands, setLiveBrands] = useState<{ name: string; slug: string }[]>(BRANDS);
+  const [liveCategories, setLiveCategories] = useState<{ id: string; name: string; slug: string }[]>([]);
 
   useEffect(() => {
     if (productsList.length === 0) setIsLoading(true);
-    Promise.all([fetchLiveProducts(), fetchLiveBrands()])
-      .then(([list, brands]) => {
+    Promise.all([fetchLiveProducts(), fetchLiveBrands(), fetchLiveCategories()])
+      .then(([list, brands, cats]) => {
         if (list && list.length > 0) setProductsList(list);
         if (brands && brands.length > 0) setLiveBrands(brands);
+        if (cats && cats.length > 0) setLiveCategories(cats);
         setIsLoading(false);
       })
       .catch(() => {
@@ -395,7 +450,61 @@ function CatalogFilters() {
     return counts;
   }, [productsList, liveBrands]);
 
-  // 7. Filtered & Sorted Products
+  // 7. GPU Counts
+  const gpuCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    GPUS.forEach(g => {
+      counts[g] = productsList.filter(p => matchGPU(p, g)).length;
+    });
+    return counts;
+  }, [productsList]);
+
+  // 8. Processor Counts
+  const procCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    PROCESSORS.forEach(pr => {
+      counts[pr] = productsList.filter(p => matchProcessor(p, pr)).length;
+    });
+    return counts;
+  }, [productsList]);
+
+  // 9. RAM Counts
+  const ramCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    RAMS.forEach(r => {
+      counts[r] = productsList.filter(p => matchRAM(p, r)).length;
+    });
+    return counts;
+  }, [productsList]);
+
+  // 10. Display Counts
+  const displayCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    DISPLAYS.forEach(d => {
+      counts[d] = productsList.filter(p => matchDisplay(p, d)).length;
+    });
+    return counts;
+  }, [productsList]);
+
+  // 11. Hz Counts
+  const hzCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    REFRESH_RATES.forEach(h => {
+      counts[h] = productsList.filter(p => matchHz(p, h)).length;
+    });
+    return counts;
+  }, [productsList]);
+
+  // 12. Matrix Counts
+  const matrixCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    MATRIX_TYPES.forEach(m => {
+      counts[m] = productsList.filter(p => matchMatrix(p, m)).length;
+    });
+    return counts;
+  }, [productsList]);
+
+  // 13. Filtered & Sorted Products
   const filtered = useMemo(() => {
     let result = [...productsList];
 
@@ -436,69 +545,37 @@ function CatalogFilters() {
 
     if (selectedProcs.length) {
       result = result.filter(p =>
-        selectedProcs.some(
-          proc => {
-            const pTarget = proc.toLowerCase();
-            return (
-              (p.processor || "").toLowerCase().includes(pTarget) ||
-              (p.cardProcessor || "").toLowerCase().includes(pTarget)
-            );
-          }
-        )
+        selectedProcs.some(proc => matchProcessor(p, proc))
       );
     }
 
     if (selectedGPUs.length) {
       result = result.filter(p =>
-        selectedGPUs.some(
-          g => {
-            const gTarget = g.toLowerCase();
-            return (
-              (p.gpu || "").toLowerCase().includes(gTarget) ||
-              (p.cardGpu || "").toLowerCase().includes(gTarget)
-            );
-          }
-        )
+        selectedGPUs.some(g => matchGPU(p, g))
       );
     }
 
     if (selectedRAMs.length) {
       result = result.filter(p =>
-        selectedRAMs.some(
-          r => {
-            const rTarget = r.toLowerCase();
-            return (
-              (p.ram || "").toLowerCase().includes(rTarget) ||
-              (p.cardRam || "").toLowerCase().includes(rTarget)
-            );
-          }
-        )
+        selectedRAMs.some(r => matchRAM(p, r))
       );
     }
 
     if (selectedDisplays.length) {
       result = result.filter(p =>
-        selectedDisplays.some(
-          d =>
-            (p.display || "").includes(d.replace("\"", "")) ||
-            (p.display || "").includes(d)
-        )
+        selectedDisplays.some(d => matchDisplay(p, d))
       );
     }
 
     if (selectedHz.length) {
       result = result.filter(p =>
-        selectedHz.some(
-          hz =>
-            (p.refreshRate || "").toLowerCase().includes(hz.toLowerCase()) ||
-            (p.refreshRate || "").includes(hz.replace(" Гц", ""))
-        )
+        selectedHz.some(hz => matchHz(p, hz))
       );
     }
 
     if (selectedMatrix.length) {
       result = result.filter(p =>
-        selectedMatrix.some(m => (p.matrixType || "").toLowerCase() === (m || "").toLowerCase())
+        selectedMatrix.some(m => matchMatrix(p, m))
       );
     }
 
@@ -903,91 +980,229 @@ function CatalogFilters() {
           {/* Processor */}
           <div className="filter-card">
             <div className="filter-title">Процессор</div>
-            {PROCESSORS.map(p => (
-              <label key={p} className="filter-option">
-                <input
-                  type="checkbox"
-                  checked={selectedProcs.includes(p)}
-                  onChange={() => toggleCheckbox("proc", selectedProcs, p)}
-                />
-                <span>{p}</span>
-              </label>
-            ))}
+            {PROCESSORS.filter(p => (procCounts[p] ?? 0) > 0 || selectedProcs.includes(p)).map(p => {
+              const isSelected = selectedProcs.includes(p);
+              const count = procCounts[p] ?? 0;
+              return (
+                <label
+                  key={p}
+                  className="filter-option"
+                  style={{
+                    color: isSelected ? "var(--accent)" : undefined,
+                    fontWeight: isSelected ? 700 : undefined,
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    cursor: "pointer",
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <input
+                      type="checkbox"
+                      checked={isSelected}
+                      onChange={() => toggleCheckbox("proc", selectedProcs, p)}
+                      style={{ accentColor: "var(--accent)" }}
+                    />
+                    <span>{p}</span>
+                  </div>
+                  {productsList.length > 0 && count > 0 && (
+                    <span style={{ fontSize: 12, color: "var(--text-muted)", opacity: 0.8 }}>
+                      {count}
+                    </span>
+                  )}
+                </label>
+              );
+            })}
           </div>
 
           {/* GPU */}
           <div className="filter-card">
             <div className="filter-title">Видеокарта</div>
-            {GPUS.map(g => (
-              <label key={g} className="filter-option">
-                <input
-                  type="checkbox"
-                  checked={selectedGPUs.includes(g)}
-                  onChange={() => toggleCheckbox("gpu", selectedGPUs, g)}
-                />
-                <span>{g}</span>
-              </label>
-            ))}
+            {GPUS.filter(g => (gpuCounts[g] ?? 0) > 0 || selectedGPUs.includes(g)).map(g => {
+              const isSelected = selectedGPUs.includes(g);
+              const count = gpuCounts[g] ?? 0;
+              return (
+                <label
+                  key={g}
+                  className="filter-option"
+                  style={{
+                    color: isSelected ? "var(--accent)" : undefined,
+                    fontWeight: isSelected ? 700 : undefined,
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    cursor: "pointer",
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <input
+                      type="checkbox"
+                      checked={isSelected}
+                      onChange={() => toggleCheckbox("gpu", selectedGPUs, g)}
+                      style={{ accentColor: "var(--accent)" }}
+                    />
+                    <span>{g}</span>
+                  </div>
+                  {productsList.length > 0 && count > 0 && (
+                    <span style={{ fontSize: 12, color: "var(--text-muted)", opacity: 0.8 }}>
+                      {count}
+                    </span>
+                  )}
+                </label>
+              );
+            })}
           </div>
 
           {/* RAM */}
           <div className="filter-card">
             <div className="filter-title">Оперативная память</div>
-            {RAMS.map(r => (
-              <label key={r} className="filter-option">
-                <input
-                  type="checkbox"
-                  checked={selectedRAMs.includes(r)}
-                  onChange={() => toggleCheckbox("ram", selectedRAMs, r)}
-                />
-                <span>{r}</span>
-              </label>
-            ))}
+            {RAMS.filter(r => (ramCounts[r] ?? 0) > 0 || selectedRAMs.includes(r)).map(r => {
+              const isSelected = selectedRAMs.includes(r);
+              const count = ramCounts[r] ?? 0;
+              return (
+                <label
+                  key={r}
+                  className="filter-option"
+                  style={{
+                    color: isSelected ? "var(--accent)" : undefined,
+                    fontWeight: isSelected ? 700 : undefined,
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    cursor: "pointer",
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <input
+                      type="checkbox"
+                      checked={isSelected}
+                      onChange={() => toggleCheckbox("ram", selectedRAMs, r)}
+                      style={{ accentColor: "var(--accent)" }}
+                    />
+                    <span>{r}</span>
+                  </div>
+                  {productsList.length > 0 && count > 0 && (
+                    <span style={{ fontSize: 12, color: "var(--text-muted)", opacity: 0.8 }}>
+                      {count}
+                    </span>
+                  )}
+                </label>
+              );
+            })}
           </div>
 
           {/* Display */}
           <div className="filter-card">
             <div className="filter-title">Диагональ</div>
-            {DISPLAYS.map(d => (
-              <label key={d} className="filter-option">
-                <input
-                  type="checkbox"
-                  checked={selectedDisplays.includes(d)}
-                  onChange={() => toggleCheckbox("display", selectedDisplays, d)}
-                />
-                <span>{d}</span>
-              </label>
-            ))}
+            {DISPLAYS.filter(d => (displayCounts[d] ?? 0) > 0 || selectedDisplays.includes(d)).map(d => {
+              const isSelected = selectedDisplays.includes(d);
+              const count = displayCounts[d] ?? 0;
+              return (
+                <label
+                  key={d}
+                  className="filter-option"
+                  style={{
+                    color: isSelected ? "var(--accent)" : undefined,
+                    fontWeight: isSelected ? 700 : undefined,
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    cursor: "pointer",
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <input
+                      type="checkbox"
+                      checked={isSelected}
+                      onChange={() => toggleCheckbox("display", selectedDisplays, d)}
+                      style={{ accentColor: "var(--accent)" }}
+                    />
+                    <span>{d}</span>
+                  </div>
+                  {productsList.length > 0 && count > 0 && (
+                    <span style={{ fontSize: 12, color: "var(--text-muted)", opacity: 0.8 }}>
+                      {count}
+                    </span>
+                  )}
+                </label>
+              );
+            })}
           </div>
 
           {/* Hz */}
           <div className="filter-card">
             <div className="filter-title">Частота экрана</div>
-            {REFRESH_RATES.map(hz => (
-              <label key={hz} className="filter-option">
-                <input
-                  type="checkbox"
-                  checked={selectedHz.includes(hz)}
-                  onChange={() => toggleCheckbox("hz", selectedHz, hz)}
-                />
-                <span>{hz}</span>
-              </label>
-            ))}
+            {REFRESH_RATES.filter(hz => (hzCounts[hz] ?? 0) > 0 || selectedHz.includes(hz)).map(hz => {
+              const isSelected = selectedHz.includes(hz);
+              const count = hzCounts[hz] ?? 0;
+              return (
+                <label
+                  key={hz}
+                  className="filter-option"
+                  style={{
+                    color: isSelected ? "var(--accent)" : undefined,
+                    fontWeight: isSelected ? 700 : undefined,
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    cursor: "pointer",
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <input
+                      type="checkbox"
+                      checked={isSelected}
+                      onChange={() => toggleCheckbox("hz", selectedHz, hz)}
+                      style={{ accentColor: "var(--accent)" }}
+                    />
+                    <span>{hz}</span>
+                  </div>
+                  {productsList.length > 0 && count > 0 && (
+                    <span style={{ fontSize: 12, color: "var(--text-muted)", opacity: 0.8 }}>
+                      {count}
+                    </span>
+                  )}
+                </label>
+              );
+            })}
           </div>
 
           {/* Matrix */}
           <div className="filter-card">
             <div className="filter-title">Тип матрицы</div>
-            {MATRIX_TYPES.map(m => (
-              <label key={m} className="filter-option">
-                <input
-                  type="checkbox"
-                  checked={selectedMatrix.includes(m)}
-                  onChange={() => toggleCheckbox("matrix", selectedMatrix, m)}
-                />
-                <span>{m}</span>
-              </label>
-            ))}
+            {MATRIX_TYPES.filter(m => (matrixCounts[m] ?? 0) > 0 || selectedMatrix.includes(m)).map(m => {
+              const isSelected = selectedMatrix.includes(m);
+              const count = matrixCounts[m] ?? 0;
+              return (
+                <label
+                  key={m}
+                  className="filter-option"
+                  style={{
+                    color: isSelected ? "var(--accent)" : undefined,
+                    fontWeight: isSelected ? 700 : undefined,
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    cursor: "pointer",
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <input
+                      type="checkbox"
+                      checked={isSelected}
+                      onChange={() => toggleCheckbox("matrix", selectedMatrix, m)}
+                      style={{ accentColor: "var(--accent)" }}
+                    />
+                    <span>{m}</span>
+                  </div>
+                  {productsList.length > 0 && count > 0 && (
+                    <span style={{ fontSize: 12, color: "var(--text-muted)", opacity: 0.8 }}>
+                      {count}
+                    </span>
+                  )}
+                </label>
+              );
+            })}
           </div>
 
           {/* Special */}

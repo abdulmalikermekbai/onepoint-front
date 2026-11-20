@@ -94,9 +94,10 @@ export function productImageUrl(value: unknown): string {
  */
 function productsApiUrl(query = "", forceRefresh = false): string {
   const isBrowser = typeof window !== "undefined";
-  const base = `${!isBrowser
-    ? (process.env.BACKEND_API_URL || "https://api.onepoint.kz")
-    : "https://api.onepoint.kz"}/api/products.php`;
+  // In the browser, use same-origin /backend-api to completely eliminate any CORS errors
+  const base = isBrowser
+    ? "/backend-api/products.php"
+    : `${process.env.BACKEND_API_URL || "https://api.onepoint.kz"}/api/products.php`;
 
   const params = new URLSearchParams(query);
   if (forceRefresh) {
@@ -115,6 +116,7 @@ interface CacheRecord<T> {
   timestamp: number;
 }
 const memoryCache = new Map<string, CacheRecord<any>>();
+const staleCache = new Map<string, any>();
 const inFlightRequests = new Map<string, Promise<any>>();
 
 export const TTL_PRODUCTS = 2 * 60 * 1000;       // 2 minutes
@@ -122,6 +124,7 @@ export const TTL_PRODUCT_SINGLE = 2 * 60 * 1000; // 2 minutes
 export const TTL_BRANDS = 10 * 60 * 1000;        // 10 minutes
 export const TTL_SETTINGS = 5 * 60 * 1000;       // 5 minutes
 export const TTL_REVIEWS = 5 * 60 * 1000;        // 5 minutes
+export const TTL_NEGATIVE = 60 * 1000;           // 1 minute negative cache for 404s
 
 async function cachedFetch<T>(
   key: string,
@@ -131,8 +134,11 @@ async function cachedFetch<T>(
 ): Promise<T> {
   if (!forceRefresh) {
     const cached = memoryCache.get(key);
-    if (cached && Date.now() - cached.timestamp < ttlMs) {
-      return cached.data as T;
+    if (cached) {
+      const effectiveTtl = cached.data === null ? TTL_NEGATIVE : ttlMs;
+      if (Date.now() - cached.timestamp < effectiveTtl) {
+        return cached.data as T;
+      }
     }
   }
 
@@ -145,10 +151,20 @@ async function cachedFetch<T>(
   const promise = (async () => {
     try {
       const data = await fetcher();
-      if (data !== undefined && data !== null) {
+      if (data !== undefined) {
         memoryCache.set(key, { data, timestamp: Date.now() });
+        if (data !== null) {
+          staleCache.set(key, data);
+        }
       }
       return data;
+    } catch (err: any) {
+      // Fallback: If network / socket timed out or failed, serve stale data if available
+      if (staleCache.has(key)) {
+        console.warn(`[cachedFetch] Backend fetch failed for "${key}", serving stale cache:`, err?.message || err);
+        return staleCache.get(key) as T;
+      }
+      return (null as unknown) as T;
     } finally {
       inFlightRequests.delete(key);
     }
@@ -373,11 +389,17 @@ export function formatGpu(gpu?: string): string {
   return cleaned || gpu;
 }
 
-function getFetchOptions(revalidateSeconds = 60): RequestInit {
+function getFetchOptions(revalidateSeconds = 60, timeoutMs = 6000): RequestInit {
+  const signal = typeof AbortSignal !== "undefined" && typeof AbortSignal.timeout === "function"
+    ? AbortSignal.timeout(timeoutMs)
+    : undefined;
   if (typeof window !== "undefined") {
-    return {};
+    return signal ? { signal } : {};
   }
-  return { next: { revalidate: revalidateSeconds } };
+  return {
+    next: { revalidate: revalidateSeconds },
+    ...(signal ? { signal } : {})
+  };
 }
 
 export async function fetchLiveProducts(forceRefresh = false): Promise<Product[]> {
@@ -386,8 +408,11 @@ export async function fetchLiveProducts(forceRefresh = false): Promise<Product[]
     TTL_PRODUCTS,
     async () => {
       try {
-        const res = await fetch(productsApiUrl("", forceRefresh), getFetchOptions(120));
-        if (!res.ok) return [];
+        const res = await fetch(productsApiUrl("", forceRefresh), getFetchOptions(120, 6000));
+        if (!res.ok) {
+          if (staleCache.has("products:all")) return staleCache.get("products:all");
+          return [];
+        }
         const data = await res.json();
         if (Array.isArray(data.products)) {
           const normalized: Product[] = data.products.map(normalizeDbProduct);
@@ -395,18 +420,25 @@ export async function fetchLiveProducts(forceRefresh = false): Promise<Product[]
           // Pre-populate individual product caches for instant slug/id lookups
           normalized.forEach((p: Product) => {
             if (p.slug) {
-              memoryCache.set(`product:${p.slug.toLowerCase()}`, { data: p, timestamp: Date.now() });
+              const sKey = `product:${p.slug.toLowerCase()}`;
+              memoryCache.set(sKey, { data: p, timestamp: Date.now() });
+              staleCache.set(sKey, p);
             }
             if (p.id) {
-              memoryCache.set(`product:${p.id}`, { data: p, timestamp: Date.now() });
+              const idKey = `product:${p.id}`;
+              memoryCache.set(idKey, { data: p, timestamp: Date.now() });
+              staleCache.set(idKey, p);
             }
           });
           return normalized;
         }
-      } catch (e) {
-        console.error("Failed to fetch live products:", e);
+      } catch (e: any) {
+        console.warn(`[fetchLiveProducts] Fetch failed (${e?.name || e?.code || 'error'}), using stale cache if available.`);
+        if (staleCache.has("products:all")) {
+          return staleCache.get("products:all");
+        }
       }
-      return [];
+      return staleCache.get("products:all") || [];
     },
     forceRefresh
   );
@@ -495,9 +527,9 @@ export async function fetchLiveProductBySlug(slug: string, forceRefresh = false)
     cacheKey,
     TTL_PRODUCT_SINGLE,
     async () => {
-      // 1. Direct fetch by slug from PHP backend with 2 min ISR revalidation
+      // 1. Direct fetch by slug from PHP backend with 5s timeout
       try {
-        const res = await fetch(productsApiUrl(`slug=${encodeURIComponent(cleanSlug)}`, forceRefresh), getFetchOptions(120));
+        const res = await fetch(productsApiUrl(`slug=${encodeURIComponent(cleanSlug)}`, forceRefresh), getFetchOptions(120, 5000));
         if (res.ok) {
           const data = await res.json();
           if (data && data.product) {
@@ -506,8 +538,8 @@ export async function fetchLiveProductBySlug(slug: string, forceRefresh = false)
             return normalized;
           }
         }
-      } catch (e) {
-        console.error(`Direct fetch by slug ${cleanSlug} failed:`, e);
+      } catch (e: any) {
+        console.warn(`[fetchLiveProductBySlug] Direct fetch for ${cleanSlug} failed (${e?.name || e?.code || 'error'})`);
       }
 
       // 2. Fallback: Search in live products list (uses in-memory cached catalog)
@@ -530,7 +562,7 @@ export async function fetchLiveProductBySlug(slug: string, forceRefresh = false)
           }
         }
       } catch (e) {
-        console.error(`Fallback product lookup failed for ${cleanSlug}:`, e);
+        // ignore
       }
 
       // 3. Fallback: Cached product in browser memory
@@ -552,9 +584,9 @@ export async function fetchSettings(forceRefresh = false): Promise<Record<string
     async () => {
       try {
         const isBrowser = typeof window !== "undefined";
-        const base = `${!isBrowser
-          ? (process.env.BACKEND_API_URL || "https://api.onepoint.kz")
-          : "https://api.onepoint.kz"}/api/settings.php${forceRefresh ? `?_t=${Date.now()}` : ""}`;
+        const base = isBrowser
+          ? `/backend-api/settings.php${forceRefresh ? `?_t=${Date.now()}` : ""}`
+          : `${process.env.BACKEND_API_URL || "https://api.onepoint.kz"}/api/settings.php${forceRefresh ? `?_t=${Date.now()}` : ""}`;
         const res = await fetch(base, getFetchOptions(300));
         if (res.ok) {
           const data = await res.json();
@@ -580,9 +612,9 @@ export async function fetchLiveReviews(forceRefresh = false): Promise<any[]> {
     async () => {
       try {
         const isBrowser = typeof window !== "undefined";
-        const base = `${!isBrowser
-          ? (process.env.BACKEND_API_URL || "https://api.onepoint.kz")
-          : "https://api.onepoint.kz"}/api/products.php?reviews=1${forceRefresh ? `&_t=${Date.now()}` : ""}`;
+        const base = isBrowser
+          ? `/backend-api/products.php?reviews=1${forceRefresh ? `&_t=${Date.now()}` : ""}`
+          : `${process.env.BACKEND_API_URL || "https://api.onepoint.kz"}/api/products.php?reviews=1${forceRefresh ? `&_t=${Date.now()}` : ""}`;
         const res = await fetch(base, getFetchOptions(300));
         if (res.ok) {
           const data = await res.json();

@@ -20,7 +20,10 @@ export default function HomeHeroSlider() {
   const [current, setCurrent] = useState(0);
 
   useEffect(() => {
-    fetch("https://api.onepoint.kz/api/products.php?hero_slides=1")
+    const url = typeof window !== "undefined"
+      ? "/backend-api/products.php?hero_slides=1"
+      : "https://api.onepoint.kz/api/products.php?hero_slides=1";
+    fetch(url)
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data.slides)) {

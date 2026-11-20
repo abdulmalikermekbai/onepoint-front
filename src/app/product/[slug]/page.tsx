@@ -28,21 +28,19 @@ const getProductData = cache(async (slug: string) => {
       canonicalRedirect = resolution.canonicalSlug;
     }
     if (!product && resolution.canonicalSlug) {
-      product = allProducts.find((p) => p.slug === resolution.canonicalSlug) || (await fetchLiveProductBySlug(resolution.canonicalSlug));
+      product = allProducts.find((p) => p.slug === resolution.canonicalSlug) || null;
     }
-  }
-
-  if (!product) {
-    const allProducts = await fetchLiveProducts();
-    const clean = decodeURIComponent(slug).trim().toLowerCase();
-    product = allProducts.find(
-      (p) =>
-        p.slug?.toLowerCase() === clean ||
-        String(p.id) === clean ||
-        `product-${p.id}` === clean ||
-        (p.sku && p.sku.toLowerCase() === clean) ||
-        (p.model && p.model.toLowerCase() === clean)
-    ) || null;
+    if (!product && allProducts && allProducts.length > 0) {
+      const clean = decodeURIComponent(slug).trim().toLowerCase();
+      product = allProducts.find(
+        (p) =>
+          p.slug?.toLowerCase() === clean ||
+          String(p.id) === clean ||
+          `product-${p.id}` === clean ||
+          (p.sku && p.sku.toLowerCase() === clean) ||
+          (p.model && p.model.toLowerCase() === clean)
+      ) || null;
+    }
   }
 
   return { product, canonicalRedirect };

@@ -17,6 +17,25 @@ console.log(`[Railway] PORT=${process.env.PORT}`);
 const mem = process.memoryUsage();
 console.log(`[Railway] Heap limit: 384MB | Initial RSS: ${Math.round(mem.rss / 1024 / 1024)}MB`);
 
+// Catch transient network socket / ETIMEDOUT errors to prevent node process crash
+process.on("unhandledRejection", (reason) => {
+  const msg = (reason && (reason.message || reason.stack)) || String(reason);
+  if (msg.includes("fetch failed") || msg.includes("ETIMEDOUT") || msg.includes("UND_ERR_SOCKET") || msg.includes("SocketError")) {
+    console.warn(`[Railway] Handled background fetch error: ${msg}`);
+    return;
+  }
+  console.error("[Railway] Unhandled Rejection:", reason);
+});
+
+process.on("uncaughtException", (err) => {
+  const msg = (err && (err.message || err.stack)) || String(err);
+  if (msg.includes("fetch failed") || msg.includes("ETIMEDOUT") || msg.includes("UND_ERR_SOCKET") || msg.includes("SocketError")) {
+    console.warn(`[Railway] Handled uncaught socket exception: ${msg}`);
+    return;
+  }
+  console.error("[Railway] Uncaught Exception:", err);
+});
+
 // Periodic lightweight unreferenced memory check (every 15 min)
 const memTimer = setInterval(() => {
   const current = process.memoryUsage();

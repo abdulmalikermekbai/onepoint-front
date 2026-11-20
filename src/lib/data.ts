@@ -94,10 +94,9 @@ export function productImageUrl(value: unknown): string {
  */
 function productsApiUrl(query = "", forceRefresh = false): string {
   const isBrowser = typeof window !== "undefined";
-  // In the browser, use same-origin /backend-api to completely eliminate any CORS errors
-  const base = isBrowser
-    ? "/backend-api/products.php"
-    : `${process.env.BACKEND_API_URL || "https://api.onepoint.kz"}/api/products.php`;
+  const base = `${!isBrowser
+    ? (process.env.BACKEND_API_URL || "https://api.onepoint.kz")
+    : "https://api.onepoint.kz"}/api/products.php`;
 
   const params = new URLSearchParams(query);
   if (forceRefresh) {
@@ -389,7 +388,7 @@ export function formatGpu(gpu?: string): string {
   return cleaned || gpu;
 }
 
-function getFetchOptions(revalidateSeconds = 60, timeoutMs = 6000): RequestInit {
+function getFetchOptions(revalidateSeconds = 60, timeoutMs = 15000): RequestInit {
   const signal = typeof AbortSignal !== "undefined" && typeof AbortSignal.timeout === "function"
     ? AbortSignal.timeout(timeoutMs)
     : undefined;
@@ -408,7 +407,7 @@ export async function fetchLiveProducts(forceRefresh = false): Promise<Product[]
     TTL_PRODUCTS,
     async () => {
       try {
-        const res = await fetch(productsApiUrl("", forceRefresh), getFetchOptions(120, 6000));
+        const res = await fetch(productsApiUrl("", forceRefresh), getFetchOptions(120, 15000));
         if (!res.ok) {
           if (staleCache.has("products:all")) return staleCache.get("products:all");
           return [];
@@ -584,10 +583,10 @@ export async function fetchSettings(forceRefresh = false): Promise<Record<string
     async () => {
       try {
         const isBrowser = typeof window !== "undefined";
-        const base = isBrowser
-          ? `/backend-api/settings.php${forceRefresh ? `?_t=${Date.now()}` : ""}`
-          : `${process.env.BACKEND_API_URL || "https://api.onepoint.kz"}/api/settings.php${forceRefresh ? `?_t=${Date.now()}` : ""}`;
-        const res = await fetch(base, getFetchOptions(300));
+        const base = `${!isBrowser
+          ? (process.env.BACKEND_API_URL || "https://api.onepoint.kz")
+          : "https://api.onepoint.kz"}/api/settings.php${forceRefresh ? `?_t=${Date.now()}` : ""}`;
+        const res = await fetch(base, getFetchOptions(300, 15000));
         if (res.ok) {
           const data = await res.json();
           return data.settings || {};
@@ -612,10 +611,10 @@ export async function fetchLiveReviews(forceRefresh = false): Promise<any[]> {
     async () => {
       try {
         const isBrowser = typeof window !== "undefined";
-        const base = isBrowser
-          ? `/backend-api/products.php?reviews=1${forceRefresh ? `&_t=${Date.now()}` : ""}`
-          : `${process.env.BACKEND_API_URL || "https://api.onepoint.kz"}/api/products.php?reviews=1${forceRefresh ? `&_t=${Date.now()}` : ""}`;
-        const res = await fetch(base, getFetchOptions(300));
+        const base = `${!isBrowser
+          ? (process.env.BACKEND_API_URL || "https://api.onepoint.kz")
+          : "https://api.onepoint.kz"}/api/products.php?reviews=1${forceRefresh ? `&_t=${Date.now()}` : ""}`;
+        const res = await fetch(base, getFetchOptions(300, 15000));
         if (res.ok) {
           const data = await res.json();
           if (Array.isArray(data.reviews) && data.reviews.length > 0) {
